@@ -9,7 +9,7 @@ namespace Repositories.Context
 
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
-        //public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<ClassApproval> ClassApprovals { get; set; }
         public DbSet<ClassSession> ClassSessions { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
@@ -31,7 +31,37 @@ namespace Repositories.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Prevent multiple cascade paths by using Restrict/NoAction delete behaviors
+            modelBuilder.Entity<Admin>()
+                .HasOne(a => a.User)
+                .WithOne()
+                .HasForeignKey<Admin>(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Admin>()
+                .HasIndex(a => a.UserId)
+                .IsUnique();
+
+            modelBuilder.Entity<Parent>()
+                .HasOne(p => p.User)
+                .WithOne()
+                .HasForeignKey<Parent>(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Parent>().HasIndex(p => p.UserId).IsUnique();
+
+            modelBuilder.Entity<Teacher>()
+                .HasOne(t => t.User)
+                .WithOne()
+                .HasForeignKey<Teacher>(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Teacher>().HasIndex(t => t.UserId).IsUnique();
+
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.User)
+                .WithOne()
+                .HasForeignKey<Student>(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Student>().HasIndex(s => s.UserId).IsUnique();
+
             modelBuilder.Entity<TeacherApproval>()
                 .HasOne(x => x.Teacher)
                 .WithMany(t => t.TeacherApprovals)

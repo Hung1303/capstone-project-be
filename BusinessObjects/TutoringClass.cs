@@ -14,7 +14,7 @@ namespace BusinessObjects
         public string TeacherId { get; set; }
         public virtual Teacher Teacher { get; set; } = null!;
 
-        public string? ApprovedBy { get; set; }
+        public string? ApproverId { get; set; }
         public virtual Admin? Approver { get; set; }
 
         // Business Properties

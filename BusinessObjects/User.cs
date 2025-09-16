@@ -44,6 +44,6 @@ namespace BusinessObjects
         public string? ProfileImageUrl { get; set; }
 
         // Collection Navigation Properties
-        //public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+        public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
     }
 }

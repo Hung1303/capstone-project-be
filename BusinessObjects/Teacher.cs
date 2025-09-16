@@ -10,7 +10,7 @@ namespace BusinessObjects
         public string UserId { get; set; }
         public virtual User User { get; set; } = null!;
 
-        public string? ApprovedBy { get; set; }
+        public string? ApproverId { get; set; }
         public virtual Admin? Approver { get; set; }
 
         // Business Properties
