@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMS-BE", "TMS-BE.csproj", "{E419F183-ECBE-48B0-B7AD-D157AF497AA9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API.csproj", "{E419F183-ECBE-48B0-B7AD-D157AF497AA9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessObjects", "..\BusinessObjects\BusinessObjects.csproj", "{77E4EC90-2093-49CB-AF92-8E7181E471F7}"
 EndProject

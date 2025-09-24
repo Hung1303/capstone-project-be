@@ -6,117 +6,112 @@ namespace Repositories.Context
     public class DatabaseContext : DbContext
     {
         public DatabaseContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { }
-
-        public DbSet<Admin> Admins { get; set; }
-        public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<ApprovalRequest> ApprovalRequests { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
-        public DbSet<ClassApproval> ClassApprovals { get; set; }
-        public DbSet<ClassSession> ClassSessions { get; set; }
+        public DbSet<BillingRecord> BillingRecords { get; set; }
+        public DbSet<CenterProfile> CenterProfiles { get; set; }
+        public DbSet<ClassSchedule> ClassSchedules { get; set; }
+        public DbSet<Course> Courses { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
-        //public DbSet<FinancialReport> FinancialReports { get; set; }
-        public DbSet<Parent> Parents { get; set; }
-       //public DbSet<Payment> Payments { get; set; }
-        //public DbSet<Schedule> Schedules { get; set; }
-        public DbSet<Student> Students { get; set; }
-        public DbSet<StudentSubject> StudentSubjects { get; set; }
-        public DbSet<Subject> Subjects { get; set; }
-        public DbSet<Teacher> Teachers { get; set; }
-        public DbSet<TeacherApproval> TeacherApprovals { get; set; }
-        public DbSet<TeacherSubject> TeacherSubjects { get; set; }
-        //public DbSet<TuitionFee> TuitionFees { get; set; }
-        public DbSet<TutoringClass> TutoringClasses { get; set; }
+        public DbSet<GeneratedReport> GeneratedReports { get; set; }
+        public DbSet<ParentProfile> ParentProfiles { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<StudentProfile> StudentProfiles { get; set; }
+        public DbSet<SuspensionRecord> SuspensionRecords { get; set; }
+        public DbSet<TeacherProfile> TeacherProfiles { get; set; }
         public DbSet<User> Users { get; set; }
 
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Admin>()
-                .HasOne(a => a.User)
-                .WithOne()
-                .HasForeignKey<Admin>(a => a.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<User>(b =>
+            {
+                b.HasIndex(x => x.Email).IsUnique();
+                b.Property(x => x.Email).HasMaxLength(256).IsRequired();
+                b.Property(x => x.FullName).HasMaxLength(256).IsRequired();
+            });
 
-            modelBuilder.Entity<Admin>()
-                .HasIndex(a => a.UserId)
-                .IsUnique();
+            modelBuilder.Entity<TeacherProfile>(b =>
+            {
+                b.HasIndex(x => x.UserId).IsUnique();
+            });
+            modelBuilder.Entity<CenterProfile>(b =>
+            {
+                b.HasIndex(x => x.UserId).IsUnique();
+                b.Property(x => x.Name).HasMaxLength(256).IsRequired();
+                b.Property(x => x.LicenseNumber).HasMaxLength(128).IsRequired();
+            });
+            modelBuilder.Entity<StudentProfile>(b =>
+            {
+                b.HasIndex(x => x.UserId).IsUnique();
+                b.Property(x => x.GradeLevel).HasMaxLength(32);
+            });
+            modelBuilder.Entity<ParentProfile>(b =>
+            {
+                b.HasIndex(x => x.UserId).IsUnique();
+            });
 
-            modelBuilder.Entity<Parent>()
-                .HasOne(p => p.User)
-                .WithOne()
-                .HasForeignKey<Parent>(p => p.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Parent>().HasIndex(p => p.UserId).IsUnique();
+            modelBuilder.Entity<Course>(b =>
+            {
+                b.Property(x => x.Title).HasMaxLength(256).IsRequired();
+                b.Property(x => x.Subject).HasMaxLength(128).IsRequired();
+                b.Property(x => x.Location).HasMaxLength(512).IsRequired();
+                b.Property(x => x.TuitionFee).HasPrecision(18, 2);
+                b.HasMany(x => x.Schedules).WithOne().HasForeignKey(s => s.CourseId).OnDelete(DeleteBehavior.Cascade);
+                b.HasMany(x => x.Enrollments).WithOne().HasForeignKey(e => e.CourseId).OnDelete(DeleteBehavior.Cascade);
+                b.HasMany(x => x.Reviews).WithOne().HasForeignKey(r => r.CourseId).OnDelete(DeleteBehavior.Cascade);
+                b.ToTable(t => t.HasCheckConstraint(
+                    "CK_Course_Owner",
+                    "(TeacherProfileId IS NOT NULL AND CenterProfileId IS NULL) OR (TeacherProfileId IS NULL AND CenterProfileId IS NOT NULL)"
+                ));
+            });
 
-            modelBuilder.Entity<Teacher>()
-                .HasOne(t => t.User)
-                .WithOne()
-                .HasForeignKey<Teacher>(t => t.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Teacher>().HasIndex(t => t.UserId).IsUnique();
+            modelBuilder.Entity<ClassSchedule>(b =>
+            {
+                b.Property(x => x.RoomOrLink).HasMaxLength(512);
+            });
 
-            modelBuilder.Entity<Student>()
-                .HasOne(s => s.User)
-                .WithOne()
-                .HasForeignKey<Student>(s => s.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Student>().HasIndex(s => s.UserId).IsUnique();
+            modelBuilder.Entity<Enrollment>(b =>
+            {
+                b.HasIndex(x => new { x.CourseId, x.StudentProfileId }).IsUnique();
+            });
 
-            modelBuilder.Entity<TeacherApproval>()
-                .HasOne(x => x.Teacher)
-                .WithMany(t => t.TeacherApprovals)
-                .HasForeignKey(x => x.TeacherId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Review>(b =>
+            {
+                b.Property(x => x.Comment).HasMaxLength(4000);
+                b.ToTable(t => t.HasCheckConstraint("CK_Review_Rating", "Rating BETWEEN 1 AND 5"));
+            });
 
-            modelBuilder.Entity<TeacherApproval>()
-                .HasOne(x => x.Admin)
-                .WithMany(a => a.TeacherApprovals)
-                .HasForeignKey(x => x.AdminId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<ApprovalRequest>(b =>
+            {
+                b.HasIndex(x => x.CourseId);
+            });
 
-            modelBuilder.Entity<TeacherSubject>()
-                .HasOne(x => x.Teacher)
-                .WithMany(t => t.TeacherSubjects)
-                .HasForeignKey(x => x.TeacherId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SuspensionRecord>(b =>
+            {
+                b.ToTable(t => t.HasCheckConstraint("CK_Suspension_Target", "(UserId IS NOT NULL) OR (CourseId IS NOT NULL)"));
+            });
 
-            modelBuilder.Entity<TutoringClass>()
-                .HasOne(x => x.Teacher)
-                .WithMany(t => t.TutoringClasses)
-                .HasForeignKey(x => x.TeacherId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<BillingRecord>(b =>
+            {
+                b.Property(x => x.Amount).HasPrecision(18, 2);
+                b.Property(x => x.Currency).HasMaxLength(8);
+                b.HasIndex(x => new { x.BillingType, x.CourseId, x.EnrollmentId });
+            });
 
-            modelBuilder.Entity<ClassApproval>()
-                .HasOne(x => x.TutoringClass)
-                .WithMany(c => c.ClassApprovals)
-                .HasForeignKey(x => x.TutoringClassId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<AuditLog>(b =>
+            {
+                b.Property(x => x.EntityName).HasMaxLength(256);
+                b.Property(x => x.IpAddress).HasMaxLength(64);
+            });
 
-            modelBuilder.Entity<ClassApproval>()
-                .HasOne(x => x.Admin)
-                .WithMany(a => a.ClassApprovals)
-                .HasForeignKey(x => x.AdminId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Prevent multiple cascade paths between TutoringClass -> Schedule -> ClassSession and direct FK
-            modelBuilder.Entity<ClassSession>()
-                .HasOne(x => x.TutoringClass)
-                .WithMany()
-                .HasForeignKey(x => x.TutoringClassId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Attendance: break cascade paths from Enrollment and ClassSession
-            modelBuilder.Entity<Attendance>()
-                .HasOne(x => x.Enrollment)
-                .WithMany(e => e.Attendances)
-                .HasForeignKey(x => x.EnrollmentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Attendance>()
-                .HasOne(x => x.ClassSession)
-                .WithMany(c => c.Attendances)
-                .HasForeignKey(x => x.ClassSessionId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<GeneratedReport>(b =>
+            {
+                b.Property(x => x.Format).HasMaxLength(16);
+                b.Property(x => x.StoragePath).HasMaxLength(1024);
+            });
         }
     }
 }

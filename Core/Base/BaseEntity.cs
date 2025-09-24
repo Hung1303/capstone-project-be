@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Core.Base
@@ -5,19 +6,22 @@ namespace Core.Base
     public abstract class BaseEntity
     {
         [Key]
-        public string Id { get; set; }
-
-        public DateTime? CreatedAt { get; set; }
-
+        public Guid Id { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public Guid? CreateBy { get; set; }
         public DateTime? LastUpdatedAt { get; set; }
+        public Guid? LastUpdateBy { get; set; }
 
-        public bool IsDeleted { get; set; } = false;
+        [DefaultValue(false)]
+        public bool IsDeleted { get; set; }
 
         protected BaseEntity()
         {
-            Id = Guid.NewGuid().ToString();
-            CreatedAt = LastUpdatedAt = DateTime.UtcNow;
+            Id = Guid.NewGuid();
+            CreatedAt = DateTime.Now;
+            LastUpdatedAt = DateTime.Now;
             IsDeleted = false;
         }
     }
 }
+

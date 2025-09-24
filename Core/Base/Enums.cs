@@ -4,48 +4,17 @@ namespace Core.Base
     {
         Admin = 1,
         Teacher = 2,
-        Student = 3,
-        Parent = 4
+        Center = 3,
+        Student = 4,
+        Parent = 5
     }
 
-    public enum TutoringType
+    public enum AccountStatus
     {
-        InSchool = 1,    // No fees, specific student groups only
-        OutOfSchool = 2  // With tuition fees, public information required
-    }
-
-    public enum StudentGroup
-    {
-        FailingSubjects = 1,           // Students failing subjects in latest semester
-        AdvancedTraining = 2,          // Students selected for advanced/gifted training
-        FinalYearPreparation = 3,      // Final-year students preparing for exams
-        OutOfSchool = 4                // Students for out-of-school tutoring
-    }
-
-    public enum RegistrationStatus
-    {
-        Pending = 1,
-        Approved = 2,
-        Rejected = 3,
-        Cancelled = 4
-    }
-
-    public enum ClassStatus
-    {
-        Planning = 1,
-        Active = 2,
-        Completed = 3,
-        Cancelled = 4,
-        Suspended = 5
-    }
-
-    public enum PaymentStatus
-    {
-        Pending = 1,
-        Paid = 2,
-        Overdue = 3,
-        Refunded = 4,
-        Cancelled = 5
+        Pending = 0,
+        Active = 1,
+        Suspended = 2,
+        Deactivated = 3
     }
 
     public enum TeachingMethod
@@ -55,7 +24,39 @@ namespace Core.Base
         Hybrid = 3
     }
 
-    public enum AuditAction
+    public enum CourseStatus
+    {
+        Draft = 0,
+        PendingApproval = 1,
+        Approved = 2,
+        Rejected = 3,
+        Suspended = 4,
+        Archived = 5
+    }
+
+    public enum EnrollmentStatus
+    {
+        Pending = 0,
+        Confirmed = 1,
+        Cancelled = 2,
+        Completed = 3
+    }
+
+    public enum ReviewStatus
+    {
+        PendingModeration = 0,
+        Approved = 1,
+        Rejected = 2
+    }
+
+    public enum ApprovalDecision
+    {
+        Pending = 0,
+        Approved = 1,
+        Rejected = 2
+    }
+
+    public enum AuditActionType
     {
         Create = 1,
         Update = 2,
@@ -64,7 +65,29 @@ namespace Core.Base
         Logout = 5,
         Approve = 6,
         Reject = 7,
-        Enroll = 8,
-        Withdraw = 9
+        Suspend = 8,
+        Restore = 9
+    }
+
+    public enum ReportType
+    {
+        ComplianceCircular29 = 1,
+        OperationalDashboard = 2
+    }
+
+    public enum BillingType
+    {
+        CoursePostFee = 1,
+        ReferralCommission = 2
+    }
+
+    public enum PaymentStatus
+    {
+        Pending = 0,
+        Paid = 1,
+        Failed = 2,
+        Refunded = 3
     }
 }
+
+
