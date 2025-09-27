@@ -2,11 +2,11 @@ namespace Core.Base
 {
     public enum UserRole
     {
-        Admin = 1,
-        Teacher = 2,
-        Center = 3,
-        Student = 4,
-        Parent = 5
+        Admin = 1,  //System management
+        Teacher = 2,    //Register for the platform, courses
+        Center = 3, //Register for the platform, accept course enrollment
+        Student = 4,    //Search for courses, enroll for courses
+        Parent = 5  //Search for courses, enroll children for courses, track children study progress
     }
 
     public enum AccountStatus

@@ -8,9 +8,7 @@ namespace Core.Base
         [Key]
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }
-        public Guid? CreateBy { get; set; }
         public DateTime? LastUpdatedAt { get; set; }
-        public Guid? LastUpdateBy { get; set; }
 
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }

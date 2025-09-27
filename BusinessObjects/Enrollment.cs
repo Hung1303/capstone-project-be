@@ -6,6 +6,7 @@ namespace BusinessObjects
     {
         public Guid CourseId { get; set; }
         public Guid StudentProfileId { get; set; }
+        public virtual StudentProfile StudentProfile { get; set; }
         public EnrollmentStatus Status { get; set; } = EnrollmentStatus.Pending;
         public DateTimeOffset? ConfirmedAt { get; set; }
         public DateTimeOffset? CancelledAt { get; set; }
