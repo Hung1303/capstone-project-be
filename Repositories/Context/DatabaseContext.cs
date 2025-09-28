@@ -20,8 +20,9 @@ namespace Repositories.Context
         public DbSet<SuspensionRecord> SuspensionRecords { get; set; }
         public DbSet<TeacherProfile> TeacherProfiles { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Token> Tokens { get; set; }
 
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -40,7 +41,7 @@ namespace Repositories.Context
             modelBuilder.Entity<CenterProfile>(b =>
             {
                 b.HasIndex(x => x.UserId).IsUnique();
-                b.Property(x => x.Name).HasMaxLength(256).IsRequired();
+                b.Property(x => x.CenterName).HasMaxLength(256).IsRequired();
                 b.Property(x => x.LicenseNumber).HasMaxLength(128).IsRequired();
             });
             modelBuilder.Entity<StudentProfile>(b =>
