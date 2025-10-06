@@ -3,10 +3,11 @@ namespace Core.Base
     public enum UserRole
     {
         Admin = 1,  //System management
-        Teacher = 2,    //Register for the platform, courses
-        Center = 3, //Register for the platform, accept course enrollment
+        Center = 2,    //Register for the platform, courses
+        Teacher = 3, //Register for the platform, accept course enrollment
         Student = 4,    //Search for courses, enroll for courses
-        Parent = 5  //Search for courses, enroll children for courses, track children study progress
+        Parent = 5,  //Search for courses, enroll children for courses, track children study progress
+        CourseInspector = 6 //To check if course is following the Circular 29
     }
 
     public enum AccountStatus
@@ -86,7 +87,7 @@ namespace Core.Base
         Pending = 0,
         Paid = 1,
         Failed = 2,
-        Refunded = 3
+        //Refunded = 3
     }
 }
 

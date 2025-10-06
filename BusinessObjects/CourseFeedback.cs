@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BusinessObjects
 {
-    public class Review : BaseEntity
+    public class CourseFeedback : BaseEntity
     {
         public Guid CourseId { get; set; }
         public Guid? StudentProfileId { get; set; }

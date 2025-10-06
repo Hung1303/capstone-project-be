@@ -14,6 +14,7 @@ namespace BusinessObjects
         public Guid? CenterProfileId { get; set; }
 
         public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
+        public virtual ICollection<TeacherFeedback> TeacherFeedbacks { get; set; } = new List<TeacherFeedback>();
     }
 }
 

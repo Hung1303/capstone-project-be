@@ -9,6 +9,9 @@ namespace BusinessObjects
         public Guid? DecidedByUserId { get; set; }
         public DateTimeOffset? DecidedAt { get; set; }
         public string? Notes { get; set; }
+
+        public virtual Course Course { get; set; } = null!;
+        public virtual User? DecidedByUser { get; set; }
     }
 }
 

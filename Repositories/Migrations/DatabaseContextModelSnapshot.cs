@@ -31,9 +31,6 @@ namespace Repositories.Migrations
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -49,18 +46,18 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("DecidedByUserId");
 
                     b.ToTable("ApprovalRequests");
                 });
@@ -73,9 +70,6 @@ namespace Repositories.Migrations
 
                     b.Property<int>("ActionType")
                         .HasColumnType("int");
-
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -100,9 +94,6 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -116,6 +107,8 @@ namespace Repositories.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EntityName");
 
                     b.HasIndex("UserId");
 
@@ -141,9 +134,6 @@ namespace Repositories.Migrations
                     b.Property<Guid?>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -157,9 +147,6 @@ namespace Repositories.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
@@ -178,6 +165,12 @@ namespace Repositories.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ChargedUserId");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("EnrollmentId");
+
                     b.HasIndex("BillingType", "CourseId", "EnrollmentId");
 
                     b.ToTable("BillingRecords");
@@ -193,14 +186,16 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CenterName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<string>("ContactEmail")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactPhone")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -208,21 +203,23 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<DateOnly>("IssueDate")
+                        .HasColumnType("date");
 
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("LicenseIssuedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LicenseNumber")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                    b.Property<string>("OwnerName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -244,9 +241,6 @@ namespace Repositories.Migrations
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -261,9 +255,6 @@ namespace Repositories.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
@@ -297,9 +288,6 @@ namespace Repositories.Migrations
                     b.Property<Guid?>("CenterProfileId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -309,9 +297,6 @@ namespace Repositories.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
@@ -346,9 +331,74 @@ namespace Repositories.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CenterProfileId");
+
+                    b.HasIndex("TeacherProfileId");
+
                     b.ToTable("Courses", t =>
                         {
                             t.HasCheckConstraint("CK_Course_Owner", "(TeacherProfileId IS NOT NULL AND CenterProfileId IS NULL) OR (TeacherProfileId IS NULL AND CenterProfileId IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("BusinessObjects.CourseFeedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTimeOffset?>("ModeratedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("ModeratedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ModerationNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid?>("ParentProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("StudentProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("ModeratedByUserId");
+
+                    b.HasIndex("ParentProfileId");
+
+                    b.HasIndex("StudentProfileId");
+
+                    b.ToTable("CourseFeedbacks", t =>
+                        {
+                            t.HasCheckConstraint("CK_Review_Rating", "Rating BETWEEN 1 AND 5");
                         });
                 });
 
@@ -370,17 +420,11 @@ namespace Repositories.Migrations
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
@@ -392,6 +436,8 @@ namespace Repositories.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StudentProfileId");
 
                     b.HasIndex("CourseId", "StudentProfileId")
                         .IsUnique();
@@ -405,14 +451,13 @@ namespace Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("FileSizeBytes")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
 
                     b.Property<string>("Format")
                         .IsRequired()
@@ -424,9 +469,6 @@ namespace Repositories.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
@@ -448,7 +490,55 @@ namespace Repositories.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ReportType");
+
+                    b.HasIndex("RequestedByUserId");
+
                     b.ToTable("GeneratedReports");
+                });
+
+            modelBuilder.Entity("BusinessObjects.LessonPlan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MaterialsUsed")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("StudentTask")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<Guid>("SyllabusId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Topic")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SyllabusId");
+
+                    b.ToTable("LessonPlans");
                 });
 
             modelBuilder.Entity("BusinessObjects.ParentProfile", b =>
@@ -460,17 +550,11 @@ namespace Repositories.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
@@ -489,21 +573,56 @@ namespace Repositories.Migrations
                     b.ToTable("ParentProfiles");
                 });
 
-            modelBuilder.Entity("BusinessObjects.Review", b =>
+            modelBuilder.Entity("BusinessObjects.StudentProfile", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<Guid>("CourseId")
+                    b.Property<string>("GradeLevel")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ParentProfileId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
+                    b.Property<string>("SchoolName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentProfileId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("StudentProfiles");
+                });
+
+            modelBuilder.Entity("BusinessObjects.SuspensionRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ActionByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -512,8 +631,107 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("LastUpdateBy")
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("SuspendedFrom")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("SuspendedTo")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionByUserId");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SuspensionRecords", t =>
+                        {
+                            t.HasCheckConstraint("CK_Suspension_Target", "(UserId IS NOT NULL) OR (CourseId IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("BusinessObjects.Syllabus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AssessmentMethod")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CourseMaterial")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("GradeLevel")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("SyllabusName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId")
+                        .IsUnique();
+
+                    b.ToTable("Syllabuses");
+                });
+
+            modelBuilder.Entity("BusinessObjects.TeacherFeedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
@@ -539,105 +757,27 @@ namespace Repositories.Migrations
                     b.Property<Guid?>("StudentProfileId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("Reviews", t =>
-                        {
-                            t.HasCheckConstraint("CK_Review_Rating", "Rating BETWEEN 1 AND 5");
-                        });
-                });
-
-            modelBuilder.Entity("BusinessObjects.StudentProfile", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("GradeLevel")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("LastUpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ParentProfileId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SchoolName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("StudentProfiles");
-                });
-
-            modelBuilder.Entity("BusinessObjects.SuspensionRecord", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ActionByUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("LastUpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("SuspendedFrom")
+                    b.Property<DateTimeOffset>("SubmittedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("SuspendedTo")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("TeacherProfileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("SuspensionRecords", t =>
+                    b.HasIndex("ModeratedByUserId");
+
+                    b.HasIndex("ParentProfileId");
+
+                    b.HasIndex("StudentProfileId");
+
+                    b.HasIndex("TeacherProfileId");
+
+                    b.ToTable("TeacherFeedbacks", t =>
                         {
-                            t.HasCheckConstraint("CK_Suspension_Target", "(UserId IS NOT NULL) OR (CourseId IS NOT NULL)");
+                            t.HasCheckConstraint("CK_TeacherFeedback_Rating", "Rating BETWEEN 1 AND 5");
+
+                            t.HasCheckConstraint("CK_TeacherFeedback_Reviewer", "(StudentProfileId IS NOT NULL) OR (ParentProfileId IS NOT NULL)");
                         });
                 });
 
@@ -653,17 +793,11 @@ namespace Repositories.Migrations
                     b.Property<Guid?>("CenterProfileId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
@@ -683,7 +817,12 @@ namespace Repositories.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("YearOfExperience")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CenterProfileId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -691,13 +830,35 @@ namespace Repositories.Migrations
                     b.ToTable("TeacherProfiles");
                 });
 
-            modelBuilder.Entity("BusinessObjects.User", b =>
+            modelBuilder.Entity("BusinessObjects.Token", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreateBy")
+                    b.Property<string>("AccessToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tokens");
+                });
+
+            modelBuilder.Entity("BusinessObjects.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -716,9 +877,6 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("LastUpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -735,21 +893,72 @@ namespace Repositories.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("BusinessObjects.ApprovalRequest", b =>
+                {
+                    b.HasOne("BusinessObjects.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObjects.User", "DecidedByUser")
+                        .WithMany()
+                        .HasForeignKey("DecidedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Course");
+
+                    b.Navigation("DecidedByUser");
                 });
 
             modelBuilder.Entity("BusinessObjects.AuditLog", b =>
                 {
-                    b.HasOne("BusinessObjects.User", null)
+                    b.HasOne("BusinessObjects.User", "User")
                         .WithMany("AuditLogs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObjects.BillingRecord", b =>
+                {
+                    b.HasOne("BusinessObjects.User", "ChargedUser")
+                        .WithMany()
+                        .HasForeignKey("ChargedUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObjects.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId");
+
+                    b.HasOne("BusinessObjects.Enrollment", "Enrollment")
+                        .WithMany()
+                        .HasForeignKey("EnrollmentId");
+
+                    b.Navigation("ChargedUser");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Enrollment");
                 });
 
             modelBuilder.Entity("BusinessObjects.CenterProfile", b =>
@@ -770,6 +979,48 @@ namespace Repositories.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BusinessObjects.Course", b =>
+                {
+                    b.HasOne("BusinessObjects.CenterProfile", "CenterProfile")
+                        .WithMany("Courses")
+                        .HasForeignKey("CenterProfileId");
+
+                    b.HasOne("BusinessObjects.TeacherProfile", "TeacherProfile")
+                        .WithMany("Courses")
+                        .HasForeignKey("TeacherProfileId");
+
+                    b.Navigation("CenterProfile");
+
+                    b.Navigation("TeacherProfile");
+                });
+
+            modelBuilder.Entity("BusinessObjects.CourseFeedback", b =>
+                {
+                    b.HasOne("BusinessObjects.Course", null)
+                        .WithMany("CourseFeedbacks")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObjects.User", "ModeratedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModeratedByUserId");
+
+                    b.HasOne("BusinessObjects.ParentProfile", "ParentProfile")
+                        .WithMany()
+                        .HasForeignKey("ParentProfileId");
+
+                    b.HasOne("BusinessObjects.StudentProfile", "StudentProfile")
+                        .WithMany()
+                        .HasForeignKey("StudentProfileId");
+
+                    b.Navigation("ModeratedByUser");
+
+                    b.Navigation("ParentProfile");
+
+                    b.Navigation("StudentProfile");
+                });
+
             modelBuilder.Entity("BusinessObjects.Enrollment", b =>
                 {
                     b.HasOne("BusinessObjects.Course", null)
@@ -777,6 +1028,36 @@ namespace Repositories.Migrations
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("BusinessObjects.StudentProfile", "StudentProfile")
+                        .WithMany()
+                        .HasForeignKey("StudentProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StudentProfile");
+                });
+
+            modelBuilder.Entity("BusinessObjects.GeneratedReport", b =>
+                {
+                    b.HasOne("BusinessObjects.User", "RequestedByUser")
+                        .WithMany()
+                        .HasForeignKey("RequestedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RequestedByUser");
+                });
+
+            modelBuilder.Entity("BusinessObjects.LessonPlan", b =>
+                {
+                    b.HasOne("BusinessObjects.Syllabus", "Syllabus")
+                        .WithMany("LessonPlans")
+                        .HasForeignKey("SyllabusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Syllabus");
                 });
 
             modelBuilder.Entity("BusinessObjects.ParentProfile", b =>
@@ -788,26 +1069,95 @@ namespace Repositories.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BusinessObjects.Review", b =>
-                {
-                    b.HasOne("BusinessObjects.Course", null)
-                        .WithMany("Reviews")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("BusinessObjects.StudentProfile", b =>
                 {
+                    b.HasOne("BusinessObjects.ParentProfile", "ParentProfile")
+                        .WithMany()
+                        .HasForeignKey("ParentProfileId");
+
                     b.HasOne("BusinessObjects.User", null)
                         .WithOne("StudentProfile")
                         .HasForeignKey("BusinessObjects.StudentProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ParentProfile");
+                });
+
+            modelBuilder.Entity("BusinessObjects.SuspensionRecord", b =>
+                {
+                    b.HasOne("BusinessObjects.User", "ActionByUser")
+                        .WithMany()
+                        .HasForeignKey("ActionByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObjects.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BusinessObjects.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ActionByUser");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObjects.Syllabus", b =>
+                {
+                    b.HasOne("BusinessObjects.Course", "Course")
+                        .WithOne("Syllabus")
+                        .HasForeignKey("BusinessObjects.Syllabus", "CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("BusinessObjects.TeacherFeedback", b =>
+                {
+                    b.HasOne("BusinessObjects.User", "ModeratedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModeratedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("BusinessObjects.ParentProfile", "ParentProfile")
+                        .WithMany()
+                        .HasForeignKey("ParentProfileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("BusinessObjects.StudentProfile", "StudentProfile")
+                        .WithMany()
+                        .HasForeignKey("StudentProfileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("BusinessObjects.TeacherProfile", "TeacherProfile")
+                        .WithMany("TeacherFeedbacks")
+                        .HasForeignKey("TeacherProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ModeratedByUser");
+
+                    b.Navigation("ParentProfile");
+
+                    b.Navigation("StudentProfile");
+
+                    b.Navigation("TeacherProfile");
                 });
 
             modelBuilder.Entity("BusinessObjects.TeacherProfile", b =>
                 {
+                    b.HasOne("BusinessObjects.CenterProfile", null)
+                        .WithMany("TeacherProfiles")
+                        .HasForeignKey("CenterProfileId");
+
                     b.HasOne("BusinessObjects.User", null)
                         .WithOne("TeacherProfile")
                         .HasForeignKey("BusinessObjects.TeacherProfile", "UserId")
@@ -815,13 +1165,34 @@ namespace Repositories.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BusinessObjects.CenterProfile", b =>
+                {
+                    b.Navigation("Courses");
+
+                    b.Navigation("TeacherProfiles");
+                });
+
             modelBuilder.Entity("BusinessObjects.Course", b =>
                 {
+                    b.Navigation("CourseFeedbacks");
+
                     b.Navigation("Enrollments");
 
-                    b.Navigation("Reviews");
-
                     b.Navigation("Schedules");
+
+                    b.Navigation("Syllabus");
+                });
+
+            modelBuilder.Entity("BusinessObjects.Syllabus", b =>
+                {
+                    b.Navigation("LessonPlans");
+                });
+
+            modelBuilder.Entity("BusinessObjects.TeacherProfile", b =>
+                {
+                    b.Navigation("Courses");
+
+                    b.Navigation("TeacherFeedbacks");
                 });
 
             modelBuilder.Entity("BusinessObjects.User", b =>
