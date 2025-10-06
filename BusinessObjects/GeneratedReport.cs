@@ -11,6 +11,8 @@ namespace BusinessObjects
         public long FileSizeBytes { get; set; }
         public Guid RequestedByUserId { get; set; }
         public DateTimeOffset GeneratedAt { get; set; } = DateTimeOffset.UtcNow;
+
+        public virtual User RequestedByUser { get; set; } = null!;
     }
 }
 

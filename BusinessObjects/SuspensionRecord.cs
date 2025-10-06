@@ -10,6 +10,11 @@ namespace BusinessObjects
         public DateTimeOffset SuspendedFrom { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? SuspendedTo { get; set; }
         public Guid ActionByUserId { get; set; }
+
+
+        public virtual User? User { get; set; }
+        public virtual Course? Course { get; set; }
+        public virtual User ActionByUser { get; set; } = null!;
     }
 }
 

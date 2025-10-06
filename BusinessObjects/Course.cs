@@ -18,7 +18,8 @@ namespace BusinessObjects
         public virtual CenterProfile CenterProfile { get; set; }
         public ICollection<ClassSchedule> Schedules { get; set; } = new List<ClassSchedule>();
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
-        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<CourseFeedback> CourseFeedbacks { get; set; } = new List<CourseFeedback>();
+        public virtual Syllabus? Syllabus { get; set; }
     }
 }
 

@@ -12,6 +12,8 @@ namespace BusinessObjects
         public string IpAddress { get; set; } = string.Empty;
         public string? UserAgent { get; set; }
         public DateTimeOffset OccurredAt { get; set; } = DateTimeOffset.UtcNow;
+
+        public virtual User User { get; set; } = null!;
     }
 }
 

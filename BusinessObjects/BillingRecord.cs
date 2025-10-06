@@ -14,6 +14,10 @@ namespace BusinessObjects
         public DateTimeOffset? PaidAt { get; set; }
         public string? PaymentReference { get; set; }
         public string? Notes { get; set; }
+
+        public virtual Course? Course { get; set; }
+        public virtual Enrollment? Enrollment { get; set; }
+        public virtual User ChargedUser { get; set; } = null!;
     }
 }
 
