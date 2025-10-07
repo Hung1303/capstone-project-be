@@ -7,7 +7,7 @@ namespace Core.Base
         Teacher = 3, //Register for the platform, accept course enrollment
         Student = 4,    //Search for courses, enroll for courses
         Parent = 5,  //Search for courses, enroll children for courses, track children study progress
-        CourseInspector = 6 //To check if course is following the Circular 29
+        Inspector = 6 //To check if course is following the Circular 29
     }
 
     public enum AccountStatus
