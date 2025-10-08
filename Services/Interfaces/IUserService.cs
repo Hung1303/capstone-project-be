@@ -1,12 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BusinessObjects;
+using BusinessObjects.DTO.User;
 
 namespace Services.Interfaces
 {
-    interface IUserService
+    public interface IUserService
     {
+        Task<CreateAdminRequest> CreateAdminRequest(CreateAdminRequest request);
+        Task<CreateCenterRequest> CreateCenterRequest(CreateCenterRequest request);
+        Task<CreateTeacherRequest> CreateTeacherRequest(CreateTeacherRequest request);
+        Task<CreateTeacherRequest> CenterAddTeacherRequest(Guid centerOwnerId, CreateTeacherRequest request);
+        Task<CreateParentRequest> CreateParentRequest(CreateParentRequest request);
+        Task<CreateStudentRequest> CreateStudentRequest(Guid parentId, CreateStudentRequest request);
+        Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null);
+        Task<User?> GetUserByIdAsync(Guid userId);
     }
 }

@@ -180,7 +180,8 @@ namespace Repositories.Context
                 b.HasIndex(x => x.ReportType);
             });
 
-            modelBuilder.Entity<Syllabus>(b =>{
+            modelBuilder.Entity<Syllabus>(b =>
+            {
                 b.HasOne(s => s.Course)
                     .WithOne(c => c.Syllabus)
                     .HasForeignKey<Syllabus>(s => s.CourseId)
@@ -193,7 +194,8 @@ namespace Repositories.Context
                 b.Property(s => s.CourseMaterial).HasColumnType("nvarchar(max)");
             });
 
-            modelBuilder.Entity<LessonPlan>(b => {
+            modelBuilder.Entity<LessonPlan>(b =>
+            {
                 b.HasOne(s => s.Syllabus)
                     .WithMany(c => c.LessonPlans)
                     .HasForeignKey(lp => lp.SyllabusId)

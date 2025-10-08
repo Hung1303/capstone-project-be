@@ -8,8 +8,9 @@ namespace BusinessObjects
         public string? Address { get; set; }
         public string? PhoneSecondary { get; set; }
 
-        public ICollection<StudentProfile> StudentProfiles = new List<StudentProfile>();
+        public virtual ICollection<StudentProfile> StudentProfiles { get; set; } = new List<StudentProfile>();
     }
+
 }
 
 
