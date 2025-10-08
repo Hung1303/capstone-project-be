@@ -1,40 +1,58 @@
-﻿namespace BusinessObjects.DTO.User
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BusinessObjects.DTO.User
 {
     public class CreateAdminRequest
     {
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        public string UserName { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
         public string Password { get; set; }
+        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
         public string FullName { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
-        public string Role { get; set; }
-        public string Status { get; set; }
     }
 
     public class CreateCenterRequest
     {
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        public string UserName { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
         public string Password { get; set; }
+        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
         public string FullName { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
-        public string Role { get; set; }
-        public string Status { get; set; }
         public string CenterName { get; set; }
         public string LicenseNumber { get; set; }
         public DateOnly IssueDate { get; set; }
         public string LicenseIssuedBy { get; set; }
         public string Address { get; set; }
-        
+
     }
 
     public class CreateTeacherRequest
     {
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        public string UserName { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
         public string Password { get; set; }
+        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
         public string FullName { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
-        public string Role { get; set; }
-        public string Status { get; set; }
-        public int YearOfExperience { get; set; }
+        [Range(0, 50, ErrorMessage = "Years of experience must be between 0 and 50.")]
+        public int YearOfExperience { get; set; } = 0;
         public string Qualifications { get; set; }
         public string LicenseNumber { get; set; }
         public string Subjects { get; set; }
@@ -43,24 +61,37 @@
 
     public class CreateParentRequest
     {
+
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        public string UserName { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
         public string Password { get; set; }
+        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
         public string FullName { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
-        public string Role { get; set; }
-        public string Status { get; set; }
         public string Address { get; set; }
-        public string PhoneSecondary { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
+        public string? PhoneSecondary { get; set; }
     }
 
     public class CreateStudentRequest
     {
+
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        public string UserName { get; set; }
+        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
         public string Password { get; set; }
+        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
         public string FullName { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
-        public string Role { get; set; }
-        public string Status { get; set; }
         public string SchoolName { get; set; }
         public string GradeLevel { get; set; }
     }

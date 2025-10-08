@@ -1,9 +1,4 @@
 ﻿using Core.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessObjects
 {
@@ -20,7 +15,7 @@ namespace BusinessObjects
         public string CourseMaterial { get; set; } = string.Empty;
 
         public virtual Course Course { get; set; }
-        public virtual ICollection<LessonPlan> LessonPlans { get; set; } = new List<LessonPlan>();  
+        public virtual ICollection<LessonPlan> LessonPlans { get; set; } = new List<LessonPlan>();
 
     }
 }
