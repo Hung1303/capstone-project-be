@@ -1,4 +1,5 @@
-﻿using BusinessObjects.DTO.User;
+﻿using BusinessObjects;
+using BusinessObjects.DTO.User;
 
 namespace Services.Interfaces
 {
@@ -10,5 +11,7 @@ namespace Services.Interfaces
         Task<CreateTeacherRequest> CenterAddTeacherRequest(Guid centerOwnerId, CreateTeacherRequest request);
         Task<CreateParentRequest> CreateParentRequest(CreateParentRequest request);
         Task<CreateStudentRequest> CreateStudentRequest(Guid parentId, CreateStudentRequest request);
+        Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null);
+        Task<User?> GetUserByIdAsync(Guid userId);
     }
 }

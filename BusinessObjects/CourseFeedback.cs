@@ -19,9 +19,9 @@ namespace BusinessObjects
         public string? ModerationNotes { get; set; }
 
 
-        public StudentProfile? StudentProfile { get; set; }
-        public ParentProfile? ParentProfile { get; set; }
-        public User? ModeratedByUser { get; set; }
+        public virtual StudentProfile? StudentProfile { get; set; }
+        public virtual ParentProfile? ParentProfile { get; set; }
+        public virtual User? ModeratedByUser { get; set; }
     }
 
 }

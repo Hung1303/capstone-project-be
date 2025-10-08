@@ -95,4 +95,18 @@ namespace BusinessObjects.DTO.User
         public string SchoolName { get; set; }
         public string GradeLevel { get; set; }
     }
+
+    public class UserSummaryDto
+    {
+        public Guid Id { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string? PhoneNumber { get; set; }
+        public string Role { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public string ProfileType { get; set; } = "None";
+        public DateTime CreatedAt { get; set; }
+    }
+
 }

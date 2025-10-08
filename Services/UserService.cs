@@ -317,5 +317,59 @@ namespace Services
 
             return request;
         }
+
+        public async Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null)
+        {
+            IQueryable<User> query = _unitOfWork.GetRepository<User>().Entities;
+
+            // Optional search by FullName
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                query = query.Where(u => EF.Functions.Like(u.FullName, $"%{fullName}%"));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            // Query with projection into DTO
+            var users = await query
+                .OrderByDescending(u => u.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(u => new UserSummaryDto
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    UserName = u.UserName,
+                    FullName = u.FullName,
+                    PhoneNumber = u.PhoneNumber,
+                    Role = u.Role.ToString(),
+                    Status = u.Status.ToString(),
+                    CreatedAt = u.CreatedAt,
+                    ProfileType =
+                        u.TeacherProfile != null ? "Teacher" :
+                        u.CenterProfile != null ? "Center" :
+                        u.StudentProfile != null ? "Student" :
+                        u.ParentProfile != null ? "Parent" :
+                        "None"
+                })
+                .ToListAsync();
+
+            return (users, totalCount);
+        }
+
+        public async Task<User?> GetUserByIdAsync(Guid userId)
+        {
+            var query = _unitOfWork.GetRepository<User>().Entities
+                .Include(u => u.TeacherProfile)
+                    .ThenInclude(t => t.Courses)
+                .Include(u => u.CenterProfile)
+                    .ThenInclude(c => c.Courses)
+                .Include(u => u.StudentProfile)
+                    .ThenInclude(s => s.ParentProfile)
+                .Include(u => u.ParentProfile)
+                    .ThenInclude(p => p.StudentProfiles);
+
+            return await query.FirstOrDefaultAsync(u => u.Id == userId);
+        }
     }
 }

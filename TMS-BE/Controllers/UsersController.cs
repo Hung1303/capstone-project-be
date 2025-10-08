@@ -18,18 +18,21 @@ namespace TMS_BE.Controllers
         }
 
 
-        // GET: api/<UsersController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
         {
-            return new string[] { "value1", "value2" };
+            var (users, totalCount) = await _userService.GetAllUsersAsync(pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, users });
         }
 
-        // GET api/<UsersController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetUserById(Guid id)
         {
-            return "value";
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+            return Ok(user);
         }
 
         // POST api/<UsersController>
