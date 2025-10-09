@@ -690,5 +690,69 @@ namespace Services
 
             return (students, totalCount);
         }
+
+        public async Task<CenterDetailRespone?> GetCenterById(Guid userId)
+        {
+            var query =  _unitOfWork.GetRepository<User>().Entities
+                .Include(c => c.CenterProfile)
+                .Where(u => u.Id == userId && u.Role == UserRole.Center && u.Status == AccountStatus.Active && !u.IsDeleted)
+                .Select(u => new CenterDetailRespone
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    Status = u.Status.ToString(),
+                    CenterId = u.CenterProfile.Id,
+                    CenterName = u.CenterProfile.CenterName,
+                    OwnerName = u.CenterProfile.OwnerName,
+                    LicenseNumber = u.CenterProfile.LicenseNumber,
+                    LicenseIssuedBy = u.CenterProfile.LicenseIssuedBy,
+                    IssueDate = u.CenterProfile.IssueDate,
+                    Address = u.CenterProfile.Address,
+                    ContactEmail = u.CenterProfile.ContactEmail,
+                    ContactPhone = u.CenterProfile.ContactPhone
+                });
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetTeachersByCenterIdAsync(
+            Guid centerId, int pageNumber, int pageSize, string? fullName = null)
+        {
+            var teacherRepo = _unitOfWork.GetRepository<TeacherProfile>().Entities;
+            var userRepo = _unitOfWork.GetRepository<User>().Entities;
+
+            // Join teachers and users, filter by centerId
+            var query = from t in teacherRepo
+                        join u in userRepo on t.UserId equals u.Id
+                        where !t.IsDeleted && !u.IsDeleted && t.CenterProfileId == centerId
+                        select new { Teacher = t, User = u };
+
+            // Optional search by teacher full name
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                query = query.Where(x => EF.Functions.Like(x.User.FullName, $"%{fullName}%"));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            // Paginate + project into DTO
+            var teachers = await query
+                .OrderByDescending(x => x.User.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new TeacherListResponse
+                {
+                    FullName = x.User.FullName,
+                    YearOfExperience = x.Teacher.YearOfExperience,
+                    Qualification = x.Teacher.Qualifications,
+                    Subject = x.Teacher.Subjects,
+                    Status = x.User.Status.ToString()
+                })
+                .ToListAsync();
+
+            return (teachers, totalCount);
+        }
     }
 }

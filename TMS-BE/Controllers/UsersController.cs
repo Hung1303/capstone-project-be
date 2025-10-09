@@ -23,17 +23,7 @@ namespace TMS_BE.Controllers
         {
             var (users, totalCount) = await _userService.GetAllUsersAsync(pageNumber, pageSize, fullName);
             return Ok(new { totalCount, users });
-        }
-
-        [HttpGet("User/{id:guid}")]
-        public async Task<IActionResult> GetUserById(Guid id)
-        {
-            var user = await _userService.GetUserByIdAsync(id);
-            if (user == null)
-                return NotFound(new { message = "User not found" });
-
-            return Ok(user);
-        }
+        }        
 
         [HttpGet("Centers")]
         public async Task<IActionResult> GetAllCenters([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? centerName = null)
@@ -61,6 +51,33 @@ namespace TMS_BE.Controllers
         {
             var (students, totalCount) = await _userService.GetAllStudentsAsync(pageNumber, pageSize, fullName);
             return Ok(new { totalCount, students });
+        }
+
+        [HttpGet("User/{id:guid}")]
+        public async Task<IActionResult> GetUserById(Guid id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+            return Ok(user);
+        }
+
+        [HttpGet("Center/{userId}")]
+        public async Task<IActionResult> GetCenterById(Guid userId)
+        {
+            var center = await _userService.GetCenterById(userId);
+            if (center == null)
+                return NotFound(new { message = "Center not found" });
+
+            return Ok(center);
+        }
+
+        [HttpGet("{centerId}/Teachers")]
+        public async Task<IActionResult> GetTeachersByCenterId(Guid centerId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (teachers, totalCount) = await _userService.GetTeachersByCenterIdAsync(centerId, pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, teachers });
         }
 
         // POST api/<UsersController>
