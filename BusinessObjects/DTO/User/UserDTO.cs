@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 
 namespace BusinessObjects.DTO.User
 {
@@ -211,7 +210,7 @@ namespace BusinessObjects.DTO.User
         public string? PhoneNumber { get; set; }
         public string Role { get; set; }
         public string Status { get; set; }
-        
+
 
     }
 }

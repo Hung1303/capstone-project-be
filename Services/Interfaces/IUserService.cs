@@ -1,5 +1,4 @@
-﻿using BusinessObjects;
-using BusinessObjects.DTO.User;
+﻿using BusinessObjects.DTO.User;
 
 namespace Services.Interfaces
 {

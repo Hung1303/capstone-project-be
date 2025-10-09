@@ -369,7 +369,7 @@ namespace Services
                     Id = u.Id,
                     Email = u.Email,
                     UserName = u.UserName,
-                    FullName = u.FullName,   
+                    FullName = u.FullName,
                     PhoneNumber = u.PhoneNumber,
                     Role = u.Role.ToString(),
                     Status = u.Status.ToString()
@@ -493,7 +493,7 @@ namespace Services
             if (phoneExists)
                 throw new InvalidOperationException("Phone number is already in use by another user.");
 
-            if(request.PhoneSecondary == user.PhoneNumber)
+            if (request.PhoneSecondary == user.PhoneNumber)
                 throw new InvalidOperationException("Cannot use main phone number as secondary.");
 
             user.Email = request.Email;
