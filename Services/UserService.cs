@@ -371,5 +371,174 @@ namespace Services
 
             return await query.FirstOrDefaultAsync(u => u.Id == userId);
         }
+
+        public async Task<bool> UpdateCenterAsync(Guid userId, CenterUpdateRequest request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            var owner = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(o => o.Id == userId && o.Status == AccountStatus.Active && o.Role == UserRole.Center && !o.IsDeleted);
+            if (owner == null)
+            {
+                return false;
+            }
+
+            var center = await _unitOfWork.GetRepository<CenterProfile>().Entities
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+            if (center == null)
+            {
+                return false;
+            }
+
+            bool emailExists = await _unitOfWork.GetRepository<User>().Entities
+                .AnyAsync(u => u.Email == request.Email && u.Id != userId && !u.IsDeleted);
+            if (emailExists)
+                throw new InvalidOperationException("Email is already in use by another user.");
+
+            bool phoneExists = await _unitOfWork.GetRepository<User>().Entities
+                .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != userId && !u.IsDeleted);
+            if (phoneExists)
+                throw new InvalidOperationException("Phone number is already in use by another user.");
+
+            owner.Email = request.Email;
+            owner.PhoneNumber = request.PhoneNumber;
+
+            center.Address = request.Address;
+            center.ContactEmail = request.Email;
+            center.ContactPhone = request.PhoneNumber;
+
+            await _unitOfWork.GetRepository<User>().UpdateAsync(owner);
+            await _unitOfWork.SaveAsync();
+
+            await _unitOfWork.GetRepository<CenterProfile>().UpdateAsync(center);
+            await _unitOfWork.SaveAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateTeacherAsynce(Guid userId, TeacherUpdateRequest request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            var user = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(o => o.Id == userId && o.Status == AccountStatus.Active && o.Role == UserRole.Teacher && !o.IsDeleted);
+            if (user == null)
+            {
+                return false;
+            }
+
+            var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+            if (teacher == null)
+            {
+                return false;
+            }
+
+            bool emailExists = await _unitOfWork.GetRepository<User>().Entities
+                .AnyAsync(u => u.Email == request.Email && u.Id != userId && !u.IsDeleted);
+            if (emailExists)
+                throw new InvalidOperationException("Email is already in use by another user.");
+
+            bool phoneExists = await _unitOfWork.GetRepository<User>().Entities
+                .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != userId && !u.IsDeleted);
+            if (phoneExists)
+                throw new InvalidOperationException("Phone number is already in use by another user.");
+
+            user.Email = request.Email;
+            user.PhoneNumber = request.PhoneNumber;
+
+            teacher.Subjects = request.Subjects;
+            teacher.Bio = request.Bio;
+
+            await _unitOfWork.GetRepository<User>().UpdateAsync(user);
+            await _unitOfWork.SaveAsync();
+
+            await _unitOfWork.GetRepository<TeacherProfile>().UpdateAsync(teacher);
+            await _unitOfWork.SaveAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateParentAsynce(Guid userId, ParentUpdateRequest request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            var user = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(o => o.Id == userId && o.Status == AccountStatus.Active && o.Role == UserRole.Parent && !o.IsDeleted);
+            if (user == null)
+            {
+                return false;
+            }
+
+            var parent = await _unitOfWork.GetRepository<ParentProfile>().Entities
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+            if (parent == null)
+            {
+                return false;
+            }
+
+            bool emailExists = await _unitOfWork.GetRepository<User>().Entities
+                .AnyAsync(u => u.Email == request.Email && u.Id != userId && !u.IsDeleted);
+            if (emailExists)
+                throw new InvalidOperationException("Email is already in use by another user.");
+
+            bool phoneExists = await _unitOfWork.GetRepository<User>().Entities
+                .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != userId && !u.IsDeleted);
+            if (phoneExists)
+                throw new InvalidOperationException("Phone number is already in use by another user.");
+
+            if(request.PhoneSecondary == user.PhoneNumber)
+                throw new InvalidOperationException("Cannot use main phone number as secondary.");
+
+            user.Email = request.Email;
+            user.PhoneNumber = request.PhoneNumber;
+
+            parent.Address = request.Address;
+            parent.PhoneSecondary = request.PhoneSecondary;
+
+            await _unitOfWork.GetRepository<User>().UpdateAsync(user);
+            await _unitOfWork.SaveAsync();
+
+            await _unitOfWork.GetRepository<ParentProfile>().UpdateAsync(parent);
+            await _unitOfWork.SaveAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateStudentAsynce(Guid userId, StudentUpdateRequest request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            var user = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(o => o.Id == userId && o.Status == AccountStatus.Active && o.Role == UserRole.Student && !o.IsDeleted);
+            if (user == null)
+            {
+                return false;
+            }
+
+            var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+            if (student == null)
+            {
+                return false;
+            }
+
+            bool emailExists = await _unitOfWork.GetRepository<User>().Entities
+                .AnyAsync(u => u.Email == request.Email && u.Id != userId && !u.IsDeleted);
+            if (emailExists)
+                throw new InvalidOperationException("Email is already in use by another user.");
+
+            bool phoneExists = await _unitOfWork.GetRepository<User>().Entities
+                .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != userId && !u.IsDeleted);
+            if (phoneExists)
+                throw new InvalidOperationException("Phone number is already in use by another user.");
+
+            user.Email = request.Email;
+            user.PhoneNumber = request.PhoneNumber;
+
+            await _unitOfWork.GetRepository<User>().UpdateAsync(user);
+            await _unitOfWork.SaveAsync();
+            return true;
+        }
     }
 }

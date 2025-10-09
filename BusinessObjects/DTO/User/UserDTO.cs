@@ -109,4 +109,54 @@ namespace BusinessObjects.DTO.User
         public DateTime CreatedAt { get; set; }
     }
 
+    public class CenterUpdateRequest
+    {
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        public string Email { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
+        public string PhoneNumber { get; set; }
+        public string Address { get; set; }
+    }
+
+    public class TeacherUpdateRequest
+    {
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        public string Email { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
+        public string PhoneNumber { get; set; }
+        public string Subjects { get; set; }
+        public string Bio { get; set; }
+    }
+
+    public class ParentUpdateRequest
+    {
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        public string Email { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
+        public string PhoneNumber { get; set; }
+        public string Address { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
+        public string? PhoneSecondary { get; set; }
+    }
+
+    public class StudentUpdateRequest
+    {
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        public string Email { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
+        public string PhoneNumber { get; set; }
+    }
+
+    public class UserUpdateRequest
+    {
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        public string Email { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
+        public string PhoneNumber { get; set; }
+    }
 }

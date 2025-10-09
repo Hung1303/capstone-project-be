@@ -13,5 +13,9 @@ namespace Services.Interfaces
         Task<CreateStudentRequest> CreateStudentRequest(Guid parentId, CreateStudentRequest request);
         Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null);
         Task<User?> GetUserByIdAsync(Guid userId);
+        Task<bool> UpdateCenterAsync(Guid userId, CenterUpdateRequest request);
+        Task<bool> UpdateTeacherAsynce(Guid userId, TeacherUpdateRequest request);
+        Task<bool> UpdateParentAsynce(Guid userId, ParentUpdateRequest request);
+        Task<bool> UpdateStudentAsynce(Guid userId, StudentUpdateRequest request);
     }
 }

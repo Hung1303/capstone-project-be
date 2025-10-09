@@ -84,10 +84,37 @@ namespace TMS_BE.Controllers
             return Ok(user);
         }
 
-        // PUT api/<UsersController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+
+        [HttpPut("Center/{userId}")]
+        public async Task<IActionResult> UpdateCenter(Guid userId, [FromBody] CenterUpdateRequest request)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var success = await _userService.UpdateCenterAsync(userId, request);
+            return success ? NoContent() : NotFound();
+        }
+
+        [HttpPut("Teacher/{userId}")]
+        public async Task<IActionResult> UpdateTeacher(Guid userId, [FromBody] TeacherUpdateRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var success = await _userService.UpdateTeacherAsynce(userId, request);
+            return success ? NoContent() : NotFound();
+        }
+
+        [HttpPut("Parent/{userId}")]
+        public async Task<IActionResult> UpdateParent(Guid userId, [FromBody] ParentUpdateRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var success = await _userService.UpdateParentAsynce(userId, request);
+            return success ? NoContent() : NotFound();
+        }
+
+        [HttpPut("Student/{userId}")]
+        public async Task<IActionResult> UpdateStudent(Guid userId, [FromBody] StudentUpdateRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var success = await _userService.UpdateStudentAsynce(userId, request);
+            return success ? NoContent() : NotFound();
         }
 
         // DELETE api/<UsersController>/5
