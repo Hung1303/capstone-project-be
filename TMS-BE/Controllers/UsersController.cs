@@ -18,14 +18,14 @@ namespace TMS_BE.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("Users")]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
         {
             var (users, totalCount) = await _userService.GetAllUsersAsync(pageNumber, pageSize, fullName);
             return Ok(new { totalCount, users });
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("User/{id:guid}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -33,6 +33,34 @@ namespace TMS_BE.Controllers
                 return NotFound(new { message = "User not found" });
 
             return Ok(user);
+        }
+
+        [HttpGet("Centers")]
+        public async Task<IActionResult> GetAllCenters([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? centerName = null)
+        {
+            var (centers, totalCount) = await _userService.GetAllCentersAsync(pageNumber, pageSize, centerName);
+            return Ok(new { totalCount, centers });
+        }
+
+        [HttpGet("Teachers")]
+        public async Task<IActionResult> GetAllTeachers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (teachers, totalCount) = await _userService.GetAllTeachersAsync(pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, teachers });
+        }
+
+        [HttpGet("Parents")]
+        public async Task<IActionResult> GetAllParents([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (parents, totalCount) = await _userService.GetAllParentsAsync(pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, parents });
+        }
+
+        [HttpGet("Students")]
+        public async Task<IActionResult> GetAllStudents([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (students, totalCount) = await _userService.GetAllStudentsAsync(pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, students });
         }
 
         // POST api/<UsersController>
