@@ -2,24 +2,23 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
+# Render sets PORT; expose a default for local run
 EXPOSE 8080
-EXPOSE 8081
 
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["API/API.csproj", "API/"]
+COPY ["TMS-BE/API.csproj", "TMS-BE/"]
 COPY ["BusinessObjects/BusinessObjects.csproj", "BusinessObjects/"]
 COPY ["Core/Core.csproj", "Core/"]
 COPY ["Repositories/Repositories.csproj", "Repositories/"]
 COPY ["Services/Services.csproj", "Services/"]
-RUN dotnet restore "./API/API.csproj"
+RUN dotnet restore "./TMS-BE/API.csproj"
 COPY . .
-WORKDIR "/src/API"
+WORKDIR "/src/TMS-BE"
 RUN dotnet build "./API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
