@@ -80,6 +80,16 @@ namespace TMS_BE.Controllers
             return Ok(new { totalCount, teachers });
         }
 
+        [HttpGet("Teacher/{userId}")]
+        public async Task<IActionResult> GetTeacherById(Guid userId)
+        {
+            var center = await _userService.GetTeacherById(userId);
+            if (center == null)
+                return NotFound(new { message = "Teacher not found" });
+
+            return Ok(center);
+        }
+
         // POST api/<UsersController>
         [HttpPost("Admin")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] CreateAdminRequest request)

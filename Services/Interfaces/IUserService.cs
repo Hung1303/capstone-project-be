@@ -23,5 +23,6 @@ namespace Services.Interfaces
         Task<CenterDetailRespone?> GetCenterById(Guid userId);
         Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetTeachersByCenterIdAsync(
             Guid centerId, int pageNumber, int pageSize, string? fullName = null);
+        Task<TeacherDetailResponse?> GetTeacherById(Guid userId);
     }
 }

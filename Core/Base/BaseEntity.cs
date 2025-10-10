@@ -16,8 +16,8 @@ namespace Core.Base
         protected BaseEntity()
         {
             Id = Guid.NewGuid();
-            CreatedAt = DateTime.Now;
-            LastUpdatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
+            LastUpdatedAt = DateTime.UtcNow;
             IsDeleted = false;
         }
     }

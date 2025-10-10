@@ -754,5 +754,28 @@ namespace Services
 
             return (teachers, totalCount);
         }
+
+        public async Task<TeacherDetailResponse?> GetTeacherById(Guid userId)
+        {
+            var query = _unitOfWork.GetRepository<User>().Entities
+                .Include(c => c.CenterProfile)
+                .Where(u => u.Id == userId && u.Role == UserRole.Teacher && u.Status == AccountStatus.Active && !u.IsDeleted)
+                .Select(u => new TeacherDetailResponse
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    Status = u.Status.ToString(),
+                    TeacherId = u.TeacherProfile.Id,
+                    YearOfExperience = u.TeacherProfile.YearOfExperience,
+                    Qualifications = u.TeacherProfile.Qualifications,
+                    LicenseNumber = u.TeacherProfile.LicenseNumber,
+                    Subjects = u.TeacherProfile.Subjects,
+                    Bio = u.TeacherProfile.Bio
+                });
+
+            return await query.FirstOrDefaultAsync();
+        }
     }
 }

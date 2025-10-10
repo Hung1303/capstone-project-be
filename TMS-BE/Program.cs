@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Repositories.Context;
 using Repository;
 using Repository.Interfaces;
@@ -15,7 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
-    options.UseSqlServer(connectionString);
+    options.UseNpgsql(connectionString);
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
