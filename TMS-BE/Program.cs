@@ -63,7 +63,12 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-app.UseHttpsRedirection();
+// Enable HTTPS redirection only when an HTTPS port is configured
+var httpsPorts = Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORTS");
+if (!string.IsNullOrWhiteSpace(httpsPorts))
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthorization();
 
