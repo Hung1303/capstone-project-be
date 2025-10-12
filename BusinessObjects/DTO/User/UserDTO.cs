@@ -159,4 +159,91 @@ namespace BusinessObjects.DTO.User
         [Phone(ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
     }
+
+    public class CenterListResponse
+    {
+        public Guid UserId { get; set; }
+        public string CenterName { get; set; }
+        public string OwnerName { get; set; }
+        public string LicenseNumber { get; set; }
+        public string Address { get; set; }
+        public string ContactEmail { get; set; }
+        public string ContactPhone { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class TeacherListResponse
+    {
+        public string FullName { get; set; }
+        public int YearOfExperience { get; set; }
+        public string Qualification { get; set; }
+        public string Subject { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class ParentListResponse
+    {
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Address { get; set; }
+        public string PhoneSecondary { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class StudentListResponse
+    {
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string SchoolName { get; set; }
+        public string GradeLevel { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class UserDetailResponse
+    {
+        public Guid Id { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string Role { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class CenterDetailRespone
+    {
+        public Guid Id { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Status { get; set; }
+        
+        public Guid CenterId { get; set; }
+        public string CenterName { get; set; }
+        public string OwnerName { get; set; }
+        public string LicenseNumber { get; set; }
+        public DateOnly IssueDate { get; set; }
+        public string? LicenseIssuedBy { get; set; }
+        public string Address { get; set; } 
+        public string? ContactEmail { get; set; }
+        public string? ContactPhone { get; set; }
+    }
+
+    public class TeacherDetailResponse
+    {
+        public Guid Id { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Status { get; set; }
+
+        public Guid TeacherId { get; set; }
+        public int YearOfExperience { get; set; }
+        public string Qualifications { get; set; }
+        public string LicenseNumber { get; set; }
+        public string Subjects { get; set; }
+        public string? Bio { get; set; }
+    }
 }

@@ -18,14 +18,42 @@ namespace TMS_BE.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("Users")]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
         {
             var (users, totalCount) = await _userService.GetAllUsersAsync(pageNumber, pageSize, fullName);
             return Ok(new { totalCount, users });
+        }        
+
+        [HttpGet("Centers")]
+        public async Task<IActionResult> GetAllCenters([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? centerName = null)
+        {
+            var (centers, totalCount) = await _userService.GetAllCentersAsync(pageNumber, pageSize, centerName);
+            return Ok(new { totalCount, centers });
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("Teachers")]
+        public async Task<IActionResult> GetAllTeachers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (teachers, totalCount) = await _userService.GetAllTeachersAsync(pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, teachers });
+        }
+
+        [HttpGet("Parents")]
+        public async Task<IActionResult> GetAllParents([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (parents, totalCount) = await _userService.GetAllParentsAsync(pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, parents });
+        }
+
+        [HttpGet("Students")]
+        public async Task<IActionResult> GetAllStudents([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (students, totalCount) = await _userService.GetAllStudentsAsync(pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, students });
+        }
+
+        [HttpGet("User/{id:guid}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -33,6 +61,33 @@ namespace TMS_BE.Controllers
                 return NotFound(new { message = "User not found" });
 
             return Ok(user);
+        }
+
+        [HttpGet("Center/{userId}")]
+        public async Task<IActionResult> GetCenterById(Guid userId)
+        {
+            var center = await _userService.GetCenterById(userId);
+            if (center == null)
+                return NotFound(new { message = "Center not found" });
+
+            return Ok(center);
+        }
+
+        [HttpGet("{centerId}/Teachers")]
+        public async Task<IActionResult> GetTeachersByCenterId(Guid centerId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (teachers, totalCount) = await _userService.GetTeachersByCenterIdAsync(centerId, pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, teachers });
+        }
+
+        [HttpGet("Teacher/{userId}")]
+        public async Task<IActionResult> GetTeacherById(Guid userId)
+        {
+            var center = await _userService.GetTeacherById(userId);
+            if (center == null)
+                return NotFound(new { message = "Teacher not found" });
+
+            return Ok(center);
         }
 
         // POST api/<UsersController>

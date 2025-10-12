@@ -131,6 +131,9 @@ namespace Services
                     throw new Exception("Duplicate Phonenumber");
             }
 
+            if (request.PhoneSecondary == request.PhoneNumber)
+                throw new InvalidOperationException("Cannot use main phone number as secondary.");
+
             var user = new User
             {
                 Email = request.Email,
@@ -357,19 +360,22 @@ namespace Services
             return (users, totalCount);
         }
 
-        public async Task<User?> GetUserByIdAsync(Guid userId)
+        public async Task<UserDetailResponse?> GetUserByIdAsync(Guid userId)
         {
             var query = _unitOfWork.GetRepository<User>().Entities
-                .Include(u => u.TeacherProfile)
-                    .ThenInclude(t => t.Courses)
-                .Include(u => u.CenterProfile)
-                    .ThenInclude(c => c.Courses)
-                .Include(u => u.StudentProfile)
-                    .ThenInclude(s => s.ParentProfile)
-                .Include(u => u.ParentProfile)
-                    .ThenInclude(p => p.StudentProfiles);
+                .Where(u => u.Id == userId && !u.IsDeleted)
+                .Select(u => new UserDetailResponse
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    UserName = u.UserName,
+                    FullName = u.FullName,
+                    PhoneNumber = u.PhoneNumber,
+                    Role = u.Role.ToString(),
+                    Status = u.Status.ToString()
+                });
 
-            return await query.FirstOrDefaultAsync(u => u.Id == userId);
+            return await query.FirstOrDefaultAsync();
         }
 
         public async Task<bool> UpdateCenterAsync(Guid userId, CenterUpdateRequest request)
@@ -487,7 +493,7 @@ namespace Services
             if (phoneExists)
                 throw new InvalidOperationException("Phone number is already in use by another user.");
 
-            if(request.PhoneSecondary == user.PhoneNumber)
+            if (request.PhoneSecondary == user.PhoneNumber)
                 throw new InvalidOperationException("Cannot use main phone number as secondary.");
 
             user.Email = request.Email;
@@ -539,6 +545,237 @@ namespace Services
             await _unitOfWork.GetRepository<User>().UpdateAsync(user);
             await _unitOfWork.SaveAsync();
             return true;
+        }
+
+        public async Task<(IEnumerable<CenterListResponse> Centers, int TotalCount)> GetAllCentersAsync(int pageNumber, int pageSize, string? centerName = null)
+        {
+            var centerRepo = _unitOfWork.GetRepository<CenterProfile>().Entities;
+            var userRepo = _unitOfWork.GetRepository<User>().Entities;
+
+            // Build base query with join to User
+            var query = from c in centerRepo
+                        join u in userRepo on c.UserId equals u.Id
+                        where !c.IsDeleted && !u.IsDeleted
+                        select new { Center = c, User = u };
+
+            // Optional search by center name
+            if (!string.IsNullOrWhiteSpace(centerName))
+            {
+                query = query.Where(x => EF.Functions.Like(x.Center.CenterName, $"%{centerName}%"));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            // Projection to DTO
+            var centers = await query
+                .OrderByDescending(x => x.Center.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new CenterListResponse
+                {
+                    UserId = x.Center.UserId,
+                    CenterName = x.Center.CenterName,
+                    OwnerName = x.Center.OwnerName,
+                    LicenseNumber = x.Center.LicenseNumber,
+                    Address = x.Center.Address,
+                    ContactEmail = x.Center.ContactEmail,
+                    ContactPhone = x.Center.ContactPhone,
+                    Status = x.User.Status.ToString()
+                })
+                .ToListAsync();
+
+            return (centers, totalCount);
+        }
+
+        public async Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetAllTeachersAsync(int pageNumber, int pageSize, string? fullName = null)
+        {
+            var teacherRepo = _unitOfWork.GetRepository<TeacherProfile>().Entities;
+            var userRepo = _unitOfWork.GetRepository<User>().Entities;
+
+            var query = from t in teacherRepo
+                        join u in userRepo on t.UserId equals u.Id
+                        where !t.IsDeleted && !u.IsDeleted
+                        select new { Teacher = t, User = u };
+
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                query = query.Where(x => EF.Functions.Like(x.User.FullName, $"%{fullName}%"));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            var teachers = await query
+                .OrderByDescending(x => x.User.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new TeacherListResponse
+                {
+                    FullName = x.User.FullName,
+                    YearOfExperience = x.Teacher.YearOfExperience,
+                    Qualification = x.Teacher.Qualifications,
+                    Subject = x.Teacher.Subjects,
+                    Status = x.User.Status.ToString()
+                })
+                .ToListAsync();
+
+            return (teachers, totalCount);
+        }
+
+        public async Task<(IEnumerable<ParentListResponse> Parents, int TotalCount)> GetAllParentsAsync(int pageNumber, int pageSize, string? fullName = null)
+        {
+            var parentRepo = _unitOfWork.GetRepository<ParentProfile>().Entities;
+            var userRepo = _unitOfWork.GetRepository<User>().Entities;
+
+            var query = from p in parentRepo
+                        join u in userRepo on p.UserId equals u.Id
+                        where !p.IsDeleted && !u.IsDeleted
+                        select new { Parent = p, User = u };
+
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                query = query.Where(x => EF.Functions.Like(x.User.FullName, $"%{fullName}%"));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            var parents = await query
+                .OrderByDescending(x => x.User.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new ParentListResponse
+                {
+                    FullName = x.User.FullName,
+                    Email = x.User.Email,
+                    PhoneNumber = x.User.PhoneNumber,
+                    Address = x.Parent.Address,
+                    PhoneSecondary = x.Parent.PhoneSecondary,
+                    Status = x.User.Status.ToString()
+                })
+                .ToListAsync();
+
+            return (parents, totalCount);
+        }
+
+        public async Task<(IEnumerable<StudentListResponse> Students, int TotalCount)> GetAllStudentsAsync(int pageNumber, int pageSize, string? fullName = null)
+        {
+            var studentRepo = _unitOfWork.GetRepository<StudentProfile>().Entities;
+            var userRepo = _unitOfWork.GetRepository<User>().Entities;
+
+            var query = from s in studentRepo
+                        join u in userRepo on s.UserId equals u.Id
+                        where !s.IsDeleted && !u.IsDeleted
+                        select new { Student = s, User = u };
+
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                query = query.Where(x => EF.Functions.Like(x.User.FullName, $"%{fullName}%"));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            var students = await query
+                .OrderByDescending(x => x.User.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new StudentListResponse
+                {
+                    FullName = x.User.FullName,
+                    Email = x.User.Email,
+                    PhoneNumber = x.User.PhoneNumber,
+                    SchoolName = x.Student.SchoolName,
+                    GradeLevel = x.Student.GradeLevel,
+                    Status = x.User.Status.ToString()
+                })
+                .ToListAsync();
+
+            return (students, totalCount);
+        }
+
+        public async Task<CenterDetailRespone?> GetCenterById(Guid userId)
+        {
+            var query =  _unitOfWork.GetRepository<User>().Entities
+                .Include(c => c.CenterProfile)
+                .Where(u => u.Id == userId && u.Role == UserRole.Center && u.Status == AccountStatus.Active && !u.IsDeleted)
+                .Select(u => new CenterDetailRespone
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    Status = u.Status.ToString(),
+                    CenterId = u.CenterProfile.Id,
+                    CenterName = u.CenterProfile.CenterName,
+                    OwnerName = u.CenterProfile.OwnerName,
+                    LicenseNumber = u.CenterProfile.LicenseNumber,
+                    LicenseIssuedBy = u.CenterProfile.LicenseIssuedBy,
+                    IssueDate = u.CenterProfile.IssueDate,
+                    Address = u.CenterProfile.Address,
+                    ContactEmail = u.CenterProfile.ContactEmail,
+                    ContactPhone = u.CenterProfile.ContactPhone
+                });
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetTeachersByCenterIdAsync(
+            Guid centerId, int pageNumber, int pageSize, string? fullName = null)
+        {
+            var teacherRepo = _unitOfWork.GetRepository<TeacherProfile>().Entities;
+            var userRepo = _unitOfWork.GetRepository<User>().Entities;
+
+            // Join teachers and users, filter by centerId
+            var query = from t in teacherRepo
+                        join u in userRepo on t.UserId equals u.Id
+                        where !t.IsDeleted && !u.IsDeleted && t.CenterProfileId == centerId
+                        select new { Teacher = t, User = u };
+
+            // Optional search by teacher full name
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                query = query.Where(x => EF.Functions.Like(x.User.FullName, $"%{fullName}%"));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            // Paginate + project into DTO
+            var teachers = await query
+                .OrderByDescending(x => x.User.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new TeacherListResponse
+                {
+                    FullName = x.User.FullName,
+                    YearOfExperience = x.Teacher.YearOfExperience,
+                    Qualification = x.Teacher.Qualifications,
+                    Subject = x.Teacher.Subjects,
+                    Status = x.User.Status.ToString()
+                })
+                .ToListAsync();
+
+            return (teachers, totalCount);
+        }
+
+        public async Task<TeacherDetailResponse?> GetTeacherById(Guid userId)
+        {
+            var query = _unitOfWork.GetRepository<User>().Entities
+                .Include(c => c.CenterProfile)
+                .Where(u => u.Id == userId && u.Role == UserRole.Teacher && u.Status == AccountStatus.Active && !u.IsDeleted)
+                .Select(u => new TeacherDetailResponse
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    Status = u.Status.ToString(),
+                    TeacherId = u.TeacherProfile.Id,
+                    YearOfExperience = u.TeacherProfile.YearOfExperience,
+                    Qualifications = u.TeacherProfile.Qualifications,
+                    LicenseNumber = u.TeacherProfile.LicenseNumber,
+                    Subjects = u.TeacherProfile.Subjects,
+                    Bio = u.TeacherProfile.Bio
+                });
+
+            return await query.FirstOrDefaultAsync();
         }
     }
 }

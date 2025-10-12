@@ -1,5 +1,4 @@
-﻿using BusinessObjects;
-using BusinessObjects.DTO.User;
+﻿using BusinessObjects.DTO.User;
 
 namespace Services.Interfaces
 {
@@ -10,12 +9,20 @@ namespace Services.Interfaces
         Task<CreateTeacherRequest> CreateTeacherRequest(CreateTeacherRequest request);
         Task<CreateTeacherRequest> CenterAddTeacherRequest(Guid centerOwnerId, CreateTeacherRequest request);
         Task<CreateParentRequest> CreateParentRequest(CreateParentRequest request);
-        Task<CreateStudentRequest> CreateStudentRequest(Guid parentId, CreateStudentRequest request);
-        Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null);
-        Task<User?> GetUserByIdAsync(Guid userId);
+        Task<CreateStudentRequest> CreateStudentRequest(Guid parentId, CreateStudentRequest request);        
         Task<bool> UpdateCenterAsync(Guid userId, CenterUpdateRequest request);
         Task<bool> UpdateTeacherAsynce(Guid userId, TeacherUpdateRequest request);
         Task<bool> UpdateParentAsynce(Guid userId, ParentUpdateRequest request);
         Task<bool> UpdateStudentAsynce(Guid userId, StudentUpdateRequest request);
+        Task<(IEnumerable<CenterListResponse> Centers, int TotalCount)> GetAllCentersAsync(int pageNumber, int pageSize, string? centerName = null);
+        Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetAllTeachersAsync(int pageNumber, int pageSize, string? fullName = null);
+        Task<(IEnumerable<ParentListResponse> Parents, int TotalCount)> GetAllParentsAsync(int pageNumber, int pageSize, string? fullName = null);
+        Task<(IEnumerable<StudentListResponse> Students, int TotalCount)> GetAllStudentsAsync(int pageNumber, int pageSize, string? fullName = null);
+        Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null);
+        Task<UserDetailResponse?> GetUserByIdAsync(Guid userId);
+        Task<CenterDetailRespone?> GetCenterById(Guid userId);
+        Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetTeachersByCenterIdAsync(
+            Guid centerId, int pageNumber, int pageSize, string? fullName = null);
+        Task<TeacherDetailResponse?> GetTeacherById(Guid userId);
     }
 }
