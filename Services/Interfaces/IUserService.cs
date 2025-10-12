@@ -1,9 +1,11 @@
-﻿using BusinessObjects.DTO.User;
+﻿using BusinessObjects;
+using BusinessObjects.DTO.User;
 
 namespace Services.Interfaces
 {
     public interface IUserService
     {
+        Task<User?> GetUserByEmailAsync(string email);
         Task<CreateAdminRequest> CreateAdminRequest(CreateAdminRequest request);
         Task<CreateCenterRequest> CreateCenterRequest(CreateCenterRequest request);
         Task<CreateTeacherRequest> CreateTeacherRequest(CreateTeacherRequest request);
