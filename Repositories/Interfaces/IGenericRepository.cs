@@ -1,4 +1,7 @@
-﻿namespace Repository.Interfaces
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+
+namespace Repository.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {
@@ -6,11 +9,14 @@
         IQueryable<T> Entities { get; }
 
         // non async
+        List<T> Get();
+        T Get(Expression<Func<T, bool>> expression);
         IEnumerable<T> GetAll();
         T? GetById(object id);
         void Insert(T obj);
         void InsertRange(IList<T> obj);
         void Update(T obj);
+        void Delete(T entity);
         void Delete(object id);
         void Save();
 

@@ -18,6 +18,10 @@ namespace Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == email);
+        }
         public async Task<CreateAdminRequest> CreateAdminRequest(CreateAdminRequest request)
         {
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";

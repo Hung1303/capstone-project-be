@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repositories.Context;
 using Repository.Interfaces;
+using System.Linq.Expressions;
 
 namespace Repository
 {
@@ -14,7 +15,17 @@ namespace Repository
             _dbSet = _context.Set<T>();
         }
         public IQueryable<T> Entities => _context.Set<T>();
+        public virtual List<T> Get()
+        {
+            return _context.Set<T>().ToList();
+            //return _context.Set<T>().AsNoTracking().ToList();
+        }
+        public virtual T Get(Expression<Func<T, bool>> expression)
+        {
+            return _context.Set<T>().FirstOrDefault(expression);
+        }
 
+        public virtual void Delete(T entity) => _dbSet.Remove(entity);
         public void Delete(object id)
         {
             T entity = _dbSet.Find(id) ?? throw new Exception();
