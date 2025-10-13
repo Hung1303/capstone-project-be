@@ -50,6 +50,13 @@ namespace API.Controllers
             });
         }
 
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetSuspensionRecordById(Guid Id)
+        {
+            var result = await _suspensionService.GetRecordById(Id);
+            return Ok(result);
+        }
+
         // POST api/<SuspensionsController>
         [HttpPost("{userId}")]
         public async Task<IActionResult> BanUser(Guid userId, Guid supervisorId, BanRequest record)

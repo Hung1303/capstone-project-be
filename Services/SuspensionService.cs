@@ -78,7 +78,7 @@ namespace Services
             return true;
         }
 
-        public async Task<(IEnumerable<SuspensionRecordResponse> Records, int TotalCount)> GetSuspensionRecordsAsync(
+        public async Task<(IEnumerable<UserSuspensionRecordResponse> Records, int TotalCount)> GetSuspensionRecordsAsync(
     int pageNumber, int pageSize, string? search = null)
         {
             var suspensionRepo = _unitOfWork.GetRepository<SuspensionRecord>().Entities;
@@ -105,7 +105,7 @@ namespace Services
                 .OrderByDescending(x => x.s.SuspendedFrom)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(x => new SuspensionRecordResponse
+                .Select(x => new UserSuspensionRecordResponse
                 {
                     Id = x.s.Id,
                     BannedUserFullName = x.bannedUser != null ? x.bannedUser.FullName : "(Unknown User)",
@@ -175,6 +175,48 @@ namespace Services
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+        }
+
+        public async Task<SuspensionRecordResponse> GetRecordById (Guid Id)
+        {
+            var record = await _unitOfWork.GetRepository<SuspensionRecord>().Entities
+                .Include(u => u.User)
+                .Include(c => c.Course)
+                .Include(a => a.ActionByUser)
+                .FirstOrDefaultAsync(r => r.Id == Id && !r.IsDeleted);
+
+            if (record == null) throw new Exception("Record not found.");
+
+            if(record != null && record.UserId != null)
+            {
+                var response = new SuspensionRecordResponse
+                {
+                    Id = record.Id,
+                    BannedId = record.User.Id,
+                    BanBy = record.ActionByUser.FullName,
+                    SuspendedFrom = record.SuspendedFrom,
+                    SuspendedTo = record.SuspendedTo,
+                    Reason = record.Reason
+                };
+
+                return response;
+            }
+            else
+            {
+                var response = new SuspensionRecordResponse
+                {
+                    Id = record.Id,
+                    BannedId = record.Course.Id,
+                    BanBy = record.ActionByUser.FullName,
+                    SuspendedFrom = record.SuspendedFrom,
+                    SuspendedTo = record.SuspendedTo,
+                    Reason = record.Reason
+                };
+
+                return response;
+            }
+
+            return null;
         }
 
 

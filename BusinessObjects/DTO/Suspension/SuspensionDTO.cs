@@ -7,7 +7,7 @@
         public DateTimeOffset? SuspendedTo { get; set; }
     }
 
-    public class SuspensionRecordResponse
+    public class UserSuspensionRecordResponse
     {
         public Guid Id { get; set; }
         public string BannedUserFullName { get; set; } = string.Empty;
@@ -26,5 +26,15 @@
         public string AdminName { get; set; }
         public string Reason { get; set; }
         public DateTime CreatedAt { get; set; }
+    }
+
+    public class SuspensionRecordResponse
+    {
+        public Guid Id { get; set; }
+        public Guid BannedId { get; set; }
+        public string BanBy { get; set; }
+        public DateTimeOffset SuspendedFrom { get; set; }
+        public DateTimeOffset? SuspendedTo { get; set; }
+        public string Reason { get; set; }
     }
 }
