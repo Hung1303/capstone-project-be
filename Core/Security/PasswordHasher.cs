@@ -29,8 +29,30 @@ namespace Core.Security
 
         public static bool VerifyPassword(string password, string hashedPassword)
         {
+            if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(hashedPassword))
+                return false;
+
             string hashedInput = HashPassword(password);
-            return string.Equals(hashedInput, hashedPassword, StringComparison.OrdinalIgnoreCase);
+
+            // Use constant-time comparison to prevent timing attacks
+            return CryptographicEquals(hashedInput, hashedPassword);
+        }
+
+        /// <summary>
+        /// Compares two strings in constant time to prevent timing attacks.
+        /// </summary>
+        private static bool CryptographicEquals(string a, string b)
+        {
+            if (a.Length != b.Length)
+                return false;
+
+            int result = 0;
+            for (int i = 0; i < a.Length; i++)
+            {
+                result |= a[i] ^ b[i];
+            }
+
+            return result == 0;
         }
     }
 }

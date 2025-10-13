@@ -30,5 +30,6 @@ namespace Services.Interfaces
         Task<StudentDetailResponse?> GetStudentById(Guid userId);
         Task<bool> DeleteUser(Guid userId);
         Task<bool> UpdateUserStatus(Guid userId, int status);
+        Task<bool> ChangePassword(Guid userId, string currentPassword, string newPassword);
     }
 }

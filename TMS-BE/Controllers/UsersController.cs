@@ -199,6 +199,13 @@ namespace TMS_BE.Controllers
             return result ? Ok(new { message = "User Staus Changed." }) : NotFound();
         }
 
+        [HttpPut("ChangePassword/{userId}")]
+        public async Task<IActionResult> ChangePassword(Guid userId, string currentPassword, string newPassword)
+        {
+            var result = await _userService.ChangePassword(userId, currentPassword, newPassword);
+            return result ? Ok(new { message = "Password Changed." }) : BadRequest();
+        }
+
         // DELETE api/<UsersController>/5
         [HttpDelete("{userId}")]
         public async Task<IActionResult> DeleteUser(Guid userId)

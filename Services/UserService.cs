@@ -866,5 +866,32 @@ namespace Services
 
             return result;
         }
+
+        public async Task<bool> ChangePassword (Guid userId, string currentPassword, string newPassword)
+        {
+            var result = false;
+            var user = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+
+            if (user == null) throw new Exception("User not found");
+
+            if (!PasswordHasher.VerifyPassword(currentPassword, user.PasswordHash))
+                throw new Exception("Current password is incorrect.");
+
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+                throw new Exception("New password must be at least 6 characters long.");
+
+            if (PasswordHasher.VerifyPassword(newPassword, user.PasswordHash))
+                throw new Exception("New password cannot be the same as the current password.");
+
+            user.PasswordHash = PasswordHasher.HashPassword(newPassword);
+            user.LastUpdatedAt = DateTime.UtcNow;
+
+            result = true;
+            await _unitOfWork.GetRepository<User>().UpdateAsync(user);
+            await _unitOfWork.SaveAsync();
+
+            return result;
+        }
     }
 }
