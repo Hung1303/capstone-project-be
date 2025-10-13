@@ -192,6 +192,13 @@ namespace TMS_BE.Controllers
             return success ? NoContent() : NotFound();
         }
 
+        [HttpPut("Status/{userId}")]
+        public async Task<IActionResult> UpdateUserStatus(Guid userId, int status)
+        {
+            var result = await _userService.UpdateUserStatus(userId, status);
+            return result ? Ok(new { message = "User Staus Changed." }) : NotFound();
+        }
+
         // DELETE api/<UsersController>/5
         [HttpDelete("{userId}")]
         public async Task<IActionResult> DeleteUser(Guid userId)

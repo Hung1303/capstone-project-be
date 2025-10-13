@@ -29,5 +29,6 @@ namespace Services.Interfaces
         Task<ParentDetailResponse?> GetParentById(Guid userId);
         Task<StudentDetailResponse?> GetStudentById(Guid userId);
         Task<bool> DeleteUser(Guid userId);
+        Task<bool> UpdateUserStatus(Guid userId, int status);
     }
 }

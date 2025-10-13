@@ -837,5 +837,34 @@ namespace Services
 
             return result;
         }
+
+        public async Task<bool> UpdateUserStatus(Guid userId, int status)
+        {
+            var result = false;
+
+            var user = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+
+            if (user == null) throw new Exception("User not found.");
+
+            if (status < 1 || status > 3) throw new Exception("Must between 1 and 3");
+
+            switch (status)
+            {
+                case 1: user.Status = AccountStatus.Active; result = true;
+                    break;
+
+                case 2: user.Status = AccountStatus.Suspended; result = true;
+                    break;
+
+                case 3: user.Status = AccountStatus.Deactivated; result = true;
+                    break;
+            }
+
+            await _unitOfWork.GetRepository<User>().UpdateAsync(user);
+            await _unitOfWork.SaveAsync();
+
+            return result;
+        }
     }
 }
