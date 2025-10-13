@@ -851,13 +851,16 @@ namespace Services
 
             switch (status)
             {
-                case 1: user.Status = AccountStatus.Active; result = true;
+                case 1:
+                    user.Status = AccountStatus.Active; result = true;
                     break;
 
-                case 2: user.Status = AccountStatus.Suspended; result = true;
+                case 2:
+                    user.Status = AccountStatus.Suspended; result = true;
                     break;
 
-                case 3: user.Status = AccountStatus.Deactivated; result = true;
+                case 3:
+                    user.Status = AccountStatus.Deactivated; result = true;
                     break;
             }
 
@@ -867,7 +870,7 @@ namespace Services
             return result;
         }
 
-        public async Task<bool> ChangePassword (Guid userId, string currentPassword, string newPassword)
+        public async Task<bool> ChangePassword(Guid userId, string currentPassword, string newPassword)
         {
             var result = false;
             var user = await _unitOfWork.GetRepository<User>().Entities

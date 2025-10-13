@@ -1,0 +1,30 @@
+﻿namespace BusinessObjects.DTO.Suspension
+{
+    public class BanRequest
+    {
+        public string Reason { get; set; } = string.Empty;
+        public DateTimeOffset SuspendedFrom { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? SuspendedTo { get; set; }
+    }
+
+    public class SuspensionRecordResponse
+    {
+        public Guid Id { get; set; }
+        public string BannedUserFullName { get; set; } = string.Empty;
+        public string AdminFullName { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
+        public DateTimeOffset SuspendedFrom { get; set; }
+        public DateTimeOffset? SuspendedTo { get; set; }
+    }
+
+    public class CourseSuspensionRecordResponse
+    {
+        public Guid SuspensionId { get; set; }
+        public string CourseTitle { get; set; }
+        public string Subject { get; set; }
+        public string TeacherName { get; set; }
+        public string AdminName { get; set; }
+        public string Reason { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+}

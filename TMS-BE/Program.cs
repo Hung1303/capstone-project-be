@@ -149,6 +149,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ISuspensionService, SuspensionService>();
 builder.Services.AddEndpointsApiExplorer();
 
 // CORS policy (tighten AllowedOrigins as needed for your frontend)
