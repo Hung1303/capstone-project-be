@@ -3,7 +3,6 @@ using BusinessObjects.DTO.Result;
 using BusinessObjects.DTO.Token;
 using Core.Base;
 using Core.Security;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Services.Interfaces;

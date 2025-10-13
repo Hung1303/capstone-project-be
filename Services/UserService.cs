@@ -697,7 +697,7 @@ namespace Services
 
         public async Task<CenterDetailRespone?> GetCenterById(Guid userId)
         {
-            var query =  _unitOfWork.GetRepository<User>().Entities
+            var query = _unitOfWork.GetRepository<User>().Entities
                 .Include(c => c.CenterProfile)
                 .Where(u => u.Id == userId && u.Role == UserRole.Center && u.Status == AccountStatus.Active && !u.IsDeleted)
                 .Select(u => new CenterDetailRespone
@@ -780,6 +780,62 @@ namespace Services
                 });
 
             return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<ParentDetailResponse?> GetParentById(Guid userId)
+        {
+            var query = _unitOfWork.GetRepository<User>().Entities
+                .Include(c => c.CenterProfile)
+                .Where(u => u.Id == userId && u.Role == UserRole.Parent && u.Status == AccountStatus.Active && !u.IsDeleted)
+                .Select(u => new ParentDetailResponse
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    Status = u.Status.ToString(),
+                    Address = u.ParentProfile.Address,
+                    PhoneSecondary = u.ParentProfile.PhoneSecondary
+                });
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<StudentDetailResponse?> GetStudentById(Guid userId)
+        {
+            var query = _unitOfWork.GetRepository<User>().Entities
+                .Include(c => c.CenterProfile)
+                .Where(u => u.Id == userId && u.Role == UserRole.Student && u.Status == AccountStatus.Active && !u.IsDeleted)
+                .Select(u => new StudentDetailResponse
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    Status = u.Status.ToString(),
+                    SchoolName = u.StudentProfile.SchoolName,
+                    GradeLevel = u.StudentProfile.GradeLevel
+                });
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> DeleteUser(Guid userId)
+        {
+            var result = false;
+            var user = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            user.IsDeleted = true;
+            result = true;
+
+            await _unitOfWork.GetRepository<User>().UpdateAsync(user);
+            await _unitOfWork.SaveAsync();
+
+            return result;
         }
     }
 }

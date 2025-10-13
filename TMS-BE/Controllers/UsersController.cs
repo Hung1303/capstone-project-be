@@ -23,7 +23,7 @@ namespace TMS_BE.Controllers
         {
             var (users, totalCount) = await _userService.GetAllUsersAsync(pageNumber, pageSize, fullName);
             return Ok(new { totalCount, users });
-        }        
+        }
 
         [HttpGet("Centers")]
         public async Task<IActionResult> GetAllCenters([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? centerName = null)
@@ -86,6 +86,26 @@ namespace TMS_BE.Controllers
             var center = await _userService.GetTeacherById(userId);
             if (center == null)
                 return NotFound(new { message = "Teacher not found" });
+
+            return Ok(center);
+        }
+
+        [HttpGet("Parent/{userId}")]
+        public async Task<IActionResult> GetParentById(Guid userId)
+        {
+            var center = await _userService.GetParentById(userId);
+            if (center == null)
+                return NotFound(new { message = "Parent not found" });
+
+            return Ok(center);
+        }
+
+        [HttpGet("Student/{userId}")]
+        public async Task<IActionResult> GetStudentById(Guid userId)
+        {
+            var center = await _userService.GetStudentById(userId);
+            if (center == null)
+                return NotFound(new { message = "Student not found" });
 
             return Ok(center);
         }
@@ -173,9 +193,11 @@ namespace TMS_BE.Controllers
         }
 
         // DELETE api/<UsersController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> DeleteUser(Guid userId)
         {
+            var result = await _userService.DeleteUser(userId);
+            return result ? Ok(new { message = "User deleted." }) : NotFound();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Services.Interfaces
         Task<CreateTeacherRequest> CreateTeacherRequest(CreateTeacherRequest request);
         Task<CreateTeacherRequest> CenterAddTeacherRequest(Guid centerOwnerId, CreateTeacherRequest request);
         Task<CreateParentRequest> CreateParentRequest(CreateParentRequest request);
-        Task<CreateStudentRequest> CreateStudentRequest(Guid parentId, CreateStudentRequest request);        
+        Task<CreateStudentRequest> CreateStudentRequest(Guid parentId, CreateStudentRequest request);
         Task<bool> UpdateCenterAsync(Guid userId, CenterUpdateRequest request);
         Task<bool> UpdateTeacherAsynce(Guid userId, TeacherUpdateRequest request);
         Task<bool> UpdateParentAsynce(Guid userId, ParentUpdateRequest request);
@@ -26,5 +26,8 @@ namespace Services.Interfaces
         Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetTeachersByCenterIdAsync(
             Guid centerId, int pageNumber, int pageSize, string? fullName = null);
         Task<TeacherDetailResponse?> GetTeacherById(Guid userId);
+        Task<ParentDetailResponse?> GetParentById(Guid userId);
+        Task<StudentDetailResponse?> GetStudentById(Guid userId);
+        Task<bool> DeleteUser(Guid userId);
     }
 }
