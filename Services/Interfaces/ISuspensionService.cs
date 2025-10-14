@@ -12,5 +12,6 @@ namespace Services.Interfaces
         Task<PagedResult<CourseSuspensionRecordResponse>> GetAllCourseSuspensionRecordsAsync(
             int pageNumber = 1, int pageSize = 5, string? searchKeyword = null);
         Task<SuspensionRecordResponse> GetRecordById(Guid Id);
+        Task<bool> RemoveBan(Guid suspensionRecordId, Guid moderatorId);
     }
 }

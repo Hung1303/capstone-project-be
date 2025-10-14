@@ -112,7 +112,9 @@ namespace Services
                     AdminFullName = x.admin != null ? x.admin.FullName : "(Unknown Admin)",
                     Reason = x.s.Reason,
                     SuspendedFrom = x.s.SuspendedFrom,
-                    SuspendedTo = x.s.SuspendedTo
+                    SuspendedTo = x.s.SuspendedTo,
+                    CreatedAt = x.s.CreatedAt,
+                    LastUpdatedAt = (DateTime)x.s.LastUpdatedAt
                 })
                 .ToListAsync();
 
@@ -146,7 +148,8 @@ namespace Services
                                   TeacherName = tu != null ? tu.FullName : "(Unknown Teacher)",
                                   AdminName = admin != null ? admin.FullName : "(Unknown Admin)",
                                   Reason = s.Reason,
-                                  CreatedAt = s.CreatedAt
+                                  CreatedAt = s.CreatedAt,
+                                  LastUpdatedAt = (DateTime)s.LastUpdatedAt
                               };
 
             if (!string.IsNullOrWhiteSpace(searchKeyword))
@@ -177,7 +180,7 @@ namespace Services
             };
         }
 
-        public async Task<SuspensionRecordResponse> GetRecordById (Guid Id)
+        public async Task<SuspensionRecordResponse> GetRecordById(Guid Id)
         {
             var record = await _unitOfWork.GetRepository<SuspensionRecord>().Entities
                 .Include(u => u.User)
@@ -187,16 +190,19 @@ namespace Services
 
             if (record == null) throw new Exception("Record not found.");
 
-            if(record != null && record.UserId != null)
+            if (record != null && record.UserId != null)
             {
                 var response = new SuspensionRecordResponse
                 {
                     Id = record.Id,
                     BannedId = record.User.Id,
+                    Type = "User",
                     BanBy = record.ActionByUser.FullName,
                     SuspendedFrom = record.SuspendedFrom,
                     SuspendedTo = record.SuspendedTo,
-                    Reason = record.Reason
+                    Reason = record.Reason,
+                    CreatedAt = record.CreatedAt,
+                    LastUpdatedAt = record.LastUpdatedAt
                 };
 
                 return response;
@@ -207,18 +213,70 @@ namespace Services
                 {
                     Id = record.Id,
                     BannedId = record.Course.Id,
+                    Type = "Course",
                     BanBy = record.ActionByUser.FullName,
                     SuspendedFrom = record.SuspendedFrom,
                     SuspendedTo = record.SuspendedTo,
-                    Reason = record.Reason
+                    Reason = record.Reason,
+                    CreatedAt = record.CreatedAt,
+                    LastUpdatedAt = record.LastUpdatedAt
                 };
 
                 return response;
             }
 
-            return null;
         }
 
+        public async Task<bool> RemoveBan(Guid suspensionRecordId, Guid moderatorId)
+        {
+            var record = await _unitOfWork.GetRepository<SuspensionRecord>().Entities
+                .Include(u => u.User)
+                .Include(c => c.Course)
+                .Include(a => a.ActionByUser)
+                .FirstOrDefaultAsync(r => r.Id == suspensionRecordId && !r.IsDeleted);
+
+            if (record == null) return false;
+
+            var mod = await _unitOfWork.GetRepository<User>().Entities
+                    .FirstOrDefaultAsync(u => u.Id == moderatorId && u.Status == AccountStatus.Active && !u.IsDeleted);
+            if (mod == null) return false;
+
+            if (record.UserId != null && record.CourseId == null)
+            {
+                var user = await _unitOfWork.GetRepository<User>().Entities
+                    .FirstOrDefaultAsync(u => u.Id == record.UserId && u.Status == AccountStatus.Suspended && !u.IsDeleted);
+                if (user == null) return false;
+
+                user.Status = AccountStatus.Active;
+                record.LastUpdatedAt = DateTime.UtcNow;
+                record.IsDeleted = true;
+
+                await _unitOfWork.GetRepository<User>().UpdateAsync(user);
+                await _unitOfWork.GetRepository<SuspensionRecord>().UpdateAsync(record);
+                await _unitOfWork.SaveAsync();
+
+                return true;
+            }
+            
+            if(record.UserId == null && record.CourseId != null)
+            {
+                var course = await _unitOfWork.GetRepository<Course>().Entities
+                    .FirstOrDefaultAsync(u => u.Id == record.CourseId && u.Status == CourseStatus.Suspended && !u.IsDeleted);
+                if (course == null) return false;
+
+                course.Status = CourseStatus.Approved;
+                record.LastUpdatedAt = DateTime.UtcNow;
+                record.IsDeleted = true;
+
+                await _unitOfWork.GetRepository<Course>().UpdateAsync(course);
+                await _unitOfWork.GetRepository<SuspensionRecord>().UpdateAsync(record);
+                await _unitOfWork.SaveAsync();
+
+                return true;
+            }
+
+            return false;
+        }
 
         public class PagedResult<T>
         {

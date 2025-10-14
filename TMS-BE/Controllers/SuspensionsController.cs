@@ -79,9 +79,11 @@ namespace API.Controllers
         }
 
         // DELETE api/<SuspensionsController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{suspensionRecordId}")]
+        public async Task<IActionResult> RemoveBan(Guid suspensionRecordId, Guid moderatorId)
         {
+            var result = await _suspensionService.RemoveBan(suspensionRecordId, moderatorId);
+            return result ? Ok(new { message = "Ban has been removed." }) : NotFound();
         }
     }
 }
