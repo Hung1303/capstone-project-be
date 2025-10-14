@@ -1,0 +1,90 @@
+﻿using BusinessObjects.DTO.Course;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Services.Interfaces;
+
+namespace API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CourseController : ControllerBase
+    {
+        private readonly ICourseService _courseService;
+        public CourseController(ICourseService courseService)
+        {
+            _courseService = courseService;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCourse(CreateCourseRequest request)
+        {
+            try
+            {
+                var result = await _courseService.CreateCourse(request);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllCourse([FromQuery]string? searchTerm, [FromQuery] int pageNumber, [FromQuery] int pageSize)
+        {
+            try
+            {
+                var result = await _courseService.GetAllCourse(searchTerm, pageNumber, pageSize);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCourseById(Guid id)
+        {
+            try
+            {
+                var result = await _courseService.GetCourseById(id);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCourse(Guid id, UpdateCourseRequest request)
+        {
+            try
+            {
+                var result = await _courseService.UpdateCourse(id, request);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCourse(Guid id)
+        {
+            try
+            {
+                var result = await _courseService.DeleteCourse(id);
+                return Ok(new { success = true, message = "Delete Successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+    }
+}

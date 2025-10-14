@@ -149,6 +149,10 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ISyllabusService, SyllabusService>();
+builder.Services.AddScoped<ILessonPlanService, LessonPlanService>();
+builder.Services.AddScoped<IClassScheduleService, ClassScheduleService>();
 builder.Services.AddEndpointsApiExplorer();
 
 // CORS policy (tighten AllowedOrigins as needed for your frontend)
