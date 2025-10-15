@@ -278,7 +278,33 @@ namespace Services
             return false;
         }
 
-        //public async Task
+        public async Task<SuspensionRecord> UpdateSuspensionRecord(Guid suspensionRecordId, UpdateSuspensionRecordRequest request)
+        {
+            var record = await _unitOfWork.GetRepository<SuspensionRecord>().Entities
+                .FirstOrDefaultAsync(r => r.Id == suspensionRecordId && !r.IsDeleted);
+            if (record == null) return null;
+
+            if (!string.IsNullOrEmpty(request.Reason))
+            {
+                record.Reason = request.Reason;
+            }
+
+            if (request.SuspendedTo == null)
+            {
+                record.SuspendedTo = record.SuspendedTo;
+            }
+            else
+            {
+                record.SuspendedTo = request.SuspendedTo;
+            }
+
+            record.LastUpdatedAt = DateTime.UtcNow;
+
+            await _unitOfWork.GetRepository<SuspensionRecord>().UpdateAsync(record);
+            await _unitOfWork.SaveAsync();
+
+            return record;
+        }
 
         public class PagedResult<T>
         {

@@ -1,4 +1,5 @@
-﻿using BusinessObjects.DTO.Suspension;
+﻿using BusinessObjects;
+using BusinessObjects.DTO.Suspension;
 using static Services.SuspensionService;
 
 namespace Services.Interfaces
@@ -13,5 +14,6 @@ namespace Services.Interfaces
             int pageNumber = 1, int pageSize = 5, string? searchKeyword = null);
         Task<SuspensionRecordResponse> GetRecordById(Guid Id);
         Task<bool> RemoveBan(Guid suspensionRecordId, Guid moderatorId);
+        Task<SuspensionRecord> UpdateSuspensionRecord(Guid suspensionRecordId, UpdateSuspensionRecordRequest request);
     }
 }

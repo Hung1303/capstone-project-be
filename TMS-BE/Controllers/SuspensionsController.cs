@@ -58,14 +58,14 @@ namespace API.Controllers
         }
 
         // POST api/<SuspensionsController>
-        [HttpPost("{userId}")]
+        [HttpPost("User/{userId}")]
         public async Task<IActionResult> BanUser(Guid userId, Guid supervisorId, BanRequest record)
         {
             var result = await _suspensionService.BanUser(userId, supervisorId, record);
             return result ? Ok(new { message = "User Banned!!!!" }) : BadRequest();
         }
 
-        [HttpPost("{courseId}")]
+        [HttpPost("Course/{courseId}")]
         public async Task<IActionResult> BanCourse(Guid courseId, Guid supervisorId, BanRequest record)
         {
             var result = await _suspensionService.BanCourse(courseId, supervisorId, record);
@@ -73,9 +73,13 @@ namespace API.Controllers
         }
 
         // PUT api/<SuspensionsController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("{suspensionRecordId}")]
+        public async Task<IActionResult> UpdateSuspensionRecord(Guid suspensionRecordId, UpdateSuspensionRecordRequest request)
         {
+            var result = await _suspensionService.UpdateSuspensionRecord(suspensionRecordId, request);
+            if (result == null) return NotFound(new { message = "Record not found." });
+
+            return Ok(result);
         }
 
         // DELETE api/<SuspensionsController>/5

@@ -43,4 +43,10 @@
         public DateTime CreatedAt { get; set; }
         public DateTime? LastUpdatedAt { get; set; }
     }
+
+    public class UpdateSuspensionRecordRequest
+    {
+        public string? Reason { get; set; }
+        public DateTimeOffset? SuspendedTo { get; set; }
+    }
 }
