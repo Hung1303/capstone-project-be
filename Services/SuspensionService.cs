@@ -238,7 +238,7 @@ namespace Services
             if (record == null) return false;
 
             var mod = await _unitOfWork.GetRepository<User>().Entities
-                    .FirstOrDefaultAsync(u => u.Id == moderatorId && u.Status == AccountStatus.Active && !u.IsDeleted);
+                    .FirstOrDefaultAsync(u => u.Id == moderatorId && u.Role == UserRole.Admin && u.Status == AccountStatus.Active && !u.IsDeleted);
             if (mod == null) return false;
 
             if (record.UserId != null && record.CourseId == null)
@@ -277,6 +277,8 @@ namespace Services
 
             return false;
         }
+
+        public async Task
 
         public class PagedResult<T>
         {
