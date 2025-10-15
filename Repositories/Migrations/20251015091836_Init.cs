@@ -239,7 +239,6 @@ namespace Repositories.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Courses", x => x.Id);
-                    table.CheckConstraint("CK_Course_Owner", "(\"TeacherProfileId\" IS NOT NULL AND \"CenterProfileId\" IS NULL) OR (\"TeacherProfileId\" IS NULL AND \"CenterProfileId\" IS NOT NULL)");
                     table.ForeignKey(
                         name: "FK_Courses_CenterProfiles_CenterProfileId",
                         column: x => x.CenterProfileId,

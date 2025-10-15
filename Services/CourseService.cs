@@ -1,13 +1,9 @@
 ﻿using BusinessObjects;
 using BusinessObjects.DTO.Course;
+using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
 using Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services
 {
@@ -20,25 +16,41 @@ namespace Services
         }
         public async Task<CourseResponse> CreateCourse(CreateCourseRequest request)
         {
-            if (request.TeacherProfileId == null && request.CenterProfileId == null)
+            if (request.TeacherProfileId == null)
             {
-                throw new Exception("TeacherProfile or CenterProfile Not Found");
+                throw new Exception("TeacherProfileId is required");
             }
-            if (request.TeacherProfileId != null)
+
+            var teacher = await _unitOfWork
+                .GetRepository<TeacherProfile>()
+                .Entities
+                .FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
+            if (teacher == null)
             {
-                var checkTeacherProfile = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
-                if (checkTeacherProfile == null)
-                {
-                    throw new Exception("TeacherProfile Not Found");
-                }
+                throw new Exception("TeacherProfile Not Found");
             }
-            if (request.CenterProfileId != null)
+
+            Guid? centerToUse = request.CenterProfileId;
+            if (centerToUse != null)
             {
-                var checkCenterProfile = await _unitOfWork.GetRepository<CenterProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.CenterProfileId);
-                if (checkCenterProfile == null)
+                var center = await _unitOfWork
+                    .GetRepository<CenterProfile>()
+                    .Entities
+                    .FirstOrDefaultAsync(a => a.Id == centerToUse);
+                if (center == null)
                 {
                     throw new Exception("CenterProfile Not Found");
                 }
+
+                if (teacher.CenterProfileId == null || teacher.CenterProfileId != centerToUse)
+                {
+                    throw new Exception("Teacher does not belong to the specified Center");
+                }
+            }
+            else
+            {
+                // Auto-assign center from teacher if any; remains null for independent teachers
+                centerToUse = teacher.CenterProfileId;
             }
 
             var course = new Course
@@ -50,9 +62,9 @@ namespace Services
                 TeachingMethod = request.TeachingMethod,
                 TuitionFee = request.TuitionFee,
                 Capacity = request.Capacity,
-                Status = request.Status,
+                Status = CourseStatus.Draft,
                 TeacherProfileId = request.TeacherProfileId,
-                CenterProfileId = request.CenterProfileId,
+                CenterProfileId = centerToUse,
             };
             await _unitOfWork.GetRepository<Course>().InsertAsync(course);
             await _unitOfWork.SaveAsync();
@@ -66,7 +78,7 @@ namespace Services
                 TeachingMethod = course.TeachingMethod,
                 TuitionFee = course.TuitionFee,
                 Capacity = course.Capacity,
-                Status= course.Status,
+                Status = course.Status,
                 TeacherProfileId = course.TeacherProfileId,
                 CenterProfileId = course.CenterProfileId,
             };
@@ -141,7 +153,7 @@ namespace Services
                 TeachingMethod = course.TeachingMethod,
                 TuitionFee = course.TuitionFee,
                 Capacity = course.Capacity,
-                Status= course.Status,
+                Status = course.Status,
                 TeacherProfileId = course.TeacherProfileId,
                 CenterProfileId = course.CenterProfileId,
             };
@@ -155,6 +167,47 @@ namespace Services
             {
                 throw new Exception("Course Not Found");
             }
+
+            // Determine target teacher and center
+            var targetTeacherId = request.TeacherProfileId ?? course.TeacherProfileId;
+            if (targetTeacherId == null)
+            {
+                throw new Exception("Course must have a TeacherProfileId");
+            }
+
+            var teacher = await _unitOfWork
+                .GetRepository<TeacherProfile>()
+                .Entities
+                .FirstOrDefaultAsync(a => a.Id == targetTeacherId);
+            if (teacher == null)
+            {
+                throw new Exception("TeacherProfile Not Found");
+            }
+
+            Guid? targetCenterId = request.CenterProfileId ?? course.CenterProfileId;
+            if (request.CenterProfileId == null && request.TeacherProfileId != null)
+            {
+                // If teacher changed and center not explicitly provided, sync center from teacher
+                targetCenterId = teacher.CenterProfileId;
+            }
+
+            if (targetCenterId != null)
+            {
+                var center = await _unitOfWork
+                    .GetRepository<CenterProfile>()
+                    .Entities
+                    .FirstOrDefaultAsync(a => a.Id == targetCenterId);
+                if (center == null)
+                {
+                    throw new Exception("CenterProfile Not Found");
+                }
+
+                if (teacher.CenterProfileId == null || teacher.CenterProfileId != targetCenterId)
+                {
+                    throw new Exception("Teacher does not belong to the specified Center");
+                }
+            }
+
             if (request.Title != null)
             {
                 course.Title = request.Title;
@@ -187,24 +240,9 @@ namespace Services
             {
                 course.Status = request.Status.Value;
             }
-            if (request.TeacherProfileId != null) 
-            {
-                var checkTeacherProfile = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
-                if (checkTeacherProfile == null)
-                {
-                    throw new Exception("TeacherProfile Not Found");
-                }
-                course.TeacherProfileId = request.TeacherProfileId;
-            }
-            if (request.CenterProfileId != null)
-            {
-                var checkCenterProfile = await _unitOfWork.GetRepository<CenterProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.CenterProfileId);
-                if (checkCenterProfile == null)
-                {
-                    throw new Exception("CenterProfile Not Found");
-                }
-                course.CenterProfileId = request.CenterProfileId;
-            }
+            // Apply ownership updates after validation above
+            course.TeacherProfileId = targetTeacherId;
+            course.CenterProfileId = targetCenterId;
             await _unitOfWork.GetRepository<Course>().UpdateAsync(course);
             await _unitOfWork.SaveAsync();
 

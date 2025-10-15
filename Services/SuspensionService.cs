@@ -257,8 +257,8 @@ namespace Services
 
                 return true;
             }
-            
-            if(record.UserId == null && record.CourseId != null)
+
+            if (record.UserId == null && record.CourseId != null)
             {
                 var course = await _unitOfWork.GetRepository<Course>().Entities
                     .FirstOrDefaultAsync(u => u.Id == record.CourseId && u.Status == CourseStatus.Suspended && !u.IsDeleted);
@@ -277,8 +277,6 @@ namespace Services
 
             return false;
         }
-
-        public async Task
 
         public class PagedResult<T>
         {

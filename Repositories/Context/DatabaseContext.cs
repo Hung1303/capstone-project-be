@@ -67,10 +67,7 @@ namespace Repositories.Context
                 b.HasMany(x => x.Schedules).WithOne().HasForeignKey(s => s.CourseId).OnDelete(DeleteBehavior.Cascade);
                 b.HasMany(x => x.Enrollments).WithOne().HasForeignKey(e => e.CourseId).OnDelete(DeleteBehavior.Cascade);
                 b.HasMany(x => x.CourseFeedbacks).WithOne().HasForeignKey(r => r.CourseId).OnDelete(DeleteBehavior.Cascade);
-                b.ToTable(t => t.HasCheckConstraint(
-                    "CK_Course_Owner",
-                    "(\"TeacherProfileId\" IS NOT NULL AND \"CenterProfileId\" IS NULL) OR (\"TeacherProfileId\" IS NULL AND \"CenterProfileId\" IS NOT NULL)"
-                ));
+                // Removed CK_Course_Owner check constraint to allow courses to be owned by center and taught by teacher simultaneously
             });
 
             modelBuilder.Entity<ClassSchedule>(b =>

@@ -12,7 +12,7 @@ using Repositories.Context;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251012160955_Init")]
+    [Migration("20251015091836_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -372,10 +372,7 @@ namespace Repositories.Migrations
 
                     b.HasIndex("TeacherProfileId");
 
-                    b.ToTable("Courses", t =>
-                        {
-                            t.HasCheckConstraint("CK_Course_Owner", "(\"TeacherProfileId\" IS NOT NULL AND \"CenterProfileId\" IS NULL) OR (\"TeacherProfileId\" IS NULL AND \"CenterProfileId\" IS NOT NULL)");
-                        });
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("BusinessObjects.CourseFeedback", b =>

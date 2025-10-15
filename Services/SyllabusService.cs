@@ -1,14 +1,8 @@
-﻿using BusinessObjects.DTO.Course;
-using BusinessObjects;
+﻿using BusinessObjects;
 using BusinessObjects.DTO.Syllabus;
-using Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Repository.Interfaces;
+using Services.Interfaces;
 
 namespace Services
 {
@@ -76,7 +70,7 @@ namespace Services
                     (c.GradeLevel != null && c.GradeLevel.ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     (c.Subject != null && c.Subject.ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     (c.AssessmentMethod != null && c.AssessmentMethod.ToLower().Contains(searchTerm.Trim().ToLower())) ||
-                    (c.CourseMaterial != null && c.CourseMaterial.ToLower().Contains(searchTerm.Trim().ToLower())) 
+                    (c.CourseMaterial != null && c.CourseMaterial.ToLower().Contains(searchTerm.Trim().ToLower()))
                 );
             }
 

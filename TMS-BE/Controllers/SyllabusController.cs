@@ -1,6 +1,4 @@
-﻿using BusinessObjects.DTO.Course;
-using BusinessObjects.DTO.Syllabus;
-using Microsoft.AspNetCore.Http;
+﻿using BusinessObjects.DTO.Syllabus;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
@@ -32,7 +30,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSyllabus([FromQuery] string? searchTerm, [FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetAllSyllabus([FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {

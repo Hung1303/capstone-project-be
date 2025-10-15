@@ -1,8 +1,5 @@
 ﻿using BusinessObjects.DTO.ClassSchedule;
-using BusinessObjects.DTO.LessonPlan;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Services;
 using Services.Interfaces;
 
 namespace API.Controllers
@@ -32,7 +29,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllClassSchedule([FromQuery] DayOfWeek? dayOfWeek, [FromQuery] TimeOnly? startTime, [FromQuery] TimeOnly? endTime, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate, [FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetAllClassSchedule([FromQuery] DayOfWeek? dayOfWeek, [FromQuery] TimeOnly? startTime, [FromQuery] TimeOnly? endTime, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {

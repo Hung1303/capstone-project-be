@@ -1,10 +1,5 @@
 ﻿using Core.Base;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessObjects.DTO.Course
 {
@@ -19,7 +14,8 @@ namespace BusinessObjects.DTO.Course
         public decimal TuitionFee { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1")]
         public int Capacity { get; set; }
-        public CourseStatus Status { get; set; }
+        //public CourseStatus Status { get; set; }
+        [Required]
         public Guid? TeacherProfileId { get; set; }
         public Guid? CenterProfileId { get; set; }
     }
@@ -40,7 +36,7 @@ namespace BusinessObjects.DTO.Course
     }
     public class CourseResponse
     {
-        public Guid id {get; set;}
+        public Guid id { get; set; }
         public string Title { get; set; }
         public string Subject { get; set; }
         public string Description { get; set; }

@@ -1,14 +1,8 @@
 ﻿using BusinessObjects;
 using BusinessObjects.DTO.LessonPlan;
-using BusinessObjects.DTO.Syllabus;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
 using Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services
 {

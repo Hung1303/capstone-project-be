@@ -1,5 +1,4 @@
 ﻿using BusinessObjects.DTO.Course;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
@@ -27,11 +26,11 @@ namespace API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            
+
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCourse([FromQuery]string? searchTerm, [FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetAllCourse([FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
@@ -42,7 +41,7 @@ namespace API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            
+
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCourseById(Guid id)

@@ -1,10 +1,4 @@
-﻿using BusinessObjects.DTO.Course;
-using BusinessObjects.DTO.Syllabus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BusinessObjects.DTO.Syllabus;
 
 namespace Services.Interfaces
 {
