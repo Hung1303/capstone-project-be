@@ -114,38 +114,15 @@ namespace API.Controllers
         #endregion
 
         #region Login
-
         [HttpPost]
         [Route("Login")]
         public IActionResult Login(string email, string password)
         {
             var user = _userService.GetUserByEmailAsync(email).Result;
-            if (user.IsDeleted == false && user.Status == AccountStatus.Active)
-            {
-                if (user != null && user.IsDeleted == false)
-                {
-                    // Hash the input password with SHA256
-                    var hashedInputPasswordString = PasswordHasher.HashPassword(password);
 
-                    if (hashedInputPasswordString == user.PasswordHash)
-                    {
-                        // Convert userId to string using .ToString()
-                        var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Name, user.Email)
-    };
-                        // Compare the hashed input password with the stored hashed password
-                        _tokenService.ResetRefreshToken();
-                        var token = GenerateToken(user, null);
-                        return Ok(new ResultDTO // Wrap the TokenDTO in a ResultDTO
-                        {
-                            IsSuccess = true,
-                            Message = "Đăng nhập thành công.",
-                            Data = token // The TokenDTO object
-                        });
-                    }
-                }
+            // Kiểm tra tồn tại user
+            if (user == null)
+            {
                 return BadRequest(new ResultDTO
                 {
                     IsSuccess = false,
@@ -153,10 +130,60 @@ namespace API.Controllers
                     Data = null
                 });
             }
+
+            // Kiểm tra trạng thái tài khoản
+            if (user.IsDeleted)
+            {
+                return BadRequest(new ResultDTO
+                {
+                    IsSuccess = false,
+                    Message = "Tài khoản đã bị xóa",
+                    Data = null
+                });
+            }
+
+            if (user.Status != AccountStatus.Active)
+            {
+                return BadRequest(new ResultDTO
+                {
+                    IsSuccess = false,
+                    Message = "Tài khoản chưa được kích hoạt",
+                    Data = null
+                });
+            }
+
+            // ✅ Kiểm tra mật khẩu (dùng PasswordHasher.VerifyPassword)
+            bool isPasswordValid = PasswordHasher.VerifyPassword(password, user.PasswordHash);
+
+            if (isPasswordValid)
+            {
+                // Convert userId to string using .ToString()
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Email)
+        };
+
+                // Reset refresh token (nếu có)
+                _tokenService.ResetRefreshToken();
+
+                // Sinh JWT token
+                var token = GenerateToken(user, null);
+
+                // ✅ Trả về kết quả thành công
+                return Ok(new ResultDTO
+                {
+                    IsSuccess = true,
+                    Message = "Đăng nhập thành công.",
+                    Data = token
+                });
+            }
+
+            // ❌ Mật khẩu sai
             return BadRequest(new ResultDTO
             {
                 IsSuccess = false,
-                Message = "Tài khoản đã bị xóa",
+                Message = "Sai email hoặc mật khẩu",
                 Data = null
             });
         }

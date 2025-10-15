@@ -78,6 +78,13 @@ namespace Repositories.Context
             modelBuilder.Entity<Enrollment>(b =>
             {
                 b.HasIndex(x => new { x.CourseId, x.StudentProfileId }).IsUnique();
+
+                // 🔹 Thiết lập quan hệ 1 Course - nhiều Enrollment
+                b.HasOne(e => e.Course)
+                    .WithMany(c => c.Enrollments)
+                    .HasForeignKey(e => e.CourseId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
             });
 
             modelBuilder.Entity<CourseFeedback>(b =>
