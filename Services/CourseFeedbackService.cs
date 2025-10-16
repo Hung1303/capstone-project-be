@@ -7,54 +7,53 @@ using Services.Interfaces;
 
 namespace Services
 {
-    public class TeacherFeedbackService : ITeacherFeedbackService
+    public class CourseFeedbackService : ICourseFeedbackService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public TeacherFeedbackService(IUnitOfWork unitOfWork)
+
+        public CourseFeedbackService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<TeacherFeedbackResponse> CreateTeacherFeedback(Guid teacherProfileId, Guid reviewerProfileId, CreateTeacherFeedbackRequest request)
+        public async Task<CourseFeedbackResponse> CreateCourseFeedback(Guid courseId, Guid reviewerProfileId, CreateCourseFeedbackRequest request)
         {
-            var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
-                .FirstOrDefaultAsync(t => t.Id == teacherProfileId);
+            var course = await _unitOfWork.GetRepository<Course>().Entities
+                .FirstOrDefaultAsync(t => t.Id == courseId && t.Status == CourseStatus.Approved && !t.IsDeleted);
 
             var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
-                .FirstOrDefaultAsync(s => s.Id == reviewerProfileId);
+                .FirstOrDefaultAsync(s => s.Id == reviewerProfileId && !s.IsDeleted);
 
             var parent = await _unitOfWork.GetRepository<ParentProfile>().Entities
-                .FirstOrDefaultAsync(s => s.Id == reviewerProfileId);
+                .FirstOrDefaultAsync(s => s.Id == reviewerProfileId && !s.IsDeleted);
 
-            if (teacher == null) return null;
+            if (course == null) return null;
             if (student != null && parent == null)
             {
-                var feedback = new TeacherFeedback
+                var feedback = new CourseFeedback
                 {
-                    TeacherProfileId = teacher.Id,
+                    CourseId = course.Id,
                     StudentProfileId = student.Id,
                     ParentProfileId = null,
                     Rating = request.Rating,
                     Comment = request.Comment,
-                    SubmittedAt = DateTimeOffset.UtcNow,
                     Status = ReviewStatus.PendingModeration,
                     ModeratedByUserId = null,
                     ModeratedAt = null,
                     ModerationNotes = null
                 };
 
-                await _unitOfWork.GetRepository<TeacherFeedback>().InsertAsync(feedback);
+                await _unitOfWork.GetRepository<CourseFeedback>().InsertAsync(feedback);
                 await _unitOfWork.SaveAsync();
 
-                return new TeacherFeedbackResponse
+                return new CourseFeedbackResponse
                 {
                     Id = feedback.Id,
-                    TeacherProfileId = feedback.TeacherProfileId,
+                    CourseId = feedback.CourseId,
                     StudentProfileId = feedback.StudentProfileId,
                     ParentProfileId = feedback.ParentProfileId,
                     Rating = feedback.Rating,
                     Comment = feedback.Comment,
-                    SubmittedAt = feedback.SubmittedAt,
                     Status = feedback.Status,
                     CreatedAt = feedback.CreatedAt,
                     LastUpdatedAt = feedback.LastUpdatedAt
@@ -62,32 +61,30 @@ namespace Services
             }
             else if (student == null && parent != null)
             {
-                var feedback = new TeacherFeedback
+                var feedback = new CourseFeedback
                 {
-                    TeacherProfileId = teacher.Id,
+                    CourseId = course.Id,
                     StudentProfileId = null,
                     ParentProfileId = parent.Id,
                     Rating = request.Rating,
                     Comment = request.Comment,
-                    SubmittedAt = DateTimeOffset.UtcNow,
                     Status = ReviewStatus.PendingModeration,
                     ModeratedByUserId = null,
                     ModeratedAt = null,
                     ModerationNotes = null
                 };
 
-                await _unitOfWork.GetRepository<TeacherFeedback>().InsertAsync(feedback);
+                await _unitOfWork.GetRepository<CourseFeedback>().InsertAsync(feedback);
                 await _unitOfWork.SaveAsync();
 
-                return new TeacherFeedbackResponse
+                return new CourseFeedbackResponse
                 {
                     Id = feedback.Id,
-                    TeacherProfileId = feedback.TeacherProfileId,
+                    CourseId = feedback.CourseId,
                     StudentProfileId = feedback.StudentProfileId,
                     ParentProfileId = feedback.ParentProfileId,
                     Rating = feedback.Rating,
                     Comment = feedback.Comment,
-                    SubmittedAt = feedback.SubmittedAt,
                     Status = feedback.Status,
                     CreatedAt = feedback.CreatedAt,
                     LastUpdatedAt = feedback.LastUpdatedAt
@@ -97,31 +94,30 @@ namespace Services
             return null;
         }
 
-        public async Task<TeacherFeedbackResponse> GetTeacherFeedbackById(Guid feedbackId)
+        public async Task<CourseFeedbackResponse> GetCourseFeedbackById(Guid courseFeedbackId)
         {
-            var feedback = await _unitOfWork.GetRepository<TeacherFeedback>().Entities
-                .FirstOrDefaultAsync(f => f.Id == feedbackId && f.Status == ReviewStatus.Approved && !f.IsDeleted);
+            var feedback = await _unitOfWork.GetRepository<CourseFeedback>().Entities
+                .FirstOrDefaultAsync(f => f.Id == courseFeedbackId && f.Status == ReviewStatus.Approved && !f.IsDeleted);
 
             if (feedback == null) return null;
 
-            return new TeacherFeedbackResponse
+            return new CourseFeedbackResponse
             {
                 Id = feedback.Id,
-                TeacherProfileId = feedback.TeacherProfileId,
+                CourseId = feedback.CourseId,
                 StudentProfileId = feedback.StudentProfileId,
                 ParentProfileId = feedback.ParentProfileId,
                 Rating = feedback.Rating,
                 Comment = feedback.Comment,
-                SubmittedAt = feedback.SubmittedAt,
                 Status = feedback.Status,
                 CreatedAt = feedback.CreatedAt,
                 LastUpdatedAt = feedback.LastUpdatedAt
             };
         }
 
-        public async Task<string> ApproveTeacherFeedback(Guid feedbackId, Guid moderatorId, TeacherFeedbackModerationRequest request)
+        public async Task<string> ApproveCourseFeedback(Guid feedbackId, Guid moderatorId, CourseFeedbackModerationRequest request)
         {
-            var feedback = await _unitOfWork.GetRepository<TeacherFeedback>().Entities
+            var feedback = await _unitOfWork.GetRepository<CourseFeedback>().Entities
                 .FirstOrDefaultAsync(f => f.Id == feedbackId && f.Status == ReviewStatus.PendingModeration && !f.IsDeleted);
             if (feedback == null) return null;
 
@@ -135,15 +131,15 @@ namespace Services
             feedback.ModeratedAt = DateTimeOffset.UtcNow;
             feedback.LastUpdatedAt = DateTime.UtcNow;
 
-            await _unitOfWork.GetRepository<TeacherFeedback>().UpdateAsync(feedback);
+            await _unitOfWork.GetRepository<CourseFeedback>().UpdateAsync(feedback);
             await _unitOfWork.SaveAsync();
 
             return "Feedback approved.";
         }
 
-        public async Task<TeacherFeedbackResponse> UpdateTeacherFeedback(Guid feedbackId, UpdateTeacherFeedbackRequest request)
+        public async Task<CourseFeedbackResponse> UpdateCourseFeedback(Guid feedbackId, UpdateCourseFeedbackRequest request)
         {
-            var fb = await _unitOfWork.GetRepository<TeacherFeedback>().Entities
+            var fb = await _unitOfWork.GetRepository<CourseFeedback>().Entities
                 .FirstOrDefaultAsync(f => f.Id == feedbackId && f.Status == ReviewStatus.Approved && !f.IsDeleted);
 
             if (fb == null) return null;
@@ -161,42 +157,41 @@ namespace Services
 
             fb.LastUpdatedAt = DateTime.UtcNow;
 
-            await _unitOfWork.GetRepository<TeacherFeedback>().UpdateAsync(fb);
+            await _unitOfWork.GetRepository<CourseFeedback>().UpdateAsync(fb);
             await _unitOfWork.SaveAsync();
 
-            return new TeacherFeedbackResponse
+            return new CourseFeedbackResponse
             {
                 Id = fb.Id,
-                TeacherProfileId = fb.TeacherProfileId,
+                CourseId = fb.CourseId,
                 StudentProfileId = fb.StudentProfileId,
                 ParentProfileId = fb.ParentProfileId,
                 Rating = fb.Rating,
                 Comment = fb.Comment,
-                SubmittedAt = fb.SubmittedAt,
                 Status = fb.Status,
                 CreatedAt = fb.CreatedAt,
                 LastUpdatedAt = fb.LastUpdatedAt
             };
         }
 
-        public async Task<bool> RemoveTeacherFeedback(Guid id)
+        public async Task<bool> RemoveCourseFeedback(Guid id)
         {
-            var fb = await _unitOfWork.GetRepository<TeacherFeedback>().Entities
+            var fb = await _unitOfWork.GetRepository<CourseFeedback>().Entities
                 .FirstOrDefaultAsync(f => f.Id == id && f.Status == ReviewStatus.Approved && !f.IsDeleted);
 
             if (fb == null) return false;
 
             fb.IsDeleted = true;
 
-            await _unitOfWork.GetRepository<TeacherFeedback>().UpdateAsync(fb);
+            await _unitOfWork.GetRepository<CourseFeedback>().UpdateAsync(fb);
             await _unitOfWork.SaveAsync();
 
             return true;
         }
 
-        public async Task<(IEnumerable<TeacherFeedbackDetailResponse> Feedbacks, int TotalCount)> GetAllTeacherFeedbacks(TeacherFeedbackQuery query)
+        public async Task<(IEnumerable<CourseFeedbackDetailResponse> Feedbacks, int TotalCount)> GetAllCoursesFeedbacks(CourseFeedbackQuery query)
         {
-            var feedbackQuery = _unitOfWork.GetRepository<TeacherFeedback>().Entities
+            var feedbackQuery = _unitOfWork.GetRepository<CourseFeedback>().Entities
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -207,19 +202,18 @@ namespace Services
 
             int totalCount = await feedbackQuery.CountAsync();
 
-            var feedbacks = await _unitOfWork.GetRepository<TeacherFeedback>().Entities
-                .OrderByDescending(f => f.SubmittedAt)
+            var feedbacks = await _unitOfWork.GetRepository<CourseFeedback>().Entities
+                .OrderByDescending(f => f.CreatedAt)
                 .Skip((query.PageNumber - 1) * query.PageSize)
                 .Take(query.PageSize)
-                .Select(f => new TeacherFeedbackDetailResponse
+                .Select(f => new CourseFeedbackDetailResponse
                 {
                     Id = f.Id,
-                    TeacherProfileId = f.TeacherProfileId,
+                    CourseId = f.CourseId,
                     StudentProfileId = f.StudentProfileId,
                     ParentProfileId = f.ParentProfileId,
                     Rating = f.Rating,
                     Comment = f.Comment,
-                    SubmittedAt = f.SubmittedAt,
                     Status = f.Status,
                     ModerateByUserId = f.ModeratedByUserId ?? Guid.Empty,
                     ModerationNotes = f.ModerationNotes ?? string.Empty,

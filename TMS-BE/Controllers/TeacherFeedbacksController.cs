@@ -1,5 +1,4 @@
-﻿using BusinessObjects;
-using BusinessObjects.DTO.Feedbacks;
+﻿using BusinessObjects.DTO.Feedbacks;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
@@ -17,7 +16,6 @@ namespace API.Controllers
             _teacherFeedbackService = teacherFeedbackService;
         }
 
-        // GET: api/<TeacherFeedbacksController>
         [HttpGet]
         public async Task<IActionResult> GetAllTeacherFeedbacks([FromQuery] TeacherFeedbackQuery query)
         {
@@ -34,7 +32,6 @@ namespace API.Controllers
             return Ok(response);
         }
 
-        // GET api/<TeacherFeedbacksController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTeacherFeedbackById(Guid id)
         {
@@ -43,7 +40,6 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        // POST api/<TeacherFeedbacksController>
         [HttpPost]
         public async Task<IActionResult> CreateTeacherFeedback(Guid teacherProfileId, Guid reviewerProfileId, [FromBody] CreateTeacherFeedbackRequest request)
         {
@@ -54,15 +50,14 @@ namespace API.Controllers
         }
 
         [HttpPut("Approve/{feedbackId}")]
-        public async Task<IActionResult> ApproveTeacherFeedback(Guid feedbackId, Guid reviewerProfileId, [FromBody] TeacherFeedbackModerationRequest request)
+        public async Task<IActionResult> ApproveTeacherFeedback(Guid feedbackId, Guid moderatorId, [FromBody] TeacherFeedbackModerationRequest request)
         {
-            var result = await _teacherFeedbackService.ApproveTeacherFeedback(feedbackId, reviewerProfileId, request);
+            var result = await _teacherFeedbackService.ApproveTeacherFeedback(feedbackId, moderatorId, request);
 
             if (result == null) return NotFound("Feedback not found.");
             return Ok(result);
         }
 
-        // PUT api/<TeacherFeedbacksController>/5
         [HttpPut("{feedbackId}")]
         public async Task<IActionResult> UpdateTeacherFeedback(Guid feedbackId, [FromBody] UpdateTeacherFeedbackRequest request)
         {
@@ -72,7 +67,6 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        // DELETE api/<TeacherFeedbacksController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveTeacherFeedback(Guid id)
         {
