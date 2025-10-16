@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.DTO.Feedbacks;
+using static Services.TeacherFeedbackService;
 
 namespace Services.Interfaces
 {
@@ -9,5 +10,6 @@ namespace Services.Interfaces
         Task<string> ApproveTeacherFeedback(Guid feedbackId, Guid moderatorId, TeacherFeedbackModerationRequest request);
         Task<TeacherFeedbackResponse> UpdateTeacherFeedback(Guid feedbackId, UpdateTeacherFeedbackRequest request);
         Task<bool> RemoveTeacherFeedback(Guid id);
+        Task<(IEnumerable<TeacherFeedbackDetailResponse> Feedbacks, int TotalCount)> GetAllTeacherFeedbacks(TeacherFeedbackQuery query);
     }
 }

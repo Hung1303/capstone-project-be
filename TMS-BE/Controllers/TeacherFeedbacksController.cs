@@ -1,4 +1,5 @@
-﻿using BusinessObjects.DTO.Feedbacks;
+﻿using BusinessObjects;
+using BusinessObjects.DTO.Feedbacks;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
@@ -18,9 +19,19 @@ namespace API.Controllers
 
         // GET: api/<TeacherFeedbacksController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> GetAllTeacherFeedbacks([FromQuery] TeacherFeedbackQuery query)
         {
-            return new string[] { "value1", "value2" };
+            var (feedbacks, totalCount) = await _teacherFeedbackService.GetAllTeacherFeedbacks(query);
+            var response = new
+            {
+                TotalCount = totalCount,
+                PageNumber = query.PageNumber,
+                PageSize = query.PageSize,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)query.PageSize),
+                Data = feedbacks
+            };
+
+            return Ok(response);
         }
 
         // GET api/<TeacherFeedbacksController>/5

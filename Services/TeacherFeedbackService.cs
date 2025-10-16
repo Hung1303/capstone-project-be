@@ -193,5 +193,42 @@ namespace Services
 
             return true;
         }
+
+        public async Task<(IEnumerable<TeacherFeedbackDetailResponse> Feedbacks, int TotalCount)> GetAllTeacherFeedbacks(TeacherFeedbackQuery query)
+        {
+            var feedbackQuery = _unitOfWork.GetRepository<TeacherFeedback>().Entities
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (query.Status.HasValue)
+            {
+                feedbackQuery = feedbackQuery.Where(f => f.Status == query.Status.Value);
+            }
+
+            int totalCount = await feedbackQuery.CountAsync();
+
+            var feedbacks = await _unitOfWork.GetRepository<TeacherFeedback>().Entities
+                .OrderByDescending(f => f.SubmittedAt)
+                .Skip((query.PageNumber - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(f => new TeacherFeedbackDetailResponse
+                {
+                    Id = f.Id,
+                    TeacherProfileId = f.TeacherProfileId,
+                    StudentProfileId = f.StudentProfileId,
+                    ParentProfileId = f.ParentProfileId,
+                    Rating = f.Rating,
+                    Comment = f.Comment,
+                    SubmittedAt = f.SubmittedAt,
+                    Status = f.Status,
+                    ModerateByUserId = f.ModeratedByUserId ?? Guid.Empty,
+                    ModerationNotes = f.ModerationNotes ?? string.Empty,
+                    ModeratedAt = f.ModeratedAt ?? DateTimeOffset.MinValue
+                })
+            .ToListAsync();
+
+            return (feedbacks, totalCount);
+        }
+                
     }
 }
