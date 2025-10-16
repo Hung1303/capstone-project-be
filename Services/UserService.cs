@@ -367,6 +367,10 @@ namespace Services
         public async Task<UserDetailResponse?> GetUserByIdAsync(Guid userId)
         {
             var query = _unitOfWork.GetRepository<User>().Entities
+                .Include(c => c.CenterProfile)
+                .Include(t => t.TeacherProfile)
+                .Include(p => p.ParentProfile)
+                .Include(s => s.StudentProfile)
                 .Where(u => u.Id == userId && !u.IsDeleted)
                 .Select(u => new UserDetailResponse
                 {
@@ -376,7 +380,11 @@ namespace Services
                     FullName = u.FullName,
                     PhoneNumber = u.PhoneNumber,
                     Role = u.Role.ToString(),
-                    Status = u.Status.ToString()
+                    Status = u.Status.ToString(),
+                    CenterProfileId = u.CenterProfile != null ? u.CenterProfile.Id : (Guid?)null,
+                    TeacherProfileId = u.TeacherProfile != null ? u.TeacherProfile.Id : (Guid?)null,
+                    ParentProfileId = u.ParentProfile != null ? u.ParentProfile.Id : (Guid?)null,
+                    StudentProfileId = u.StudentProfile != null ? u.StudentProfile.Id : (Guid?)null
                 });
 
             return await query.FirstOrDefaultAsync();
@@ -578,6 +586,7 @@ namespace Services
                 .Select(x => new CenterListResponse
                 {
                     UserId = x.Center.UserId,
+                    CenterProfileId = x.Center.Id,
                     CenterName = x.Center.CenterName,
                     OwnerName = x.Center.OwnerName,
                     LicenseNumber = x.Center.LicenseNumber,
@@ -762,11 +771,12 @@ namespace Services
         public async Task<TeacherDetailResponse?> GetTeacherById(Guid userId)
         {
             var query = _unitOfWork.GetRepository<User>().Entities
-                .Include(c => c.CenterProfile)
+                .Include(c => c.TeacherProfile)
                 .Where(u => u.Id == userId && u.Role == UserRole.Teacher && u.Status == AccountStatus.Active && !u.IsDeleted)
                 .Select(u => new TeacherDetailResponse
                 {
                     Id = u.Id,
+                    CenterId = u.TeacherProfile.CenterProfileId,
                     FullName = u.FullName,
                     Email = u.Email,
                     PhoneNumber = u.PhoneNumber,
@@ -785,11 +795,12 @@ namespace Services
         public async Task<ParentDetailResponse?> GetParentById(Guid userId)
         {
             var query = _unitOfWork.GetRepository<User>().Entities
-                .Include(c => c.CenterProfile)
+                .Include(c => c.ParentProfile)
                 .Where(u => u.Id == userId && u.Role == UserRole.Parent && u.Status == AccountStatus.Active && !u.IsDeleted)
                 .Select(u => new ParentDetailResponse
                 {
                     Id = u.Id,
+                    ParentId = u.ParentProfile.Id,
                     FullName = u.FullName,
                     Email = u.Email,
                     PhoneNumber = u.PhoneNumber,
@@ -804,11 +815,12 @@ namespace Services
         public async Task<StudentDetailResponse?> GetStudentById(Guid userId)
         {
             var query = _unitOfWork.GetRepository<User>().Entities
-                .Include(c => c.CenterProfile)
+                .Include(c => c.StudentProfile)
                 .Where(u => u.Id == userId && u.Role == UserRole.Student && u.Status == AccountStatus.Active && !u.IsDeleted)
                 .Select(u => new StudentDetailResponse
                 {
                     Id = u.Id,
+                    StudentId = u.StudentProfile.Id,
                     FullName = u.FullName,
                     Email = u.Email,
                     PhoneNumber = u.PhoneNumber,

@@ -163,6 +163,7 @@ namespace BusinessObjects.DTO.User
     public class CenterListResponse
     {
         public Guid UserId { get; set; }
+        public Guid CenterProfileId { get; set; }
         public string CenterName { get; set; }
         public string OwnerName { get; set; }
         public string LicenseNumber { get; set; }
@@ -210,6 +211,10 @@ namespace BusinessObjects.DTO.User
         public string? PhoneNumber { get; set; }
         public string Role { get; set; }
         public string Status { get; set; }
+        public Guid? TeacherProfileId { get; set; }
+        public Guid? CenterProfileId { get; set; }
+        public Guid? StudentProfileId { get; set; }
+        public Guid? ParentProfileId { get; set; }
     }
 
     public class CenterDetailRespone
@@ -234,6 +239,7 @@ namespace BusinessObjects.DTO.User
     public class TeacherDetailResponse
     {
         public Guid Id { get; set; }
+        public Guid? CenterId { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
@@ -250,6 +256,7 @@ namespace BusinessObjects.DTO.User
     public class ParentDetailResponse
     {
         public Guid Id { get; set; }
+        public Guid ParentId { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
@@ -262,6 +269,7 @@ namespace BusinessObjects.DTO.User
     public class StudentDetailResponse
     {
         public Guid Id { get; set; }
+        public Guid StudentId { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }

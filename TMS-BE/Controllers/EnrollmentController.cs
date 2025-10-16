@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BusinessObjects.DTO.EnrollmentDTO;
+using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
-using BusinessObjects.DTO.EnrollmentDTO;
 
 namespace API.Controllers
 {
