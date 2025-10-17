@@ -30,11 +30,12 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCourse([FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        public async Task<IActionResult> GetAllCourse([FromQuery] string? searchTerm, [FromQuery] Guid? TeacherProfileId, [FromQuery] Guid? CenterProfileId,
+            [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
-                var result = await _courseService.GetAllCourse(searchTerm, pageNumber, pageSize);
+                var result = await _courseService.GetAllCourse(searchTerm, pageNumber, pageSize, TeacherProfileId, CenterProfileId);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)

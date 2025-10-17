@@ -98,9 +98,18 @@ namespace Services
             return true;
         }
 
-        public async Task<IEnumerable<CourseResponse>> GetAllCourse(string? searchTerm, int pageNumber, int pageSize)
+        public async Task<IEnumerable<CourseResponse>> GetAllCourse(string? searchTerm, int pageNumber, int pageSize, Guid? TeacherProfileId, Guid? CenterProfileId)
         {
             var courses = _unitOfWork.GetRepository<Course>().Entities.Where(a => !a.IsDeleted);
+            if (TeacherProfileId.HasValue)
+            {
+                courses = courses.Where(a => a.TeacherProfileId == TeacherProfileId);
+            }
+            if (CenterProfileId.HasValue)
+
+            {
+                courses = courses.Where(a => a.CenterProfileId == CenterProfileId);
+            }
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 courses = courses.Where(c =>

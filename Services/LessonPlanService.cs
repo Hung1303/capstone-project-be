@@ -55,9 +55,13 @@ namespace Services
             return true;
         }
 
-        public async Task<IEnumerable<LessonPlanResponse>> GetAllLessonPlan(string? searchTerm, int pageNumber, int pageSize)
+        public async Task<IEnumerable<LessonPlanResponse>> GetAllLessonPlan(string? searchTerm, int pageNumber, int pageSize, Guid? syllabusId)
         {
             var lessnPlan = _unitOfWork.GetRepository<LessonPlan>().Entities.Where(a => !a.IsDeleted);
+            if (syllabusId.HasValue)
+            {
+                lessnPlan = lessnPlan.Where(a => a.SyllabusId == syllabusId);
+            }
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 lessnPlan = lessnPlan.Where(c =>

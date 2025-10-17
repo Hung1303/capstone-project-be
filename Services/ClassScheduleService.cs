@@ -70,9 +70,13 @@ namespace Services
             return true;
         }
 
-        public async Task<IEnumerable<ClassScheduleResponse>> GetAllClassSchedule(DayOfWeek? dayOfWeek, TimeOnly? startTime, TimeOnly? endTime, DateOnly? startDate, DateOnly? endDate, int pageNumber, int pageSize)
+        public async Task<IEnumerable<ClassScheduleResponse>> GetAllClassSchedule(Guid? courseId, DayOfWeek? dayOfWeek, TimeOnly? startTime, TimeOnly? endTime, DateOnly? startDate, DateOnly? endDate, int pageNumber, int pageSize)
         {
             var classSchedule = _unitOfWork.GetRepository<ClassSchedule>().Entities.Where(a => !a.IsDeleted);
+            if (courseId.HasValue)
+            {
+                classSchedule = classSchedule.Where(a => a.CourseId == courseId);
+            }
             if (dayOfWeek.HasValue)
             {
                 classSchedule = classSchedule.Where(s => s.DayOfWeek == dayOfWeek.Value);

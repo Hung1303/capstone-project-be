@@ -12,8 +12,8 @@ using Repositories.Context;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251015091836_Init")]
-    partial class Init
+    [Migration("20251017065907_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1239,10 +1239,10 @@ namespace Repositories.Migrations
 
             modelBuilder.Entity("BusinessObjects.Enrollment", b =>
                 {
-                    b.HasOne("BusinessObjects.Course", null)
+                    b.HasOne("BusinessObjects.Course", "Course")
                         .WithMany("Enrollments")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BusinessObjects.StudentProfile", "StudentProfile")
@@ -1250,6 +1250,8 @@ namespace Repositories.Migrations
                         .HasForeignKey("StudentProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("StudentProfile");
                 });
