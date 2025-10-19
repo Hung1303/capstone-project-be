@@ -10,6 +10,7 @@ using Repository;
 using Repository.Interfaces;
 using Services;
 using Services.Interfaces;
+using API.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 // 1. Authorization policies cho từng Role và nhóm quyền
@@ -136,7 +137,10 @@ builder.Services.AddAuthentication(options =>
     });
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<AuditLogActionFilter>();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
@@ -157,6 +161,7 @@ builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<ISuspensionService, SuspensionService>();
 builder.Services.AddScoped<ITeacherFeedbackService, TeacherFeedbackService>();
 builder.Services.AddScoped<ICourseFeedbackService, CourseFeedbackService>();
+builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddEndpointsApiExplorer();
 
 // CORS policy (tighten AllowedOrigins as needed for your frontend)
