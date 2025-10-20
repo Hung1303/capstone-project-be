@@ -166,7 +166,7 @@ namespace API.Services
             if (request == null) return false;
 
             request.IsDeleted = true;
-            request.UpdatedAt = DateTime.UtcNow;
+            request.LastUpdatedAt = DateTime.UtcNow;
 
             await approvalRepo.UpdateAsync(request);
             await _unitOfWork.SaveAsync();
