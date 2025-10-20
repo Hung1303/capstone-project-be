@@ -51,5 +51,14 @@ namespace API.Controllers
             var result = await _approvalService.GetApprovalRequestByIdAsync(id);
             return Ok(result);
         }
+        // DELETE: api/ApprovalRequests/{approvalRequestId}
+        [HttpDelete("{approvalRequestId}")]
+        public async Task<IActionResult> DeleteApprovalRequest(Guid approvalRequestId)
+        {
+            var result = await _approvalService.DeleteApprovalRequestAsync(approvalRequestId);
+            return result
+                ? Ok(new { message = "Approval request deleted successfully." })
+                : BadRequest(new { message = "Failed to delete approval request." });
+        }
     }
 }

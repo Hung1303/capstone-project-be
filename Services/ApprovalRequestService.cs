@@ -158,6 +158,21 @@ namespace API.Services
                 CreatedAt = request.CreatedAt
             };
         }
+        public async Task<bool> DeleteApprovalRequestAsync(Guid approvalRequestId)
+        {
+            var approvalRepo = _unitOfWork.GetRepository<ApprovalRequest>();
+
+            var request = await approvalRepo.Entities.FirstOrDefaultAsync(r => r.Id == approvalRequestId && !r.IsDeleted);
+            if (request == null) return false;
+
+            request.IsDeleted = true;
+            request.UpdatedAt = DateTime.UtcNow;
+
+            await approvalRepo.UpdateAsync(request);
+            await _unitOfWork.SaveAsync();
+
+            return true;
+        }
     }
 }
 
