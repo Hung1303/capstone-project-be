@@ -5,6 +5,7 @@ using Core.Base;
 using Core.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Repository.Interfaces;
 using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
@@ -20,45 +21,62 @@ namespace API.Controllers
     {
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthController(ITokenService tokenService, IUserService userService)
+        public AuthController(IUnitOfWork unitOfWork,ITokenService tokenService, IUserService userService)
         {
+            _unitOfWork = unitOfWork;
             _tokenService = tokenService;
             _userService = userService;
         }
 
-        #region GenerateToken
-        /// <summary>
-        /// Which will generating token accessible for user
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
         [NonAction]
-        public TokenDTO GenerateToken(User user, String? RT)
+        public TokenDTO GenerateToken(User user, string? RT)
         {
-            List<Claim> claims = new List<Claim>()
+            var claims = new List<Claim>
     {
         new Claim("UserId", user.Id.ToString()),
         new Claim("UserName", user.UserName),
         new Claim("Email", user.Email),
         new Claim("Role", user.Role.ToString()),
         new Claim("PhoneNumber", user.PhoneNumber ?? ""),
-        new Claim("FullName", user.FullName ?? ""),
-        new Claim("PasswordHash", user.PasswordHash.ToString()),
+        new Claim("FullName", user.FullName ?? "")
     };
-            //if (user.Role == UserRole.Seller || user.Role == UserRole.Shipper)
-            //{
-            //    claims.Add(new Claim("BankName", user.BankName ?? ""));
-            //    claims.Add(new Claim("BankAccountNumber", user.BankAccountNumber ?? ""));
-            //    claims.Add(new Claim("BankAccountName", user.BankAccountName ?? ""));
-            //}
-            //if (user.Role == UserRole.Seller)
-            //{
-            //    claims.Add(new Claim("ShopName", user.ShopName ?? ""));
-            //    claims.Add(new Claim("ShopDescription", user.shopDescription ?? ""));
-            //    claims.Add(new Claim("BusinessType", user.BusinessType ?? ""));
-            //}
-            var securityKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes("c2VydmVwZXJmZWN0bHljaGVlc2VxdWlja2NvYWNoY29sbGVjdHNsb3Bld2lzZWNhbWU="));
+
+            // 🟢 Thêm ProfileId tùy theo Role
+            switch (user.Role)
+            {
+                case UserRole.Teacher:
+                    var teacher = _unitOfWork.GetRepository<TeacherProfile>()
+                        .Entities.FirstOrDefault(x => x.UserId == user.Id);
+                    if (teacher != null)
+                        claims.Add(new Claim("TeacherProfileId", teacher.Id.ToString()));
+                    break;
+
+                case UserRole.Center:
+                    var center = _unitOfWork.GetRepository<CenterProfile>()
+                        .Entities.FirstOrDefault(x => x.UserId == user.Id);
+                    if (center != null)
+                        claims.Add(new Claim("CenterProfileId", center.Id.ToString()));
+                    break;
+
+                case UserRole.Student:
+                    var student = _unitOfWork.GetRepository<StudentProfile>()
+                        .Entities.FirstOrDefault(x => x.UserId == user.Id);
+                    if (student != null)
+                        claims.Add(new Claim("StudentProfileId", student.Id.ToString()));
+                    break;
+
+                case UserRole.Parent:
+                    var parent = _unitOfWork.GetRepository<ParentProfile>()
+                        .Entities.FirstOrDefault(x => x.UserId == user.Id);
+                    if (parent != null)
+                        claims.Add(new Claim("ParentProfileId", parent.Id.ToString()));
+                    break;
+            }
+
+            // Tạo token
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("c2VydmVwZXJmZWN0bHljaGVlc2VxdWlja2NvYWNoY29sbGVjdHNsb3Bld2lzZWNhbWU="));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -69,23 +87,16 @@ namespace API.Controllers
                 signingCredentials: credentials);
 
             var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
-            if (RT != null)
-            {
-                return new TokenDTO()
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = RT,
-                    ExpiredAt = _tokenService.GetRefreshTokenByUserID(user.Id).ExpiredTime
-                };
-            }
+
+            // Refresh token logic
             return new TokenDTO()
             {
                 AccessToken = accessToken,
-                RefreshToken = GenerateRefreshToken(user),
+                RefreshToken = RT ?? GenerateRefreshToken(user),
                 ExpiredAt = _tokenService.GetRefreshTokenByUserID(user.Id).ExpiredTime
             };
         }
-        #endregion
+
 
         #region GenerateRefreshToken
         // Hàm tạo refresh token
@@ -304,6 +315,13 @@ namespace API.Controllers
                     ? parsedStatus
                     : AccountStatus.Active;
 
+                // Xác định ProfileId theo thứ tự ưu tiên
+                string? profileId =
+                    teacherProfileClaim?.Value ??
+                    centerProfileClaim?.Value ??
+                    studentProfileClaim?.Value ??
+                    parentProfileClaim?.Value;
+
                 // Tạo dictionary động để dễ dàng loại bỏ field null
                 var userInfo = new Dictionary<string, object?>
         {
@@ -337,6 +355,7 @@ namespace API.Controllers
             }
         }
         #endregion
+
 
 
     }
