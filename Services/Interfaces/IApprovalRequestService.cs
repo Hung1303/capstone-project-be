@@ -16,5 +16,6 @@ namespace Services.Interfaces
         Task<bool> ReviewApprovalRequestAsync(Guid approvalRequestId, Guid reviewerUserId, ApprovalDecision decision, string? notes = null);
         Task<(IEnumerable<ApprovalRequestResponse> Records, int TotalCount)> GetApprovalRequestsAsync(int pageNumber, int pageSize, string? searchKeyword = null);
         Task<ApprovalRequestResponse> GetApprovalRequestByIdAsync(Guid id);
+        Task<bool> DeleteApprovalRequestAsync(Guid approvalRequestId);
     }
 }
