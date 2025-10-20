@@ -585,6 +585,7 @@ namespace Services
                 .Take(pageSize)
                 .Select(x => new CenterListResponse
                 {
+                    Id = x.Center.Id,
                     UserId = x.Center.UserId,
                     CenterProfileId = x.Center.Id,
                     CenterName = x.Center.CenterName,
@@ -623,6 +624,7 @@ namespace Services
                 .Take(pageSize)
                 .Select(x => new TeacherListResponse
                 {
+                    Id = x.Teacher.Id,
                     FullName = x.User.FullName,
                     YearOfExperience = x.Teacher.YearOfExperience,
                     Qualification = x.Teacher.Qualifications,
@@ -657,6 +659,7 @@ namespace Services
                 .Take(pageSize)
                 .Select(x => new ParentListResponse
                 {
+                    Id = x.Parent.Id,
                     FullName = x.User.FullName,
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,
@@ -692,6 +695,7 @@ namespace Services
                 .Take(pageSize)
                 .Select(x => new StudentListResponse
                 {
+                    Id = x.Student.Id,
                     FullName = x.User.FullName,
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,
@@ -757,6 +761,7 @@ namespace Services
                 .Take(pageSize)
                 .Select(x => new TeacherListResponse
                 {
+                    Id = x.Teacher.Id,
                     FullName = x.User.FullName,
                     YearOfExperience = x.Teacher.YearOfExperience,
                     Qualification = x.Teacher.Qualifications,

@@ -162,6 +162,7 @@ namespace BusinessObjects.DTO.User
 
     public class CenterListResponse
     {
+        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid CenterProfileId { get; set; }
         public string CenterName { get; set; }
@@ -175,6 +176,7 @@ namespace BusinessObjects.DTO.User
 
     public class TeacherListResponse
     {
+        public Guid Id { get; set; }
         public string FullName { get; set; }
         public int YearOfExperience { get; set; }
         public string Qualification { get; set; }
@@ -184,6 +186,7 @@ namespace BusinessObjects.DTO.User
 
     public class ParentListResponse
     {
+        public Guid Id { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
@@ -194,6 +197,7 @@ namespace BusinessObjects.DTO.User
 
     public class StudentListResponse
     {
+        public Guid Id { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
