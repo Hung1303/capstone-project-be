@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -257,6 +258,86 @@ namespace API.Controllers
             }
         }
         #endregion
+
+        #region Who Am I
+        /// <summary>
+        /// Get information of the currently authenticated user
+        /// </summary>
+        /// <returns>Information about the logged-in user</returns>
+        [HttpGet("whoami")]
+        public IActionResult WhoAmI()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized(new { Message = "User is not authenticated" });
+            }
+
+            try
+            {
+                // Lấy claim cơ bản
+                var userIdClaim = User.FindFirst("UserId");
+                var emailClaim = User.FindFirst("Email");
+                var usernameClaim = User.FindFirst("UserName");
+                var fullNameClaim = User.FindFirst("FullName");
+                var phoneClaim = User.FindFirst("PhoneNumber");
+                var roleClaim = User.FindFirst("Role");
+                var statusClaim = User.FindFirst("Status");
+
+                // Lấy claim profile
+                var teacherProfileClaim = User.FindFirst("TeacherProfileId");
+                var centerProfileClaim = User.FindFirst("CenterProfileId");
+                var studentProfileClaim = User.FindFirst("StudentProfileId");
+                var parentProfileClaim = User.FindFirst("ParentProfileId");
+
+                // Kiểm tra thông tin bắt buộc
+                if (userIdClaim == null || emailClaim == null || usernameClaim == null || roleClaim == null)
+                {
+                    return Unauthorized(new { Message = "Missing essential user information in claims" });
+                }
+
+                // Parse role và status
+                UserRole role = Enum.TryParse(roleClaim.Value, out UserRole parsedRole)
+                    ? parsedRole
+                    : UserRole.Student;
+
+                AccountStatus status = Enum.TryParse(statusClaim?.Value, out AccountStatus parsedStatus)
+                    ? parsedStatus
+                    : AccountStatus.Active;
+
+                // Tạo dictionary động để dễ dàng loại bỏ field null
+                var userInfo = new Dictionary<string, object?>
+        {
+            { "Id", userIdClaim.Value },
+            { "Email", emailClaim.Value },
+            { "UserName", usernameClaim.Value },
+            { "FullName", fullNameClaim?.Value },
+            { "PhoneNumber", phoneClaim?.Value },
+            { "Role", role.ToString() },
+            { "Status", status.ToString() },
+            { "TeacherProfileId", teacherProfileClaim?.Value },
+            { "CenterProfileId", centerProfileClaim?.Value },
+            { "StudentProfileId", studentProfileClaim?.Value },
+            { "ParentProfileId", parentProfileClaim?.Value }
+        };
+
+                // Loại bỏ các key có giá trị null
+                var filteredInfo = userInfo
+                    .Where(kv => kv.Value != null)
+                    .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+                return Ok(filteredInfo);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Message = "Error reading user information",
+                    Detail = ex.Message
+                });
+            }
+        }
+        #endregion
+
 
     }
 }
