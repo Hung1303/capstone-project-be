@@ -390,7 +390,7 @@ namespace Services
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<bool> UpdateCenterAsync(Guid userId, CenterUpdateRequest request)
+        public async Task<CenterDetailRespone?> UpdateCenterAsync(Guid userId, CenterUpdateRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -398,14 +398,14 @@ namespace Services
                 .FirstOrDefaultAsync(o => o.Id == userId && o.Status == AccountStatus.Active && o.Role == UserRole.Center && !o.IsDeleted);
             if (owner == null)
             {
-                return false;
+                return null;
             }
 
             var center = await _unitOfWork.GetRepository<CenterProfile>().Entities
                 .FirstOrDefaultAsync(c => c.UserId == userId);
             if (center == null)
             {
-                return false;
+                return null;
             }
 
             bool emailExists = await _unitOfWork.GetRepository<User>().Entities
@@ -431,10 +431,10 @@ namespace Services
             await _unitOfWork.GetRepository<CenterProfile>().UpdateAsync(center);
             await _unitOfWork.SaveAsync();
 
-            return true;
+            return await GetCenterById(userId);
         }
 
-        public async Task<bool> UpdateTeacherAsynce(Guid userId, TeacherUpdateRequest request)
+        public async Task<TeacherDetailResponse?> UpdateTeacherAsynce(Guid userId, TeacherUpdateRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -442,14 +442,14 @@ namespace Services
                 .FirstOrDefaultAsync(o => o.Id == userId && o.Status == AccountStatus.Active && o.Role == UserRole.Teacher && !o.IsDeleted);
             if (user == null)
             {
-                return false;
+                return null;
             }
 
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
                 .FirstOrDefaultAsync(c => c.UserId == userId);
             if (teacher == null)
             {
-                return false;
+                return null;
             }
 
             bool emailExists = await _unitOfWork.GetRepository<User>().Entities
@@ -474,10 +474,10 @@ namespace Services
             await _unitOfWork.GetRepository<TeacherProfile>().UpdateAsync(teacher);
             await _unitOfWork.SaveAsync();
 
-            return true;
+            return await GetTeacherById(userId);
         }
 
-        public async Task<bool> UpdateParentAsynce(Guid userId, ParentUpdateRequest request)
+        public async Task<ParentDetailResponse?> UpdateParentAsynce(Guid userId, ParentUpdateRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -485,14 +485,14 @@ namespace Services
                 .FirstOrDefaultAsync(o => o.Id == userId && o.Status == AccountStatus.Active && o.Role == UserRole.Parent && !o.IsDeleted);
             if (user == null)
             {
-                return false;
+                return null;
             }
 
             var parent = await _unitOfWork.GetRepository<ParentProfile>().Entities
                 .FirstOrDefaultAsync(c => c.UserId == userId);
             if (parent == null)
             {
-                return false;
+                return null;
             }
 
             bool emailExists = await _unitOfWork.GetRepository<User>().Entities
@@ -520,10 +520,10 @@ namespace Services
             await _unitOfWork.GetRepository<ParentProfile>().UpdateAsync(parent);
             await _unitOfWork.SaveAsync();
 
-            return true;
+            return await GetParentById(userId);
         }
 
-        public async Task<bool> UpdateStudentAsynce(Guid userId, StudentUpdateRequest request)
+        public async Task<StudentDetailResponse?> UpdateStudentAsynce(Guid userId, StudentUpdateRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -531,14 +531,14 @@ namespace Services
                 .FirstOrDefaultAsync(o => o.Id == userId && o.Status == AccountStatus.Active && o.Role == UserRole.Student && !o.IsDeleted);
             if (user == null)
             {
-                return false;
+                return null;
             }
 
             var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
                 .FirstOrDefaultAsync(c => c.UserId == userId);
             if (student == null)
             {
-                return false;
+                return null;
             }
 
             bool emailExists = await _unitOfWork.GetRepository<User>().Entities
@@ -556,7 +556,8 @@ namespace Services
 
             await _unitOfWork.GetRepository<User>().UpdateAsync(user);
             await _unitOfWork.SaveAsync();
-            return true;
+            
+            return await GetStudentById(userId);
         }
 
         public async Task<(IEnumerable<CenterListResponse> Centers, int TotalCount)> GetAllCentersAsync(int pageNumber, int pageSize, string? centerName = null)

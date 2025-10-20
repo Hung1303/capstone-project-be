@@ -164,32 +164,32 @@ namespace TMS_BE.Controllers
         public async Task<IActionResult> UpdateCenter(Guid userId, [FromBody] CenterUpdateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var success = await _userService.UpdateCenterAsync(userId, request);
-            return success ? NoContent() : NotFound();
+            var result = await _userService.UpdateCenterAsync(userId, request);
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPut("Teacher/{userId}")]
         public async Task<IActionResult> UpdateTeacher(Guid userId, [FromBody] TeacherUpdateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var success = await _userService.UpdateTeacherAsynce(userId, request);
-            return success ? NoContent() : NotFound();
+            var result = await _userService.UpdateTeacherAsynce(userId, request);
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPut("Parent/{userId}")]
         public async Task<IActionResult> UpdateParent(Guid userId, [FromBody] ParentUpdateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var success = await _userService.UpdateParentAsynce(userId, request);
-            return success ? NoContent() : NotFound();
+            var result = await _userService.UpdateParentAsynce(userId, request);
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPut("Student/{userId}")]
         public async Task<IActionResult> UpdateStudent(Guid userId, [FromBody] StudentUpdateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var success = await _userService.UpdateStudentAsynce(userId, request);
-            return success ? NoContent() : NotFound();
+            var result = await _userService.UpdateStudentAsynce(userId, request);
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPut("Status/{userId}")]

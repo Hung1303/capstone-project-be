@@ -119,7 +119,7 @@ namespace Services
             };
         }
 
-        public async Task<string> ApproveTeacherFeedback(Guid feedbackId, Guid moderatorId, TeacherFeedbackModerationRequest request)
+        public async Task<TeacherFeedbackResponse?> ApproveTeacherFeedback(Guid feedbackId, Guid moderatorId, TeacherFeedbackModerationRequest request)
         {
             var feedback = await _unitOfWork.GetRepository<TeacherFeedback>().Entities
                 .FirstOrDefaultAsync(f => f.Id == feedbackId && f.Status == ReviewStatus.PendingModeration && !f.IsDeleted);
@@ -138,7 +138,19 @@ namespace Services
             await _unitOfWork.GetRepository<TeacherFeedback>().UpdateAsync(feedback);
             await _unitOfWork.SaveAsync();
 
-            return "Feedback approved.";
+            return new TeacherFeedbackResponse
+            {
+                Id = feedback.Id,
+                TeacherProfileId = feedback.TeacherProfileId,
+                StudentProfileId = feedback.StudentProfileId,
+                ParentProfileId = feedback.ParentProfileId,
+                Rating = feedback.Rating,
+                Comment = feedback.Comment,
+                SubmittedAt = feedback.SubmittedAt,
+                Status = feedback.Status,
+                CreatedAt = feedback.CreatedAt,
+                LastUpdatedAt = feedback.LastUpdatedAt
+            };
         }
 
         public async Task<TeacherFeedbackResponse> UpdateTeacherFeedback(Guid feedbackId, UpdateTeacherFeedbackRequest request)

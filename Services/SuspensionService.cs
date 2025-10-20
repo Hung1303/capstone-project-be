@@ -278,7 +278,7 @@ namespace Services
             return false;
         }
 
-        public async Task<SuspensionRecord> UpdateSuspensionRecord(Guid suspensionRecordId, UpdateSuspensionRecordRequest request)
+        public async Task<SuspensionRecordResponse?> UpdateSuspensionRecord(Guid suspensionRecordId, UpdateSuspensionRecordRequest request)
         {
             var record = await _unitOfWork.GetRepository<SuspensionRecord>().Entities
                 .FirstOrDefaultAsync(r => r.Id == suspensionRecordId && !r.IsDeleted);
@@ -303,7 +303,7 @@ namespace Services
             await _unitOfWork.GetRepository<SuspensionRecord>().UpdateAsync(record);
             await _unitOfWork.SaveAsync();
 
-            return record;
+            return await GetRecordById(suspensionRecordId);
         }
 
         public class PagedResult<T>
