@@ -191,6 +191,9 @@ namespace Repositories.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<string>("City")
+                        .HasColumnType("text");
+
                     b.Property<string>("ContactEmail")
                         .HasColumnType("text");
 
@@ -199,6 +202,9 @@ namespace Repositories.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("District")
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -209,6 +215,9 @@ namespace Repositories.Migrations
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("LicenseIssuedBy")
                         .IsRequired()
                         .HasColumnType("text");
@@ -217,6 +226,9 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("OwnerName")
                         .HasColumnType("text");
@@ -1016,7 +1028,7 @@ namespace Repositories.Migrations
                             FullName = "System Admin",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            PasswordHash = "d033e22ae348aeb5660fc2140aec35850c4da997",
+                            PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                             PhoneNumber = "+10000000000",
                             Role = 1,
                             Status = 1,
@@ -1030,7 +1042,7 @@ namespace Repositories.Migrations
                             FullName = "Emily Clark",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                            PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                             PhoneNumber = "+10000000001",
                             Role = 2,
                             Status = 1,
@@ -1044,7 +1056,7 @@ namespace Repositories.Migrations
                             FullName = "Michael Brown",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                            PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                             PhoneNumber = "+10000000002",
                             Role = 2,
                             Status = 0,
@@ -1058,7 +1070,7 @@ namespace Repositories.Migrations
                             FullName = "Jane Doe",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                            PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                             PhoneNumber = "+10000000003",
                             Role = 3,
                             Status = 1,
@@ -1072,7 +1084,7 @@ namespace Repositories.Migrations
                             FullName = "John Smith",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                            PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                             PhoneNumber = "+10000000004",
                             Role = 3,
                             Status = 0,
@@ -1086,7 +1098,7 @@ namespace Repositories.Migrations
                             FullName = "Liam Johnson",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                            PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                             PhoneNumber = "+10000000005",
                             Role = 5,
                             Status = 1,
@@ -1100,7 +1112,7 @@ namespace Repositories.Migrations
                             FullName = "Ava Johnson",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                            PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                             PhoneNumber = "+10000000006",
                             Role = 4,
                             Status = 1,
@@ -1114,7 +1126,7 @@ namespace Repositories.Migrations
                             FullName = "Noah Williams",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                            PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                             PhoneNumber = "+10000000007",
                             Role = 4,
                             Status = 0,

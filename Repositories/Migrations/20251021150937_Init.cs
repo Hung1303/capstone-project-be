@@ -92,6 +92,10 @@ namespace Repositories.Migrations
                     Address = table.Column<string>(type: "text", nullable: false),
                     ContactEmail = table.Column<string>(type: "text", nullable: true),
                     ContactPhone = table.Column<string>(type: "text", nullable: true),
+                    Latitude = table.Column<double>(type: "double precision", nullable: true),
+                    Longitude = table.Column<double>(type: "double precision", nullable: true),
+                    City = table.Column<string>(type: "text", nullable: true),
+                    District = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -573,23 +577,23 @@ namespace Repositories.Migrations
                 columns: new[] { "Id", "CreatedAt", "Email", "FullName", "IsDeleted", "LastUpdatedAt", "PasswordHash", "PhoneNumber", "Role", "Status", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@example.com", "System Admin", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "d033e22ae348aeb5660fc2140aec35850c4da997", "+10000000000", 1, 1, "admin" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "center.active@example.com", "Emily Clark", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", "+10000000001", 2, 1, "center_active" },
-                    { new Guid("33333333-3333-3333-3333-333333333333"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "center.pending@example.com", "Michael Brown", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", "+10000000002", 2, 0, "center_pending" },
-                    { new Guid("44444444-4444-4444-4444-444444444444"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "teacher.jane@example.com", "Jane Doe", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", "+10000000003", 3, 1, "teacher_jane" },
-                    { new Guid("55555555-5555-5555-5555-555555555555"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "teacher.john@example.com", "John Smith", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", "+10000000004", 3, 0, "teacher_john" },
-                    { new Guid("66666666-6666-6666-6666-666666666666"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "parent.liam@example.com", "Liam Johnson", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", "+10000000005", 5, 1, "parent_liam" },
-                    { new Guid("77777777-7777-7777-7777-777777777777"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "student.ava@example.com", "Ava Johnson", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", "+10000000006", 4, 1, "student_ava" },
-                    { new Guid("88888888-8888-8888-8888-888888888888"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "student.noah@example.com", "Noah Williams", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", "+10000000007", 4, 0, "student_noah" }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@example.com", "System Admin", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000000", 1, 1, "admin" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "center.active@example.com", "Emily Clark", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000001", 2, 1, "center_active" },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "center.pending@example.com", "Michael Brown", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000002", 2, 0, "center_pending" },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "teacher.jane@example.com", "Jane Doe", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000003", 3, 1, "teacher_jane" },
+                    { new Guid("55555555-5555-5555-5555-555555555555"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "teacher.john@example.com", "John Smith", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000004", 3, 0, "teacher_john" },
+                    { new Guid("66666666-6666-6666-6666-666666666666"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "parent.liam@example.com", "Liam Johnson", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000005", 5, 1, "parent_liam" },
+                    { new Guid("77777777-7777-7777-7777-777777777777"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "student.ava@example.com", "Ava Johnson", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000006", 4, 1, "student_ava" },
+                    { new Guid("88888888-8888-8888-8888-888888888888"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "student.noah@example.com", "Noah Williams", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000007", 4, 0, "student_noah" }
                 });
 
             migrationBuilder.InsertData(
                 table: "CenterProfiles",
-                columns: new[] { "Id", "Address", "CenterName", "ContactEmail", "ContactPhone", "CreatedAt", "IsDeleted", "IssueDate", "LastUpdatedAt", "LicenseIssuedBy", "LicenseNumber", "OwnerName", "UserId" },
+                columns: new[] { "Id", "Address", "CenterName", "City", "ContactEmail", "ContactPhone", "CreatedAt", "District", "IsDeleted", "IssueDate", "LastUpdatedAt", "Latitude", "LicenseIssuedBy", "LicenseNumber", "Longitude", "OwnerName", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("99999999-9999-9999-9999-999999999999"), "123 Learning Ave, Cityville", "Bright Future Center", "contact@brightfuture.example.com", "+10000001001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateOnly(2024, 1, 15), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Education Dept", "LIC-2024-0001", "Emily Clark", new Guid("22222222-2222-2222-2222-222222222222") },
-                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "456 Discovery Rd, Townsburg", "New Horizons Center", "hello@newhorizons.example.com", "+10000001002", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateOnly(2025, 2, 1), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Education Dept", "LIC-2025-0005", "Michael Brown", new Guid("33333333-3333-3333-3333-333333333333") }
+                    { new Guid("99999999-9999-9999-9999-999999999999"), "123 Learning Ave, Cityville", "Bright Future Center", null, "contact@brightfuture.example.com", "+10000001001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2024, 1, 15), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Education Dept", "LIC-2024-0001", null, "Emily Clark", new Guid("22222222-2222-2222-2222-222222222222") },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "456 Discovery Rd, Townsburg", "New Horizons Center", null, "hello@newhorizons.example.com", "+10000001002", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2025, 2, 1), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Education Dept", "LIC-2025-0005", null, "Michael Brown", new Guid("33333333-3333-3333-3333-333333333333") }
                 });
 
             migrationBuilder.InsertData(
