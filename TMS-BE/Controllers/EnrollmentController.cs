@@ -86,6 +86,48 @@ namespace API.Controllers
             });
         }
 
+        // ✅ NEW 1: APPROVE ENROLLMENT
+        // POST: api/Enrollments/{id}/approve?approverProfileId={guid}
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> ApproveEnrollment(Guid id, [FromQuery] Guid approverProfileId)
+        {
+            try
+            {
+                var result = await _enrollmentService.ApproveEnrollment(id, approverProfileId);
+                return Ok(new
+                {
+                    message = "Enrollment approved successfully.",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // ✅ NEW 2: REJECT ENROLLMENT
+        // POST: api/Enrollments/{id}/reject?approverProfileId={guid}
+        [HttpPost("{id}/reject")]
+        public async Task<IActionResult> RejectEnrollment(Guid id, [FromQuery] Guid approverProfileId, [FromBody] RejectEnrollmentRequest request)
+        {
+            try
+            {
+                var result = await _enrollmentService.RejectEnrollment(id, approverProfileId, request.Reason);
+                return Ok(new
+                {
+                    message = "Enrollment rejected successfully.",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+    
+
+
         // ✅ DELETE: api/Enrollments/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEnrollment(Guid id)
