@@ -85,6 +85,12 @@ namespace Repositories.Context
                     .HasForeignKey(e => e.CourseId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+                // 🔹 Thiết lập quan hệ 1 StudentProfile - nhiều Enrollment
+                b.HasOne(e => e.StudentProfile)
+                    .WithMany(sp => sp.Enrollments)
+                    .HasForeignKey(e => e.StudentProfileId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
             });
 
             modelBuilder.Entity<CourseFeedback>(b =>
@@ -269,7 +275,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "admin@example.com",
                     UserName = "admin",
-                    PasswordHash = "d033e22ae348aeb5660fc2140aec35850c4da997", // sha1("admin") placeholder
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", //string123
                     FullName = "System Admin",
                     PhoneNumber = "+10000000000",
                     Role = Core.Base.UserRole.Admin,
@@ -283,7 +289,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "center.active@example.com",
                     UserName = "center_active",
-                    PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", // sha256("Password123!")
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", 
                     FullName = "Emily Clark",
                     PhoneNumber = "+10000000001",
                     Role = Core.Base.UserRole.Center,
@@ -297,7 +303,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "center.pending@example.com",
                     UserName = "center_pending",
-                    PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                     FullName = "Michael Brown",
                     PhoneNumber = "+10000000002",
                     Role = Core.Base.UserRole.Center,
@@ -311,7 +317,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "teacher.jane@example.com",
                     UserName = "teacher_jane",
-                    PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                     FullName = "Jane Doe",
                     PhoneNumber = "+10000000003",
                     Role = Core.Base.UserRole.Teacher,
@@ -325,7 +331,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "teacher.john@example.com",
                     UserName = "teacher_john",
-                    PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                     FullName = "John Smith",
                     PhoneNumber = "+10000000004",
                     Role = Core.Base.UserRole.Teacher,
@@ -339,7 +345,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "parent.liam@example.com",
                     UserName = "parent_liam",
-                    PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                     FullName = "Liam Johnson",
                     PhoneNumber = "+10000000005",
                     Role = Core.Base.UserRole.Parent,
@@ -353,7 +359,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "student.ava@example.com",
                     UserName = "student_ava",
-                    PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                     FullName = "Ava Johnson",
                     PhoneNumber = "+10000000006",
                     Role = Core.Base.UserRole.Student,
@@ -367,7 +373,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "student.noah@example.com",
                     UserName = "student_noah",
-                    PasswordHash = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                     FullName = "Noah Williams",
                     PhoneNumber = "+10000000007",
                     Role = Core.Base.UserRole.Student,

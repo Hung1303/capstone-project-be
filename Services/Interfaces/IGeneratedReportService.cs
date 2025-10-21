@@ -1,4 +1,5 @@
 using BusinessObjects.DTO.GeneratedReport;
+using Core.Base;
 
 namespace Services.Interfaces
 {
