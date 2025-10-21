@@ -92,6 +92,10 @@ namespace Repositories.Migrations
                     Address = table.Column<string>(type: "text", nullable: false),
                     ContactEmail = table.Column<string>(type: "text", nullable: true),
                     ContactPhone = table.Column<string>(type: "text", nullable: true),
+                    Latitude = table.Column<double>(type: "double precision", nullable: true),
+                    Longitude = table.Column<double>(type: "double precision", nullable: true),
+                    City = table.Column<string>(type: "text", nullable: true),
+                    District = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -585,11 +589,11 @@ namespace Repositories.Migrations
 
             migrationBuilder.InsertData(
                 table: "CenterProfiles",
-                columns: new[] { "Id", "Address", "CenterName", "ContactEmail", "ContactPhone", "CreatedAt", "IsDeleted", "IssueDate", "LastUpdatedAt", "LicenseIssuedBy", "LicenseNumber", "OwnerName", "UserId" },
+                columns: new[] { "Id", "Address", "CenterName", "City", "ContactEmail", "ContactPhone", "CreatedAt", "District", "IsDeleted", "IssueDate", "LastUpdatedAt", "Latitude", "LicenseIssuedBy", "LicenseNumber", "Longitude", "OwnerName", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("99999999-9999-9999-9999-999999999999"), "123 Learning Ave, Cityville", "Bright Future Center", "contact@brightfuture.example.com", "+10000001001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateOnly(2024, 1, 15), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Education Dept", "LIC-2024-0001", "Emily Clark", new Guid("22222222-2222-2222-2222-222222222222") },
-                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "456 Discovery Rd, Townsburg", "New Horizons Center", "hello@newhorizons.example.com", "+10000001002", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateOnly(2025, 2, 1), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Education Dept", "LIC-2025-0005", "Michael Brown", new Guid("33333333-3333-3333-3333-333333333333") }
+                    { new Guid("99999999-9999-9999-9999-999999999999"), "123 Learning Ave, Cityville", "Bright Future Center", null, "contact@brightfuture.example.com", "+10000001001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2024, 1, 15), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Education Dept", "LIC-2024-0001", null, "Emily Clark", new Guid("22222222-2222-2222-2222-222222222222") },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "456 Discovery Rd, Townsburg", "New Horizons Center", null, "hello@newhorizons.example.com", "+10000001002", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2025, 2, 1), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Education Dept", "LIC-2025-0005", null, "Michael Brown", new Guid("33333333-3333-3333-3333-333333333333") }
                 });
 
             migrationBuilder.InsertData(
