@@ -179,6 +179,83 @@ namespace Services
             };
         }
 
+        // ✅ APPROVE
+        public async Task<EnrollmentResponse> ApproveEnrollment(Guid enrollmentId, Guid approverProfileId)
+        {
+            var enrollment = await _unitOfWork.GetRepository<Enrollment>().Entities
+                .Include(e => e.Course)
+                .FirstOrDefaultAsync(e => e.Id == enrollmentId && !e.IsDeleted);
+
+            if (enrollment == null)
+                throw new Exception("Enrollment not found");
+
+            var course = enrollment.Course;
+
+            // ✅ Kiểm tra quyền duyệt
+            bool isAuthorized = (course.TeacherProfileId == approverProfileId) ||
+                                (course.CenterProfileId == approverProfileId);
+
+            if (!isAuthorized)
+                throw new Exception("You do not have permission to approve this enrollment");
+
+            // ✅ Cập nhật trạng thái
+            enrollment.Status = EnrollmentStatus.Confirmed;
+            enrollment.ConfirmedAt = DateTimeOffset.UtcNow;
+            enrollment.CancelledAt = null;
+            enrollment.CancelReason = null;
+
+            await _unitOfWork.GetRepository<Enrollment>().UpdateAsync(enrollment);
+            await _unitOfWork.SaveAsync();
+
+            return new EnrollmentResponse
+            {
+                Id = enrollment.Id,
+                CourseId = enrollment.CourseId,
+                StudentProfileId = enrollment.StudentProfileId,
+                Status = enrollment.Status,
+                ConfirmedAt = enrollment.ConfirmedAt
+            };
+        }
+
+        // ✅ REJECT
+        public async Task<EnrollmentResponse> RejectEnrollment(Guid enrollmentId, Guid approverProfileId, string reason)
+        {
+            var enrollment = await _unitOfWork.GetRepository<Enrollment>().Entities
+                .Include(e => e.Course)
+                .FirstOrDefaultAsync(e => e.Id == enrollmentId && !e.IsDeleted);
+
+            if (enrollment == null)
+                throw new Exception("Enrollment not found");
+
+            var course = enrollment.Course;
+
+            // ✅ Kiểm tra quyền duyệt
+            bool isAuthorized = (course.TeacherProfileId == approverProfileId) ||
+                                (course.CenterProfileId == approverProfileId);
+
+            if (!isAuthorized)
+                throw new Exception("You do not have permission to reject this enrollment");
+
+            // ✅ Cập nhật trạng thái
+            enrollment.Status = EnrollmentStatus.Cancelled;
+            enrollment.CancelledAt = DateTimeOffset.UtcNow;
+            enrollment.CancelReason = reason;
+
+            await _unitOfWork.GetRepository<Enrollment>().UpdateAsync(enrollment);
+            await _unitOfWork.SaveAsync();
+
+            return new EnrollmentResponse
+            {
+                Id = enrollment.Id,
+                CourseId = enrollment.CourseId,
+                StudentProfileId = enrollment.StudentProfileId,
+                Status = enrollment.Status,
+                CancelledAt = enrollment.CancelledAt,
+                CancelReason = enrollment.CancelReason
+            };
+        }
+
+
         // ✅ DELETE
         public async Task<bool> DeleteEnrollment(Guid id)
         {
