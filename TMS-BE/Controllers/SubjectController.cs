@@ -1,4 +1,6 @@
-﻿using BusinessObjects.DTO.Syllabus;
+﻿using BusinessObjects.DTO.Course;
+using BusinessObjects.DTO.Subject;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
@@ -6,20 +8,20 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SyllabusController : ControllerBase
+    public class SubjectController : ControllerBase
     {
-        private readonly ISyllabusService _syllabusService;
-        public SyllabusController(ISyllabusService syllabusService)
+        private readonly ISubjectService _subjectService;
+        public SubjectController(ISubjectService subjectService)
         {
-            _syllabusService = syllabusService;
+            _subjectService = subjectService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateSyllabus(CreateSyllabusRequest request)
+        public async Task<IActionResult> CreateSubject(CreateSubjectRequest request)
         {
             try
             {
-                var result = await _syllabusService.CreateSyllabus(request);
+                var result = await _subjectService.CreateSubject(request);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -30,11 +32,12 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSyllabus([FromQuery] string? searchTerm, [FromQuery] Guid? subjectId,[FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        public async Task<IActionResult> GetAllSubject([FromQuery] string? searchTerm, [FromQuery] Guid? CourseId, [FromQuery] Guid? TeacherProfileId,
+            [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
-                var result = await _syllabusService.GetAllSyllabus(searchTerm, pageNumber, pageSize, subjectId);
+                var result = await _subjectService.GetAllSubject(searchTerm, pageNumber, pageSize, CourseId, TeacherProfileId);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -44,11 +47,11 @@ namespace API.Controllers
 
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetSyllabusById(Guid id)
+        public async Task<IActionResult> GetsubjectById(Guid id)
         {
             try
             {
-                var result = await _syllabusService.GetSyllabusById(id);
+                var result = await _subjectService.GetSubjectById(id);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -58,11 +61,11 @@ namespace API.Controllers
 
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSyllabus(Guid id, UpdateSyllabusRequest request)
+        public async Task<IActionResult> UpdateSubject(Guid id, UpdateSubjectRequest request)
         {
             try
             {
-                var result = await _syllabusService.UpdateSyllabus(id, request);
+                var result = await _subjectService.UpdateSubject(id, request);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -72,11 +75,11 @@ namespace API.Controllers
 
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSyllabus(Guid id)
+        public async Task<IActionResult> DeleteSubject(Guid id)
         {
             try
             {
-                var result = await _syllabusService.DeleteSyllabus(id);
+                var result = await _subjectService.DeleteSubject(id);
                 return Ok(new { success = true, message = "Delete Successfully" });
             }
             catch (Exception ex)

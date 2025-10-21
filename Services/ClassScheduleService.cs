@@ -15,10 +15,10 @@ namespace Services
         }
         public async Task<ClassScheduleResponse> CreateClassSchedule(CreateClassScheduleRequest request)
         {
-            var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == request.CourseId);
-            if (course == null)
+            var subject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == request.SubjectId);
+            if (subject == null)
             {
-                throw new Exception("Course Not Found");
+                throw new Exception("subject Not Found");
             }
             //if (request.StartDate.HasValue && request.EndDate.HasValue)
             //{
@@ -33,7 +33,7 @@ namespace Services
             //}
             var classSchedule = new ClassSchedule
             {
-                CourseId = request.CourseId,
+                SubjectId = request.SubjectId,
                 DayOfWeek = request.DayOfWeek,
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
@@ -46,7 +46,7 @@ namespace Services
             var result = new ClassScheduleResponse
             {
                 Id = classSchedule.Id,
-                CourseId = classSchedule.CourseId,
+                SubjectId = classSchedule.SubjectId,
                 DayOfWeek = classSchedule.DayOfWeek,
                 StartTime = classSchedule.StartTime,
                 EndTime = classSchedule.EndTime,
@@ -70,12 +70,12 @@ namespace Services
             return true;
         }
 
-        public async Task<IEnumerable<ClassScheduleResponse>> GetAllClassSchedule(Guid? courseId, DayOfWeek? dayOfWeek, TimeOnly? startTime, TimeOnly? endTime, DateOnly? startDate, DateOnly? endDate, int pageNumber, int pageSize)
+        public async Task<IEnumerable<ClassScheduleResponse>> GetAllClassSchedule(Guid? subjectId, DayOfWeek? dayOfWeek, TimeOnly? startTime, TimeOnly? endTime, DateOnly? startDate, DateOnly? endDate, int pageNumber, int pageSize)
         {
             var classSchedule = _unitOfWork.GetRepository<ClassSchedule>().Entities.Where(a => !a.IsDeleted);
-            if (courseId.HasValue)
+            if (subjectId.HasValue)
             {
-                classSchedule = classSchedule.Where(a => a.CourseId == courseId);
+                classSchedule = classSchedule.Where(a => a.SubjectId == subjectId);
             }
             if (dayOfWeek.HasValue)
             {
@@ -108,7 +108,7 @@ namespace Services
                 .Select(a => new ClassScheduleResponse
                 {
                     Id = a.Id,
-                    CourseId = a.CourseId,
+                    SubjectId = a.SubjectId,
                     DayOfWeek = a.DayOfWeek,
                     StartTime = a.StartTime,
                     EndTime = a.EndTime,
@@ -129,7 +129,7 @@ namespace Services
             var result = new ClassScheduleResponse
             {
                 Id = classSchedule.Id,
-                CourseId = classSchedule.CourseId,
+                SubjectId = classSchedule.SubjectId,
                 DayOfWeek = classSchedule.DayOfWeek,
                 StartTime = classSchedule.StartTime,
                 EndTime = classSchedule.EndTime,
@@ -171,14 +171,14 @@ namespace Services
             {
                 classSchedule.RoomOrLink = request.RoomOrLink;
             }
-            if (request.CourseId.HasValue)
+            if (request.SubjectId.HasValue)
             {
-                var checkCourse = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == request.CourseId);
-                if (checkCourse == null)
+                var checkSubject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == request.SubjectId);
+                if (checkSubject == null)
                 {
-                    throw new Exception("Course Not Found");
+                    throw new Exception("Subject Not Found");
                 }
-                classSchedule.CourseId = request.CourseId.Value;
+                classSchedule.SubjectId = request.SubjectId.Value;
             }
             await _unitOfWork.GetRepository<ClassSchedule>().UpdateAsync(classSchedule);
             await _unitOfWork.SaveAsync();
@@ -186,7 +186,7 @@ namespace Services
             var result = new ClassScheduleResponse
             {
                 Id = classSchedule.Id,
-                CourseId = classSchedule.CourseId,
+                SubjectId = classSchedule.SubjectId,
                 DayOfWeek = classSchedule.DayOfWeek,
                 StartTime = classSchedule.StartTime,
                 EndTime = classSchedule.EndTime,

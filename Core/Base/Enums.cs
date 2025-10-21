@@ -89,6 +89,13 @@ namespace Core.Base
         Failed = 2,
         //Refunded = 3
     }
+
+    public enum Semester
+    {
+        Spring = 1,
+        Summer = 2,
+        Fall = 3,
+    }
 }
 
 

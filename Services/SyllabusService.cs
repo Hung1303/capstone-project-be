@@ -15,20 +15,20 @@ namespace Services
         }
         public async Task<SyllabusResponse> CreateSyllabus(CreateSyllabusRequest request)
         {
-            var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == request.CourseId);
-            if (course == null)
+            var subject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == request.SubjectId);
+            if (subject == null)
             {
-                throw new Exception("Course Not Found");
+                throw new Exception("Subject Not Found");
             }
             var syllabus = new Syllabus
             {
                 SyllabusName = request.SyllabusName,
                 Description = request.Description,
                 GradeLevel = request.GradeLevel,
-                Subject = request.Subject,
+                //Subject = request.Subject,
                 AssessmentMethod = request.AssessmentMethod,
                 CourseMaterial = request.CourseMaterial,
-                CourseId = request.CourseId,
+                SubjectId = request.SubjectId,
             };
             await _unitOfWork.GetRepository<Syllabus>().InsertAsync(syllabus);
             await _unitOfWork.SaveAsync();
@@ -38,10 +38,10 @@ namespace Services
                 SyllabusName = syllabus.SyllabusName,
                 Description = syllabus.Description,
                 GradeLevel = syllabus.GradeLevel,
-                Subject = syllabus.Subject,
+                //Subject = syllabus.Subject,
                 AssessmentMethod = syllabus.AssessmentMethod,
                 CourseMaterial = syllabus.CourseMaterial,
-                CourseId = syllabus.CourseId,
+                SubjectId = syllabus.SubjectId,
             };
             return result;
         }
@@ -59,12 +59,12 @@ namespace Services
             return true;
         }
 
-        public async Task<IEnumerable<SyllabusResponse>> GetAllSyllabus(string? searchTerm, int pageNumber, int pageSize, Guid? courseId)
+        public async Task<IEnumerable<SyllabusResponse>> GetAllSyllabus(string? searchTerm, int pageNumber, int pageSize, Guid? subjectId)
         {
             var syllabus = _unitOfWork.GetRepository<Syllabus>().Entities.Where(a => !a.IsDeleted);
-            if (courseId.HasValue)
+            if (subjectId.HasValue)
             {
-                syllabus = syllabus.Where(a => a.CourseId == courseId);
+                syllabus = syllabus.Where(a => a.SubjectId == subjectId);
             }
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -72,7 +72,7 @@ namespace Services
                     (c.SyllabusName != null && c.SyllabusName.ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     (c.Description != null && c.Description.ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     (c.GradeLevel != null && c.GradeLevel.ToLower().Contains(searchTerm.Trim().ToLower())) ||
-                    (c.Subject != null && c.Subject.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    //(c.Subject != null && c.Subject.ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     (c.AssessmentMethod != null && c.AssessmentMethod.ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     (c.CourseMaterial != null && c.CourseMaterial.ToLower().Contains(searchTerm.Trim().ToLower()))
                 );
@@ -92,10 +92,10 @@ namespace Services
                     SyllabusName = a.SyllabusName,
                     Description = a.Description,
                     GradeLevel = a.GradeLevel,
-                    Subject = a.Subject,
+                    //Subject = a.Subject,
                     AssessmentMethod = a.AssessmentMethod,
                     CourseMaterial = a.CourseMaterial,
-                    CourseId = a.CourseId,
+                    SubjectId = a.SubjectId,
                 }).ToListAsync();
             return paginatedSylabus;
         }
@@ -113,10 +113,10 @@ namespace Services
                 SyllabusName = syllabus.SyllabusName,
                 Description = syllabus.Description,
                 GradeLevel = syllabus.GradeLevel,
-                Subject = syllabus.Subject,
+                //Subject = syllabus.Subject,
                 AssessmentMethod = syllabus.AssessmentMethod,
                 CourseMaterial = syllabus.CourseMaterial,
-                CourseId = syllabus.CourseId,
+                SubjectId = syllabus.SubjectId,
             };
             return result;
         }
@@ -140,10 +140,10 @@ namespace Services
             {
                 syllabus.GradeLevel = request.GradeLevel;
             }
-            if (request.Subject != null)
-            {
-                syllabus.Subject = request.Subject;
-            }
+            //if (request.Subject != null)
+            //{
+            //    syllabus.Subject = request.Subject;
+            //}
             if (request.AssessmentMethod != null)
             {
                 syllabus.AssessmentMethod = request.AssessmentMethod;
@@ -152,14 +152,14 @@ namespace Services
             {
                 syllabus.CourseMaterial = request.CourseMaterial;
             }
-            if (request.CourseId.HasValue)
+            if (request.SubjectId.HasValue)
             {
-                var checkCourse = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == request.CourseId);
-                if (checkCourse == null)
+                var checkSubject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == request.SubjectId);
+                if (checkSubject == null)
                 {
-                    throw new Exception("Course Not Found");
+                    throw new Exception("Subject Not Found");
                 }
-                syllabus.CourseId = request.CourseId.Value;
+                syllabus.SubjectId = request.SubjectId.Value;
             }
             await _unitOfWork.GetRepository<Syllabus>().UpdateAsync(syllabus);
             await _unitOfWork.SaveAsync();
@@ -170,10 +170,10 @@ namespace Services
                 SyllabusName = syllabus.SyllabusName,
                 Description = syllabus.Description,
                 GradeLevel = syllabus.GradeLevel,
-                Subject = syllabus.Subject,
+                //Subject = syllabus.Subject,
                 AssessmentMethod = syllabus.AssessmentMethod,
                 CourseMaterial = syllabus.CourseMaterial,
-                CourseId = syllabus.CourseId,
+                SubjectId = syllabus.SubjectId,
             };
             return result;
         }

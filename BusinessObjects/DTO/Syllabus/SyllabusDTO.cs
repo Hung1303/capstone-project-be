@@ -5,20 +5,18 @@
         public string SyllabusName { get; set; }
         public string Description { get; set; }
         public string GradeLevel { get; set; }
-        public string Subject { get; set; }
         public string AssessmentMethod { get; set; }
         public string CourseMaterial { get; set; }
-        public Guid CourseId { get; set; }
+        public Guid SubjectId { get; set; }
     }
     public class UpdateSyllabusRequest
     {
         public string? SyllabusName { get; set; }
         public string? Description { get; set; }
         public string? GradeLevel { get; set; }
-        public string? Subject { get; set; }
         public string? AssessmentMethod { get; set; }
         public string? CourseMaterial { get; set; }
-        public Guid? CourseId { get; set; }
+        public Guid? SubjectId { get; set; }
     }
     public class SyllabusResponse
     {
@@ -26,9 +24,8 @@
         public string SyllabusName { get; set; }
         public string Description { get; set; }
         public string GradeLevel { get; set; }
-        public string Subject { get; set; }
         public string AssessmentMethod { get; set; }
         public string CourseMaterial { get; set; }
-        public Guid CourseId { get; set; }
+        public Guid SubjectId { get; set; }
     }
 }
