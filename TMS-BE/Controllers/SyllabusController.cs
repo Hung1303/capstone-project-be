@@ -30,7 +30,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSyllabus([FromQuery] string? searchTerm, [FromQuery] Guid? subjectId,[FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        public async Task<IActionResult> GetAllSyllabus([FromQuery] string? searchTerm, [FromQuery] Guid? subjectId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {

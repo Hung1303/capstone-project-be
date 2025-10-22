@@ -556,7 +556,7 @@ namespace Services
 
             await _unitOfWork.GetRepository<User>().UpdateAsync(user);
             await _unitOfWork.SaveAsync();
-            
+
             return await GetStudentById(userId);
         }
 

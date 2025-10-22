@@ -12,8 +12,8 @@ using Repositories.Context;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251021164437_subject")]
-    partial class subject
+    [Migration("20251022153133_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -287,9 +287,6 @@ namespace Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("CourseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -318,14 +315,12 @@ namespace Repositories.Migrations
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time without time zone");
 
-                    b.Property<Guid>("SubjectId")
+                    b.Property<Guid>("TeacherProfileId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("SubjectId");
+                    b.HasIndex("TeacherProfileId");
 
                     b.ToTable("ClassSchedules");
                 });
@@ -715,9 +710,6 @@ namespace Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -735,16 +727,48 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("TeacherProfileId")
+                    b.HasKey("Id");
+
+                    b.ToTable("Subjects");
+                });
+
+            modelBuilder.Entity("BusinessObjects.SubjectBuilder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClassScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClassScheduleId");
+
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("TeacherProfileId");
+                    b.HasIndex("SubjectId");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("SubjectBuilder");
                 });
 
             modelBuilder.Entity("BusinessObjects.SuspensionRecord", b =>
@@ -1247,17 +1271,13 @@ namespace Repositories.Migrations
 
             modelBuilder.Entity("BusinessObjects.ClassSchedule", b =>
                 {
-                    b.HasOne("BusinessObjects.Course", null)
-                        .WithMany("Schedules")
-                        .HasForeignKey("CourseId");
-
-                    b.HasOne("BusinessObjects.Subject", "Subject")
-                        .WithMany("ClassSchedules")
-                        .HasForeignKey("SubjectId")
+                    b.HasOne("BusinessObjects.TeacherProfile", "TeacherProfile")
+                        .WithMany()
+                        .HasForeignKey("TeacherProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Subject");
+                    b.Navigation("TeacherProfile");
                 });
 
             modelBuilder.Entity("BusinessObjects.Course", b =>
@@ -1367,23 +1387,31 @@ namespace Repositories.Migrations
                     b.Navigation("ParentProfile");
                 });
 
-            modelBuilder.Entity("BusinessObjects.Subject", b =>
+            modelBuilder.Entity("BusinessObjects.SubjectBuilder", b =>
                 {
+                    b.HasOne("BusinessObjects.ClassSchedule", "ClassSchedule")
+                        .WithMany("SubjectBuilders")
+                        .HasForeignKey("ClassScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BusinessObjects.Course", "Course")
-                        .WithMany("Subjects")
+                        .WithMany("SubjectBuilders")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObjects.TeacherProfile", "TeacherProfile")
-                        .WithMany()
-                        .HasForeignKey("TeacherProfileId")
+                    b.HasOne("BusinessObjects.Subject", "Subject")
+                        .WithMany("SubjectBuilders")
+                        .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("ClassSchedule");
+
                     b.Navigation("Course");
 
-                    b.Navigation("TeacherProfile");
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("BusinessObjects.SuspensionRecord", b =>
@@ -1474,15 +1502,18 @@ namespace Repositories.Migrations
                     b.Navigation("TeacherProfiles");
                 });
 
+            modelBuilder.Entity("BusinessObjects.ClassSchedule", b =>
+                {
+                    b.Navigation("SubjectBuilders");
+                });
+
             modelBuilder.Entity("BusinessObjects.Course", b =>
                 {
                     b.Navigation("CourseFeedbacks");
 
                     b.Navigation("Enrollments");
 
-                    b.Navigation("Schedules");
-
-                    b.Navigation("Subjects");
+                    b.Navigation("SubjectBuilders");
                 });
 
             modelBuilder.Entity("BusinessObjects.ParentProfile", b =>
@@ -1497,7 +1528,7 @@ namespace Repositories.Migrations
 
             modelBuilder.Entity("BusinessObjects.Subject", b =>
                 {
-                    b.Navigation("ClassSchedules");
+                    b.Navigation("SubjectBuilders");
 
                     b.Navigation("Syllabus")
                         .IsRequired();

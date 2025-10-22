@@ -1,4 +1,6 @@
-﻿using Core.Base;
+﻿using API.Filters;
+using API.Services;
+using Core.Base;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -10,8 +12,6 @@ using Repository;
 using Repository.Interfaces;
 using Services;
 using Services.Interfaces;
-using API.Filters;
-using API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // 1. Authorization policies cho từng Role và nhóm quyền

@@ -30,7 +30,7 @@ namespace API.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAllClassSchedule([FromQuery] Guid? teacherProfileId, [FromQuery] DayOfWeek? dayOfWeek,
-            [FromQuery] TimeOnly? startTime, [FromQuery] TimeOnly? endTime, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate, 
+            [FromQuery] TimeOnly? startTime, [FromQuery] TimeOnly? endTime, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate,
             [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try

@@ -1,9 +1,7 @@
-﻿using Azure.Core;
-using BusinessObjects;
+﻿using BusinessObjects;
 using BusinessObjects.DTO.Course;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
-using Repositories.Migrations;
 using Repository.Interfaces;
 using Services.Interfaces;
 
@@ -81,8 +79,8 @@ namespace Services
                 Description = course.Description,
                 Location = course.Location,
                 Semester = course.Semester,
-                StartDate= course.StartDate,
-                EndDate= course.EndDate,
+                StartDate = course.StartDate,
+                EndDate = course.EndDate,
                 TeachingMethod = course.TeachingMethod,
                 TuitionFee = course.TuitionFee,
                 Capacity = course.Capacity,
@@ -231,7 +229,7 @@ namespace Services
             {
                 subjectBuilder = subjectBuilder.Where(c =>
                     (c.Subject.SubjectName != null && c.Subject.SubjectName.ToLower().Contains(searchTerm.Trim().ToLower())) ||
-                    (c.Subject.Description != null && c.Subject.Description.ToLower().Contains(searchTerm.Trim().ToLower())) 
+                    (c.Subject.Description != null && c.Subject.Description.ToLower().Contains(searchTerm.Trim().ToLower()))
                 );
             }
 
@@ -292,9 +290,9 @@ namespace Services
         public async Task<CourseSubjectResponse> GetCourseSubjectById(Guid id)
         {
             var subjectBuilder = await _unitOfWork.GetRepository<SubjectBuilder>().Entities
-                .Include(a=> a.Course)
-                .Include(a=> a.ClassSchedule)
-                .Include(a=> a.Subject)
+                .Include(a => a.Course)
+                .Include(a => a.ClassSchedule)
+                .Include(a => a.Subject)
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (subjectBuilder == null)
             {

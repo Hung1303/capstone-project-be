@@ -13,7 +13,7 @@ namespace BusinessObjects
         public string Address { get; set; } = string.Empty;
         public string? ContactEmail { get; set; }
         public string? ContactPhone { get; set; }
-        
+
         // Location fields for mapping
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }

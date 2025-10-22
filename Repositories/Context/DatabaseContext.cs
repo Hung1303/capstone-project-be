@@ -290,7 +290,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "center.active@example.com",
                     UserName = "center_active",
-                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", 
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                     FullName = "Emily Clark",
                     PhoneNumber = "+10000000001",
                     Role = Core.Base.UserRole.Center,

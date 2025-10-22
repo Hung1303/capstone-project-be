@@ -14,6 +14,22 @@ namespace Repositories.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Subjects",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubjectName = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subjects", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tokens",
                 columns: table => new
                 {
@@ -48,6 +64,32 @@ namespace Repositories.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Syllabuses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SyllabusName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    GradeLevel = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    AssessmentMethod = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    CourseMaterial = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Syllabuses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Syllabuses_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -162,6 +204,31 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LessonPlans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SyllabusId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Topic = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    StudentTask = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    MaterialsUsed = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Notes = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LessonPlans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LessonPlans_Syllabuses_SyllabusId",
+                        column: x => x.SyllabusId,
+                        principalTable: "Syllabuses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TeacherProfiles",
                 columns: table => new
                 {
@@ -223,6 +290,33 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ClassSchedules",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "integer", nullable: false),
+                    StartTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    EndTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    RoomOrLink = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    TeacherProfileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClassSchedules", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ClassSchedules_TeacherProfiles_TeacherProfileId",
+                        column: x => x.TeacherProfileId,
+                        principalTable: "TeacherProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Courses",
                 columns: table => new
                 {
@@ -231,6 +325,9 @@ namespace Repositories.Migrations
                     Subject = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Location = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    Semester = table.Column<int>(type: "integer", nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
                     TeachingMethod = table.Column<int>(type: "integer", nullable: false),
                     TuitionFee = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     Capacity = table.Column<int>(type: "integer", nullable: false),
@@ -338,33 +435,6 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClassSchedules",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    DayOfWeek = table.Column<int>(type: "integer", nullable: false),
-                    StartTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
-                    StartDate = table.Column<DateOnly>(type: "date", nullable: true),
-                    EndDate = table.Column<DateOnly>(type: "date", nullable: true),
-                    RoomOrLink = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClassSchedules", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ClassSchedules_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CourseFeedbacks",
                 columns: table => new
                 {
@@ -442,6 +512,42 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SubjectBuilder",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassScheduleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    status = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubjectBuilder", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubjectBuilder_ClassSchedules_ClassScheduleId",
+                        column: x => x.ClassScheduleId,
+                        principalTable: "ClassSchedules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SubjectBuilder_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SubjectBuilder_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SuspensionRecords",
                 columns: table => new
                 {
@@ -481,33 +587,6 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Syllabuses",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SyllabusName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
-                    GradeLevel = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    Subject = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
-                    AssessmentMethod = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    CourseMaterial = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Syllabuses", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Syllabuses_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "BillingRecords",
                 columns: table => new
                 {
@@ -543,31 +622,6 @@ namespace Repositories.Migrations
                         name: "FK_BillingRecords_Users_ChargedUserId",
                         column: x => x.ChargedUserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LessonPlans",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SyllabusId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Topic = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    StudentTask = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
-                    MaterialsUsed = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    Notes = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LessonPlans", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_LessonPlans_Syllabuses_SyllabusId",
-                        column: x => x.SyllabusId,
-                        principalTable: "Syllabuses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -667,9 +721,9 @@ namespace Repositories.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClassSchedules_CourseId",
+                name: "IX_ClassSchedules_TeacherProfileId",
                 table: "ClassSchedules",
-                column: "CourseId");
+                column: "TeacherProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseFeedbacks_CourseId",
@@ -745,6 +799,21 @@ namespace Repositories.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_SubjectBuilder_ClassScheduleId",
+                table: "SubjectBuilder",
+                column: "ClassScheduleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubjectBuilder_CourseId",
+                table: "SubjectBuilder",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubjectBuilder_SubjectId",
+                table: "SubjectBuilder",
+                column: "SubjectId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SuspensionRecords_ActionByUserId",
                 table: "SuspensionRecords",
                 column: "ActionByUserId");
@@ -760,9 +829,9 @@ namespace Repositories.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Syllabuses_CourseId",
+                name: "IX_Syllabuses_SubjectId",
                 table: "Syllabuses",
-                column: "CourseId",
+                column: "SubjectId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -822,9 +891,6 @@ namespace Repositories.Migrations
                 name: "BillingRecords");
 
             migrationBuilder.DropTable(
-                name: "ClassSchedules");
-
-            migrationBuilder.DropTable(
                 name: "CourseFeedbacks");
 
             migrationBuilder.DropTable(
@@ -832,6 +898,9 @@ namespace Repositories.Migrations
 
             migrationBuilder.DropTable(
                 name: "LessonPlans");
+
+            migrationBuilder.DropTable(
+                name: "SubjectBuilder");
 
             migrationBuilder.DropTable(
                 name: "SuspensionRecords");
@@ -849,16 +918,22 @@ namespace Repositories.Migrations
                 name: "Syllabuses");
 
             migrationBuilder.DropTable(
-                name: "StudentProfiles");
+                name: "ClassSchedules");
 
             migrationBuilder.DropTable(
                 name: "Courses");
 
             migrationBuilder.DropTable(
-                name: "ParentProfiles");
+                name: "StudentProfiles");
+
+            migrationBuilder.DropTable(
+                name: "Subjects");
 
             migrationBuilder.DropTable(
                 name: "TeacherProfiles");
+
+            migrationBuilder.DropTable(
+                name: "ParentProfiles");
 
             migrationBuilder.DropTable(
                 name: "CenterProfiles");
