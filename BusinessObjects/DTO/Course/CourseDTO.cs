@@ -33,6 +33,35 @@ namespace BusinessObjects.DTO.Course
             }
         }
     }
+    public class CreateSubjectForCourseRequest
+    {
+        public Guid CourseId { get; set; }
+        public Guid ClassScheduleId { get; set; }
+        public Guid SubjectId { get; set; }
+        public string status { get; set; }
+    }
+    public class UpdateCourseSubject
+    {
+        public Guid? ClassScheduleId { get; set; }
+        public string? status { get; set; }
+    }
+    public class CourseSubjectResponse
+    {
+        public Guid id { get; set; }
+        public Guid CourseId { get; set; }
+        public Guid ClassScheduleId { get; set; }
+        public Guid SubjectId { get; set; }
+        public Guid TeacherProfileId { get; set; }
+        public string status { get; set; }
+        public string SubjectName { get; set; }
+        public string Description { get; set; }
+        public DayOfWeek DayOfWeek { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+        public string? RoomOrLink { get; set; }
+    }
     public class UpdateCourseRequest : IValidatableObject
     {
         public string? Title { get; set; }

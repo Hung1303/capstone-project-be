@@ -12,7 +12,7 @@ namespace Services.Interfaces
     {
         Task<SubjectResponse> CreateSubject(CreateSubjectRequest request);
         Task<SubjectResponse> UpdateSubject(Guid id, UpdateSubjectRequest request);
-        Task<IEnumerable<SubjectResponse>> GetAllSubject(string? searchTerm, int pageNumber, int pageSize, Guid? CourseId, Guid? TeacherProfileId);
+        Task<IEnumerable<SubjectResponse>> GetAllSubject(string? searchTerm, int pageNumber, int pageSize);
         Task<SubjectResponse> GetSubjectById(Guid id);
         Task<bool> DeleteSubject(Guid id);
     }

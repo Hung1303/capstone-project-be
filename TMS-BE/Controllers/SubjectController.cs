@@ -32,12 +32,12 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSubject([FromQuery] string? searchTerm, [FromQuery] Guid? CourseId, [FromQuery] Guid? TeacherProfileId,
+        public async Task<IActionResult> GetAllSubject([FromQuery] string? searchTerm,
             [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
-                var result = await _subjectService.GetAllSubject(searchTerm, pageNumber, pageSize, CourseId, TeacherProfileId);
+                var result = await _subjectService.GetAllSubject(searchTerm, pageNumber, pageSize);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)

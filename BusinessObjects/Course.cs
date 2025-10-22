@@ -19,10 +19,10 @@ namespace BusinessObjects
         public virtual TeacherProfile TeacherProfile { get; set; }
         public Guid? CenterProfileId { get; set; }
         public virtual CenterProfile CenterProfile { get; set; }
-        public virtual ICollection<ClassSchedule> Schedules { get; set; } = new List<ClassSchedule>();
+        public virtual ICollection<SubjectBuilder> SubjectBuilders { get; set; } = new List<SubjectBuilder>();
         public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public virtual ICollection<CourseFeedback> CourseFeedbacks { get; set; } = new List<CourseFeedback>();
-        public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
+        //public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
         //public virtual Syllabus? Syllabus { get; set; }
     }
 }

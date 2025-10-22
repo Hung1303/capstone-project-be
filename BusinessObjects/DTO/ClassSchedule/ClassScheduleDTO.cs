@@ -4,12 +4,12 @@ namespace BusinessObjects.DTO.ClassSchedule
 {
     public class CreateClassScheduleRequest : IValidatableObject
     {
-        public Guid SubjectId { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
+        public Guid TeacherProfileId { get; set; }
         public string? RoomOrLink { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -35,12 +35,12 @@ namespace BusinessObjects.DTO.ClassSchedule
     }
     public class UpdateClassScheduleRequest : IValidatableObject
     {
-        public Guid? SubjectId { get; set; }
         public DayOfWeek? DayOfWeek { get; set; }
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
+        public Guid? TeacherProfileId { get; set; }
         public string? RoomOrLink { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -67,12 +67,12 @@ namespace BusinessObjects.DTO.ClassSchedule
     public class ClassScheduleResponse
     {
         public Guid Id { get; set; }
-        public Guid SubjectId { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
+        public Guid? TeacherProfileId { get; set; }
         public string? RoomOrLink { get; set; }
     }
 }
