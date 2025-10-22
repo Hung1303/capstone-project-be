@@ -12,11 +12,7 @@ namespace BusinessObjects
     {
         public string SubjectName { get; set; }
         public string Description { get; set; }
-        public Guid TeacherProfileId { get; set; }
-        public Guid CourseId { get; set; }
         public virtual Syllabus Syllabus { get; set; }
-        public virtual TeacherProfile TeacherProfile { get; set; }
-        public virtual Course Course { get; set; }
-        public virtual ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
+        public virtual ICollection<SubjectBuilder> SubjectBuilders { get; set; } = new List<SubjectBuilder>();
     }
 }
