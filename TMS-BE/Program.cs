@@ -165,6 +165,7 @@ builder.Services.AddScoped<ICourseFeedbackService, CourseFeedbackService>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddScoped<IApprovalRequestService, ApprovalRequestService>();
 builder.Services.AddScoped<IGeneratedReportService, GeneratedReportService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddEndpointsApiExplorer();
 
 // CORS policy (tighten AllowedOrigins as needed for your frontend)

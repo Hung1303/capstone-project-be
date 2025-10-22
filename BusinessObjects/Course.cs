@@ -8,6 +8,9 @@ namespace BusinessObjects
         public string Subject { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
+        public Semester Semester { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
         public TeachingMethod TeachingMethod { get; set; }
         public decimal TuitionFee { get; set; }
         public int Capacity { get; set; }
@@ -19,7 +22,8 @@ namespace BusinessObjects
         public virtual ICollection<ClassSchedule> Schedules { get; set; } = new List<ClassSchedule>();
         public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public virtual ICollection<CourseFeedback> CourseFeedbacks { get; set; } = new List<CourseFeedback>();
-        public virtual Syllabus? Syllabus { get; set; }
+        public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
+        //public virtual Syllabus? Syllabus { get; set; }
     }
 }
 

@@ -59,6 +59,9 @@ namespace Services
                 Subject = request.Subject,
                 Description = request.Description,
                 Location = request.Location,
+                Semester = request.Semester,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
                 TeachingMethod = request.TeachingMethod,
                 TuitionFee = request.TuitionFee,
                 Capacity = request.Capacity,
@@ -75,6 +78,9 @@ namespace Services
                 Subject = course.Subject,
                 Description = course.Description,
                 Location = course.Location,
+                Semester = course.Semester,
+                StartDate= course.StartDate,
+                EndDate= course.EndDate,
                 TeachingMethod = course.TeachingMethod,
                 TuitionFee = course.TuitionFee,
                 Capacity = course.Capacity,
@@ -135,6 +141,9 @@ namespace Services
                     Subject = a.Subject,
                     Description = a.Description,
                     Location = a.Location,
+                    Semester = a.Semester,
+                    StartDate = a.StartDate,
+                    EndDate = a.EndDate,
                     TeachingMethod = a.TeachingMethod,
                     TuitionFee = a.TuitionFee,
                     Capacity = a.Capacity,
@@ -159,6 +168,9 @@ namespace Services
                 Subject = course.Subject,
                 Description = course.Description,
                 Location = course.Location,
+                Semester = course.Semester,
+                StartDate = course.StartDate,
+                EndDate = course.EndDate,
                 TeachingMethod = course.TeachingMethod,
                 TuitionFee = course.TuitionFee,
                 Capacity = course.Capacity,
@@ -233,6 +245,18 @@ namespace Services
             {
                 course.Location = request.Location;
             }
+            if (request.Semester.HasValue)
+            {
+                course.Semester = request.Semester.Value;
+            }
+            if (request.StartDate.HasValue)
+            {
+                course.StartDate = request.StartDate.Value;
+            }
+            if (request.EndDate.HasValue)
+            {
+                course.EndDate = request.EndDate.Value;
+            }
             if (request.TeachingMethod.HasValue)
             {
                 course.TeachingMethod = request.TeachingMethod.Value;
@@ -262,6 +286,9 @@ namespace Services
                 Subject = course.Subject,
                 Description = course.Description,
                 Location = course.Location,
+                Semester = course.Semester,
+                StartDate = course.StartDate,
+                EndDate = course.EndDate,
                 TeachingMethod = course.TeachingMethod,
                 TuitionFee = course.TuitionFee,
                 Capacity = course.Capacity,

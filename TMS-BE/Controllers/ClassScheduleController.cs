@@ -29,13 +29,13 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllClassSchedule([FromQuery] Guid? courseId, [FromQuery] DayOfWeek? dayOfWeek,
+        public async Task<IActionResult> GetAllClassSchedule([FromQuery] Guid? subjectId, [FromQuery] DayOfWeek? dayOfWeek,
             [FromQuery] TimeOnly? startTime, [FromQuery] TimeOnly? endTime, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate, 
             [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
-                var result = await _classScheduleService.GetAllClassSchedule(courseId, dayOfWeek, startTime, endTime, startDate, endDate, pageNumber, pageSize);
+                var result = await _classScheduleService.GetAllClassSchedule(subjectId, dayOfWeek, startTime, endTime, startDate, endDate, pageNumber, pageSize);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)

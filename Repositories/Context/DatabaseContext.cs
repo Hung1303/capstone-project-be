@@ -24,6 +24,7 @@ namespace Repositories.Context
         public DbSet<Syllabus> Syllabuses { get; set; }
         public DbSet<LessonPlan> LessonPlans { get; set; }
         public DbSet<TeacherFeedback> TeacherFeedbacks { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,7 +65,7 @@ namespace Repositories.Context
                 b.Property(x => x.Subject).HasMaxLength(128).IsRequired();
                 b.Property(x => x.Location).HasMaxLength(512).IsRequired();
                 b.Property(x => x.TuitionFee).HasPrecision(18, 2);
-                b.HasMany(x => x.Schedules).WithOne().HasForeignKey(s => s.CourseId).OnDelete(DeleteBehavior.Cascade);
+                //b.HasMany(x => x.Schedules).WithOne().HasForeignKey(s => s.CourseId).OnDelete(DeleteBehavior.Cascade);
                 b.HasMany(x => x.Enrollments).WithOne().HasForeignKey(e => e.CourseId).OnDelete(DeleteBehavior.Cascade);
                 b.HasMany(x => x.CourseFeedbacks).WithOne().HasForeignKey(r => r.CourseId).OnDelete(DeleteBehavior.Cascade);
                 // Removed CK_Course_Owner check constraint to allow courses to be owned by center and taught by teacher simultaneously
@@ -192,14 +193,14 @@ namespace Repositories.Context
 
             modelBuilder.Entity<Syllabus>(b =>
             {
-                b.HasOne(s => s.Course)
+                b.HasOne(s => s.Subject)
                     .WithOne(c => c.Syllabus)
-                    .HasForeignKey<Syllabus>(s => s.CourseId)
+                    .HasForeignKey<Syllabus>(s => s.SubjectId)
                     .OnDelete(DeleteBehavior.Cascade);
                 b.Property(s => s.SyllabusName).HasMaxLength(256).IsRequired();
                 b.Property(s => s.Description).HasMaxLength(2000);
                 b.Property(s => s.GradeLevel).HasMaxLength(64);
-                b.Property(s => s.Subject).HasMaxLength(40);
+                //b.Property(s => s.Subject).HasMaxLength(40);
                 b.Property(s => s.AssessmentMethod).HasMaxLength(1000);
                 b.Property(s => s.CourseMaterial).HasColumnType("text");
             });
