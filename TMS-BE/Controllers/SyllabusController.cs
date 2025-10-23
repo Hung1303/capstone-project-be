@@ -30,11 +30,11 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSyllabus([FromQuery] string? searchTerm, [FromQuery] Guid? subjectId,[FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        public async Task<IActionResult> GetAllSyllabus([FromQuery] string? searchTerm, [FromQuery] Guid? subjectId, [FromQuery] Guid? TeacherProfileId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
-                var result = await _syllabusService.GetAllSyllabus(searchTerm, pageNumber, pageSize, subjectId);
+                var result = await _syllabusService.GetAllSyllabus(searchTerm, pageNumber, pageSize, subjectId, TeacherProfileId);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)

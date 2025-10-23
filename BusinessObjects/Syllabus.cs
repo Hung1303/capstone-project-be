@@ -7,6 +7,7 @@ namespace BusinessObjects
     {
         //public Guid CourseId { get; set; }
         public Guid SubjectId { get; set; }
+        public Guid TeacherProfileId { get; set; }
         public string SyllabusName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string GradeLevel { get; set; } = string.Empty;
@@ -17,6 +18,7 @@ namespace BusinessObjects
 
         //public virtual Course Course { get; set; }
         public virtual Subject Subject { get; set; }
+        public virtual TeacherProfile TeacherProfile { get; set; }
         public virtual ICollection<LessonPlan> LessonPlans { get; set; } = new List<LessonPlan>();
 
     }

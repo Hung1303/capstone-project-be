@@ -20,6 +20,11 @@ namespace Services
             {
                 throw new Exception("Subject Not Found");
             }
+            var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
+            if (teacher == null)
+            {
+                throw new Exception("Teacher Not Found");
+            }
             var syllabus = new Syllabus
             {
                 SyllabusName = request.SyllabusName,
@@ -29,6 +34,7 @@ namespace Services
                 AssessmentMethod = request.AssessmentMethod,
                 CourseMaterial = request.CourseMaterial,
                 SubjectId = request.SubjectId,
+                TeacherProfileId = request.TeacherProfileId,
             };
             await _unitOfWork.GetRepository<Syllabus>().InsertAsync(syllabus);
             await _unitOfWork.SaveAsync();
@@ -42,6 +48,7 @@ namespace Services
                 AssessmentMethod = syllabus.AssessmentMethod,
                 CourseMaterial = syllabus.CourseMaterial,
                 SubjectId = syllabus.SubjectId,
+                TeacherProfileId = syllabus.TeacherProfileId,
             };
             return result;
         }
@@ -59,12 +66,16 @@ namespace Services
             return true;
         }
 
-        public async Task<IEnumerable<SyllabusResponse>> GetAllSyllabus(string? searchTerm, int pageNumber, int pageSize, Guid? subjectId)
+        public async Task<IEnumerable<SyllabusResponse>> GetAllSyllabus(string? searchTerm, int pageNumber, int pageSize, Guid? subjectId, Guid? TeacherProfileId)
         {
             var syllabus = _unitOfWork.GetRepository<Syllabus>().Entities.Where(a => !a.IsDeleted);
             if (subjectId.HasValue)
             {
                 syllabus = syllabus.Where(a => a.SubjectId == subjectId);
+            }
+            if (TeacherProfileId.HasValue)
+            {
+                syllabus = syllabus.Where(a => a.TeacherProfileId == TeacherProfileId);
             }
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -96,6 +107,7 @@ namespace Services
                     AssessmentMethod = a.AssessmentMethod,
                     CourseMaterial = a.CourseMaterial,
                     SubjectId = a.SubjectId,
+                    TeacherProfileId = a.TeacherProfileId,
                 }).ToListAsync();
             return paginatedSylabus;
         }
@@ -117,6 +129,7 @@ namespace Services
                 AssessmentMethod = syllabus.AssessmentMethod,
                 CourseMaterial = syllabus.CourseMaterial,
                 SubjectId = syllabus.SubjectId,
+                TeacherProfileId = syllabus.TeacherProfileId,
             };
             return result;
         }
@@ -161,6 +174,15 @@ namespace Services
                 }
                 syllabus.SubjectId = request.SubjectId.Value;
             }
+            if (request.TeacherProfileId.HasValue)
+            {
+                var checkTeacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
+                if (checkTeacher == null)
+                {
+                    throw new Exception("Teacher Not Found");
+                }
+                syllabus.TeacherProfileId = request.TeacherProfileId.Value;
+            }
             await _unitOfWork.GetRepository<Syllabus>().UpdateAsync(syllabus);
             await _unitOfWork.SaveAsync();
 
@@ -174,6 +196,7 @@ namespace Services
                 AssessmentMethod = syllabus.AssessmentMethod,
                 CourseMaterial = syllabus.CourseMaterial,
                 SubjectId = syllabus.SubjectId,
+                TeacherProfileId = syllabus.TeacherProfileId,
             };
             return result;
         }

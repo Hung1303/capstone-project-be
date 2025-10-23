@@ -8,6 +8,8 @@
         public string AssessmentMethod { get; set; }
         public string CourseMaterial { get; set; }
         public Guid SubjectId { get; set; }
+        public Guid TeacherProfileId { get; set; }
+
     }
     public class UpdateSyllabusRequest
     {
@@ -17,6 +19,7 @@
         public string? AssessmentMethod { get; set; }
         public string? CourseMaterial { get; set; }
         public Guid? SubjectId { get; set; }
+        public Guid? TeacherProfileId { get; set; }
     }
     public class SyllabusResponse
     {
@@ -27,5 +30,6 @@
         public string AssessmentMethod { get; set; }
         public string CourseMaterial { get; set; }
         public Guid SubjectId { get; set; }
+        public Guid TeacherProfileId { get; set; }
     }
 }

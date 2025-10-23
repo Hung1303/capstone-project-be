@@ -6,7 +6,7 @@ namespace Services.Interfaces
     {
         Task<SyllabusResponse> CreateSyllabus(CreateSyllabusRequest request);
         Task<SyllabusResponse> UpdateSyllabus(Guid id, UpdateSyllabusRequest request);
-        Task<IEnumerable<SyllabusResponse>> GetAllSyllabus(string? searchTerm, int pageNumber, int pageSize, Guid? subjectId);
+        Task<IEnumerable<SyllabusResponse>> GetAllSyllabus(string? searchTerm, int pageNumber, int pageSize, Guid? subjectId, Guid? TeacherProfileId);
         Task<SyllabusResponse> GetSyllabusById(Guid id);
         Task<bool> DeleteSyllabus(Guid id);
     }
