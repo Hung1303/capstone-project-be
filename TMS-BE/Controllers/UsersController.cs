@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.DTO.User;
+using Core.Base;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
@@ -110,12 +111,20 @@ namespace TMS_BE.Controllers
             return Ok(center);
         }
 
-        // POST api/<UsersController>
+
         [HttpPost("Admin")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] CreateAdminRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var user = await _userService.CreateAdminRequest(request);
+            return Ok(user);
+        }
+
+        [HttpPost("Inspector")]
+        public async Task<IActionResult> CreateInspectorAccount([FromBody] CreateAdminRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var user = await _userService.CreateInspectorRequest(request);
             return Ok(user);
         }
 
@@ -204,6 +213,22 @@ namespace TMS_BE.Controllers
         {
             var result = await _userService.ChangePassword(userId, currentPassword, newPassword);
             return result ? Ok(new { message = "Password Changed." }) : BadRequest();
+        }
+
+        [HttpGet("Centers/Status/{status}")]
+        public async Task<IActionResult> GetCentersByStatus(CenterStatus status, int pageNumber = 1, int pageSize = 10, string? centerName = null)
+        {
+            var (centers, totalCount) = await _userService.GetCentersByStatusAsync(status, pageNumber, pageSize, centerName);
+            return Ok(new { centers, totalCount, pageNumber, pageSize });
+        }
+
+        [HttpPut("Centers/{centerId}/Status")]
+        public async Task<IActionResult> UpdateCenterStatus(Guid centerId, [FromBody] UpdateCenterStatusRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
+            var result = await _userService.UpdateCenterStatusAsync(centerId, request.Status, request.Reason);
+            return result ? Ok(new { message = "Center status updated successfully" }) : NotFound();
         }
 
         // DELETE api/<UsersController>/5

@@ -1,5 +1,6 @@
 ﻿using BusinessObjects;
 using BusinessObjects.DTO.User;
+using Core.Base;
 
 namespace Services.Interfaces
 {
@@ -7,6 +8,7 @@ namespace Services.Interfaces
     {
         Task<User?> GetUserByEmailAsync(string email);
         Task<CreateAdminRequest> CreateAdminRequest(CreateAdminRequest request);
+        Task<CreateAdminRequest> CreateInspectorRequest(CreateAdminRequest request);
         Task<CreateCenterRequest> CreateCenterRequest(CreateCenterRequest request);
         Task<CreateTeacherRequest> CreateTeacherRequest(CreateTeacherRequest request);
         Task<CreateTeacherRequest> CenterAddTeacherRequest(Guid centerOwnerId, CreateTeacherRequest request);
@@ -31,5 +33,7 @@ namespace Services.Interfaces
         Task<bool> DeleteUser(Guid userId);
         Task<bool> UpdateUserStatus(Guid userId, int status);
         Task<bool> ChangePassword(Guid userId, string currentPassword, string newPassword);
+        Task<(IEnumerable<CenterListResponse> Centers, int TotalCount)> GetCentersByStatusAsync(CenterStatus status, int pageNumber, int pageSize, string? centerName = null);
+        Task<bool> UpdateCenterStatusAsync(Guid centerId, CenterStatus status, string? reason = null);
     }
 }

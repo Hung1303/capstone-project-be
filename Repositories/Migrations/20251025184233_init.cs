@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -138,6 +138,15 @@ namespace Repositories.Migrations
                     Longitude = table.Column<double>(type: "double precision", nullable: true),
                     City = table.Column<string>(type: "text", nullable: true),
                     District = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    VerificationRequestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    VerificationCompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    VerificationNotes = table.Column<string>(type: "text", nullable: true),
+                    RejectionReason = table.Column<string>(type: "text", nullable: true),
+                    LicenseDocumentPath = table.Column<string>(type: "text", nullable: true),
+                    BusinessRegistrationPath = table.Column<string>(type: "text", nullable: true),
+                    TaxCodeDocumentPath = table.Column<string>(type: "text", nullable: true),
+                    OtherDocumentsPath = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -226,6 +235,53 @@ namespace Repositories.Migrations
                         principalTable: "Syllabuses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CenterVerificationRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CenterProfileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    InspectorId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    ScheduledDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CompletedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    InspectorNotes = table.Column<string>(type: "text", nullable: true),
+                    VerificationPhotos = table.Column<string>(type: "text", nullable: true),
+                    DocumentChecklist = table.Column<string>(type: "text", nullable: true),
+                    IsLocationVerified = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDocumentsVerified = table.Column<bool>(type: "boolean", nullable: false),
+                    IsLicenseValid = table.Column<bool>(type: "boolean", nullable: false),
+                    AdminId = table.Column<Guid>(type: "uuid", nullable: true),
+                    AdminDecisionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    AdminDecision = table.Column<int>(type: "integer", nullable: false),
+                    AdminNotes = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CenterVerificationRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CenterVerificationRequests_CenterProfiles_CenterProfileId",
+                        column: x => x.CenterProfileId,
+                        principalTable: "CenterProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CenterVerificationRequests_Users_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CenterVerificationRequests_Users_InspectorId",
+                        column: x => x.InspectorId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -643,11 +699,11 @@ namespace Repositories.Migrations
 
             migrationBuilder.InsertData(
                 table: "CenterProfiles",
-                columns: new[] { "Id", "Address", "CenterName", "City", "ContactEmail", "ContactPhone", "CreatedAt", "District", "IsDeleted", "IssueDate", "LastUpdatedAt", "Latitude", "LicenseIssuedBy", "LicenseNumber", "Longitude", "OwnerName", "UserId" },
+                columns: new[] { "Id", "Address", "BusinessRegistrationPath", "CenterName", "City", "ContactEmail", "ContactPhone", "CreatedAt", "District", "IsDeleted", "IssueDate", "LastUpdatedAt", "Latitude", "LicenseDocumentPath", "LicenseIssuedBy", "LicenseNumber", "Longitude", "OtherDocumentsPath", "OwnerName", "RejectionReason", "Status", "TaxCodeDocumentPath", "UserId", "VerificationCompletedAt", "VerificationNotes", "VerificationRequestedAt" },
                 values: new object[,]
                 {
-                    { new Guid("99999999-9999-9999-9999-999999999999"), "123 Learning Ave, Cityville", "Bright Future Center", null, "contact@brightfuture.example.com", "+10000001001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2024, 1, 15), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Education Dept", "LIC-2024-0001", null, "Emily Clark", new Guid("22222222-2222-2222-2222-222222222222") },
-                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "456 Discovery Rd, Townsburg", "New Horizons Center", null, "hello@newhorizons.example.com", "+10000001002", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2025, 2, 1), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Education Dept", "LIC-2025-0005", null, "Michael Brown", new Guid("33333333-3333-3333-3333-333333333333") }
+                    { new Guid("99999999-9999-9999-9999-999999999999"), "123 Learning Ave, Cityville", null, "Bright Future Center", null, "contact@brightfuture.example.com", "+10000001001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2024, 1, 15), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, "Education Dept", "LIC-2024-0001", null, null, "Emily Clark", null, 4, null, new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), "Successfully verified and approved", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "456 Discovery Rd, Townsburg", null, "New Horizons Center", null, "hello@newhorizons.example.com", "+10000001002", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2025, 2, 1), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, "Education Dept", "LIC-2025-0005", null, null, "Michael Brown", null, 0, null, new Guid("33333333-3333-3333-3333-333333333333"), null, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -719,6 +775,21 @@ namespace Repositories.Migrations
                 table: "CenterProfiles",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CenterVerificationRequests_AdminId",
+                table: "CenterVerificationRequests",
+                column: "AdminId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CenterVerificationRequests_CenterProfileId",
+                table: "CenterVerificationRequests",
+                column: "CenterProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CenterVerificationRequests_InspectorId",
+                table: "CenterVerificationRequests",
+                column: "InspectorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClassSchedules_TeacherProfileId",
@@ -889,6 +960,9 @@ namespace Repositories.Migrations
 
             migrationBuilder.DropTable(
                 name: "BillingRecords");
+
+            migrationBuilder.DropTable(
+                name: "CenterVerificationRequests");
 
             migrationBuilder.DropTable(
                 name: "CourseFeedbacks");

@@ -56,6 +56,40 @@ namespace Services
             return request;
         }
 
+        public async Task<CreateAdminRequest> CreateInspectorRequest(CreateAdminRequest request)
+        {
+            var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
+            if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
+                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+
+            var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
+            if (checkUser != null)
+            {
+                if (checkUser.Email == request.Email)
+                    throw new Exception("Duplicate email");
+                else if (checkUser.UserName == request.UserName)
+                    throw new Exception("Duplicate Username");
+                else
+                    throw new Exception("Duplicate Phonenumber");
+            }
+
+            var user = new User
+            {
+                Email = request.Email,
+                UserName = request.UserName,
+                FullName = request.FullName,
+                PasswordHash = PasswordHasher.HashPassword(request.Password),
+                PhoneNumber = request.PhoneNumber,
+                Role = UserRole.Inspector,
+                Status = AccountStatus.Active
+            };
+
+            await _unitOfWork.GetRepository<User>().InsertAsync(user);
+            await _unitOfWork.SaveAsync();
+
+            return request;
+        }
+
         public async Task<CreateCenterRequest> CreateCenterRequest(CreateCenterRequest request)
         {
 
@@ -101,7 +135,8 @@ namespace Services
                     LicenseIssuedBy = request.LicenseIssuedBy,
                     Address = request.Address,
                     ContactEmail = request.Email,
-                    ContactPhone = request.PhoneNumber
+                    ContactPhone = request.PhoneNumber,
+                    Status = CenterStatus.Pending
                 };
 
                 await _unitOfWork.GetRepository<User>().InsertAsync(user);
@@ -913,6 +948,66 @@ namespace Services
             await _unitOfWork.SaveAsync();
 
             return result;
+        }
+
+        public async Task<(IEnumerable<CenterListResponse> Centers, int TotalCount)> GetCentersByStatusAsync(CenterStatus status, int pageNumber, int pageSize, string? centerName = null)
+        {
+            var query = _unitOfWork.GetRepository<CenterProfile>().Entities
+                .Where(c => !c.IsDeleted && c.Status == status);
+
+            if (!string.IsNullOrWhiteSpace(centerName))
+            {
+                query = query.Where(c => c.CenterName.Contains(centerName));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var centers = await query
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new CenterListResponse
+                {
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    CenterProfileId = c.Id,
+                    CenterName = c.CenterName,
+                    OwnerName = c.OwnerName ?? "",
+                    LicenseNumber = c.LicenseNumber,
+                    Address = c.Address,
+                    ContactEmail = c.ContactEmail ?? "",
+                    ContactPhone = c.ContactPhone ?? "",
+                    Status = c.Status.ToString()
+                })
+                .ToListAsync();
+
+            return (centers, totalCount);
+        }
+
+        public async Task<bool> UpdateCenterStatusAsync(Guid centerId, CenterStatus status, string? reason = null)
+        {
+            var center = await _unitOfWork.GetRepository<CenterProfile>().Entities
+                .FirstOrDefaultAsync(c => c.Id == centerId && !c.IsDeleted);
+
+            if (center == null)
+                return false;
+
+            center.Status = status;
+            center.LastUpdatedAt = DateTime.UtcNow;
+
+            if (status == CenterStatus.Rejected && !string.IsNullOrEmpty(reason))
+            {
+                center.RejectionReason = reason;
+            }
+            else if (status == CenterStatus.Verified)
+            {
+                center.VerificationCompletedAt = DateTime.UtcNow;
+            }
+
+            await _unitOfWork.GetRepository<CenterProfile>().UpdateAsync(center);
+            await _unitOfWork.SaveAsync();
+
+            return true;
         }
     }
 }

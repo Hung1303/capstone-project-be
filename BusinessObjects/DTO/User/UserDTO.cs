@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace BusinessObjects.DTO.User
 {
@@ -281,6 +282,13 @@ namespace BusinessObjects.DTO.User
 
         public string SchoolName { get; set; }
         public string GradeLevel { get; set; }
+    }
+
+    public class UpdateCenterStatusRequest
+    {
+        [Required]
+        public CenterStatus Status { get; set; }
+        public string? Reason { get; set; }
     }
 
 
