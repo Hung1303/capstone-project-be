@@ -490,6 +490,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     UserId = userStudentActiveId,
                     SchoolName = "City High School",
+                    SchoolYear = "2024-2025",
                     GradeLevel = "10",
                     ParentProfileId = parentLiamProfileId
                 },
@@ -501,6 +502,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     UserId = userStudentPendingId,
                     SchoolName = "Town Middle School",
+                    SchoolYear = "2024-2025",
                     GradeLevel = "8",
                     ParentProfileId = parentLiamProfileId
                 }

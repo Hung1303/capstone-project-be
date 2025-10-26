@@ -12,7 +12,7 @@ using Repositories.Context;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251025184233_init")]
+    [Migration("20251026175752_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -770,6 +770,10 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("SchoolYear")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -792,6 +796,7 @@ namespace Repositories.Migrations
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ParentProfileId = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
                             SchoolName = "City High School",
+                            SchoolYear = "2024-2025",
                             UserId = new Guid("77777777-7777-7777-7777-777777777777")
                         },
                         new
@@ -803,6 +808,7 @@ namespace Repositories.Migrations
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ParentProfileId = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
                             SchoolName = "Town Middle School",
+                            SchoolYear = "2024-2025",
                             UserId = new Guid("88888888-8888-8888-8888-888888888888")
                         });
                 });

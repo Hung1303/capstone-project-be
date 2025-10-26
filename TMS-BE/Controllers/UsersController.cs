@@ -226,7 +226,7 @@ namespace TMS_BE.Controllers
         public async Task<IActionResult> UpdateCenterStatus(Guid centerId, [FromBody] UpdateCenterStatusRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            
+
             var result = await _userService.UpdateCenterStatusAsync(centerId, request.Status, request.Reason);
             return result ? Ok(new { message = "Center status updated successfully" }) : NotFound();
         }

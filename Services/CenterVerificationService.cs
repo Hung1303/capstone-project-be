@@ -112,12 +112,12 @@ namespace Services
                 center.Status = CenterStatus.Active; // Set to Active for operational centers
                 center.VerificationCompletedAt = DateTime.UtcNow;
                 center.VerificationNotes = decision.AdminNotes;
-                
+
                 // Also update the user account status to Active
                 var user = await _unitOfWork.GetRepository<User>()
                     .Entities
                     .FirstOrDefaultAsync(u => u.Id == center.UserId);
-                
+
                 if (user != null)
                 {
                     user.Status = AccountStatus.Active;

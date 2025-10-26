@@ -202,31 +202,48 @@ namespace Services
 
         public async Task<CreateStudentRequest> CreateStudentRequest(Guid parentId, CreateStudentRequest request)
         {
-            var parent = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(o => o.Id == parentId && o.Role == UserRole.Parent && o.Status == AccountStatus.Active);
+            var parent = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(o => o.Id == parentId && o.Role == UserRole.Parent && o.Status == AccountStatus.Active);
             if (parent == null)
                 throw new Exception("Parent not found");
 
-            var parentProfile = await _unitOfWork.GetRepository<ParentProfile>().Entities.FirstOrDefaultAsync(c => c.UserId == parentId);
+            var parentProfile = await _unitOfWork.GetRepository<ParentProfile>().Entities
+                .FirstOrDefaultAsync(c => c.UserId == parentId);
             if (parentProfile == null)
-            {
                 throw new Exception("Parent Profile not found.");
-            }
 
+            // ✅ Validate FullName format
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
                 throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
 
-            var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
+            // ✅ Validate SchoolYear format (e.g., "2024-2025")
+            var yearRangePattern = @"^(\d{4})-(\d{4})$";
+            if (string.IsNullOrWhiteSpace(request.SchoolYear) || !Regex.IsMatch(request.SchoolYear.Trim(), yearRangePattern))
+                throw new Exception("School year must follow the format 'YYYY-YYYY' (e.g., 2024-2025).");
+
+            var match = Regex.Match(request.SchoolYear.Trim(), yearRangePattern);
+            int startYear = int.Parse(match.Groups[1].Value);
+            int endYear = int.Parse(match.Groups[2].Value);
+
+            if (endYear != startYear + 1)
+                throw new Exception("The second year in SchoolYear must be exactly one greater than the first (e.g., 2024-2025).");
+
+            // ✅ Check duplicates
+            var checkUser = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
+
             if (checkUser != null)
             {
                 if (checkUser.Email == request.Email)
                     throw new Exception("Duplicate email");
                 else if (checkUser.UserName == request.UserName)
-                    throw new Exception("Duplicate Username");
+                    throw new Exception("Duplicate username");
                 else
-                    throw new Exception("Duplicate Phonenumber");
+                    throw new Exception("Duplicate phone number");
             }
 
+            // ✅ Create User
             var user = new User
             {
                 Email = request.Email,
@@ -238,10 +255,12 @@ namespace Services
                 Status = AccountStatus.Pending
             };
 
+            // ✅ Create Student Profile
             var student = new StudentProfile
             {
                 UserId = user.Id,
                 SchoolName = request.SchoolName,
+                SchoolYear = request.SchoolYear.Trim(),
                 GradeLevel = request.GradeLevel,
                 ParentProfileId = parentProfile.Id
             };
@@ -736,6 +755,7 @@ namespace Services
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,
                     SchoolName = x.Student.SchoolName,
+                    SchoolYear = x.Student.SchoolYear,
                     GradeLevel = x.Student.GradeLevel,
                     Status = x.User.Status.ToString()
                 })
@@ -867,6 +887,7 @@ namespace Services
                     PhoneNumber = u.PhoneNumber,
                     Status = u.Status.ToString(),
                     SchoolName = u.StudentProfile.SchoolName,
+                    SchoolYear = u.StudentProfile.SchoolYear,
                     GradeLevel = u.StudentProfile.GradeLevel
                 });
 

@@ -7,7 +7,7 @@ namespace BusinessObjects
         public Guid CenterProfileId { get; set; }
         public Guid InspectorId { get; set; } // Staff member who performs verification
         public VerificationStatus Status { get; set; } = VerificationStatus.Pending;
-        
+
         // Verification details
         public DateTime? ScheduledDate { get; set; }
         public DateTime? CompletedDate { get; set; }
@@ -17,7 +17,7 @@ namespace BusinessObjects
         public bool IsLocationVerified { get; set; } = false;
         public bool IsDocumentsVerified { get; set; } = false;
         public bool IsLicenseValid { get; set; } = false;
-        
+
         // Admin decision
         public Guid? AdminId { get; set; } // Admin who makes final decision
         public DateTime? AdminDecisionDate { get; set; }

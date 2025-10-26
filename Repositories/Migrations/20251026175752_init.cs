@@ -323,6 +323,7 @@ namespace Repositories.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SchoolName = table.Column<string>(type: "text", nullable: false),
+                    SchoolYear = table.Column<string>(type: "text", nullable: false),
                     GradeLevel = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     ParentProfileId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -718,11 +719,11 @@ namespace Repositories.Migrations
 
             migrationBuilder.InsertData(
                 table: "StudentProfiles",
-                columns: new[] { "Id", "CreatedAt", "GradeLevel", "IsDeleted", "LastUpdatedAt", "ParentProfileId", "SchoolName", "UserId" },
+                columns: new[] { "Id", "CreatedAt", "GradeLevel", "IsDeleted", "LastUpdatedAt", "ParentProfileId", "SchoolName", "SchoolYear", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "10", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "City High School", new Guid("77777777-7777-7777-7777-777777777777") },
-                    { new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "8", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "Town Middle School", new Guid("88888888-8888-8888-8888-888888888888") }
+                    { new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "10", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "City High School", "2024-2025", new Guid("77777777-7777-7777-7777-777777777777") },
+                    { new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "8", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "Town Middle School", "2024-2025", new Guid("88888888-8888-8888-8888-888888888888") }
                 });
 
             migrationBuilder.InsertData(
