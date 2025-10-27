@@ -161,7 +161,7 @@ namespace TMS_BE.Controllers
         }
 
         [HttpPost("{parentId}/Student")]
-        public async Task<IActionResult> CreateParentAccount(Guid parentId, [FromBody] CreateStudentRequest request)
+        public async Task<IActionResult> CreateStudentAccount(Guid parentId, [FromBody] CreateStudentRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var user = await _userService.CreateStudentRequest(parentId, request);
