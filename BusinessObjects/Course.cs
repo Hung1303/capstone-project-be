@@ -22,6 +22,7 @@ namespace BusinessObjects
         public virtual ICollection<SubjectBuilder> SubjectBuilders { get; set; } = new List<SubjectBuilder>();
         public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public virtual ICollection<CourseFeedback> CourseFeedbacks { get; set; } = new List<CourseFeedback>();
+        public virtual ICollection<CourseResult> CourseResults { get; set; } = new List<CourseResult>();
         //public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
         //public virtual Syllabus? Syllabus { get; set; }
     }

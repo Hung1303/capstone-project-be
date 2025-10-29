@@ -557,6 +557,48 @@ namespace Repositories.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BusinessObjects.CourseResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<float>("Mark")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("StudentProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TeacherProfileId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentProfileId");
+
+                    b.HasIndex("TeacherProfileId");
+
+                    b.ToTable("CourseResults");
+                });
+
             modelBuilder.Entity("BusinessObjects.Enrollment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1459,6 +1501,33 @@ namespace Repositories.Migrations
                     b.Navigation("StudentProfile");
                 });
 
+            modelBuilder.Entity("BusinessObjects.CourseResult", b =>
+                {
+                    b.HasOne("BusinessObjects.Course", "Course")
+                        .WithMany("CourseResults")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObjects.StudentProfile", "StudentProfile")
+                        .WithMany()
+                        .HasForeignKey("StudentProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObjects.TeacherProfile", "TeacherProfile")
+                        .WithMany()
+                        .HasForeignKey("TeacherProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("StudentProfile");
+
+                    b.Navigation("TeacherProfile");
+                });
+
             modelBuilder.Entity("BusinessObjects.Enrollment", b =>
                 {
                     b.HasOne("BusinessObjects.Course", "Course")
@@ -1657,6 +1726,8 @@ namespace Repositories.Migrations
             modelBuilder.Entity("BusinessObjects.Course", b =>
                 {
                     b.Navigation("CourseFeedbacks");
+
+                    b.Navigation("CourseResults");
 
                     b.Navigation("Enrollments");
 

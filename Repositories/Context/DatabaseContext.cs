@@ -26,6 +26,7 @@ namespace Repositories.Context
         public DbSet<TeacherFeedback> TeacherFeedbacks { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<CenterVerificationRequest> CenterVerificationRequests { get; set; }
+        public DbSet<CourseResult> CourseResults { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
