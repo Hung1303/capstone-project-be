@@ -1,5 +1,5 @@
-﻿using BusinessObjects.DTO.ApprovalRequest;
-using Core.Base;
+﻿using Core.Base;
+using Services.DTO.ApprovalRequest;
 
 namespace Services.Interfaces
 {

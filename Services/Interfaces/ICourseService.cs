@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.Course;
+﻿using Services.DTO.Course;
 
 namespace Services.Interfaces
 {

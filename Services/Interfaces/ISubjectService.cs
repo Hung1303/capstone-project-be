@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.Subject;
+﻿using Services.DTO.Subject;
 
 namespace Services.Interfaces
 {

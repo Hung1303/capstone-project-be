@@ -1,5 +1,5 @@
 using BusinessObjects;
-using BusinessObjects.DTO.GeneratedReport;
+using Services.DTO.GeneratedReport;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;

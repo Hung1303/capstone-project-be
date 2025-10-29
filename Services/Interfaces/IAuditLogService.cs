@@ -1,4 +1,4 @@
-using BusinessObjects.DTO.AuditLog;
+using Services.DTO.AuditLog;
 
 namespace Services.Interfaces
 {

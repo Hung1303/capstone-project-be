@@ -1,5 +1,5 @@
 using BusinessObjects;
-using BusinessObjects.DTO.CenterVerification;
+using Services.DTO.CenterVerification;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;

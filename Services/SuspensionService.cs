@@ -1,5 +1,5 @@
 ﻿using BusinessObjects;
-using BusinessObjects.DTO.Suspension;
+using Services.DTO.Suspension;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;

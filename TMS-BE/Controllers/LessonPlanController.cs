@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.LessonPlan;
+﻿using Services.DTO.LessonPlan;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 

@@ -1,6 +1,6 @@
 ﻿using BusinessObjects;
-using BusinessObjects.DTO.Result;
-using BusinessObjects.DTO.Token;
+using Services.DTO.Result;
+using Services.DTO.Token;
 using Core.Base;
 using Core.Security;
 using Microsoft.AspNetCore.Mvc;

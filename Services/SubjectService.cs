@@ -1,5 +1,5 @@
 ﻿using BusinessObjects;
-using BusinessObjects.DTO.Subject;
+using Services.DTO.Subject;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
 using Services.Interfaces;

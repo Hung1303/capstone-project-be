@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.Feedbacks;
+﻿using Services.DTO.Feedbacks;
 
 namespace Services.Interfaces
 {

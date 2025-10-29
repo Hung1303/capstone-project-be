@@ -1,4 +1,4 @@
-using BusinessObjects.DTO.GeneratedReport;
+using Services.DTO.GeneratedReport;
 using Core.Base;
 
 namespace Services.Interfaces

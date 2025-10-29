@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.Syllabus;
+﻿using Services.DTO.Syllabus;
 
 namespace Services.Interfaces
 {

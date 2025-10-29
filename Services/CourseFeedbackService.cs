@@ -1,5 +1,5 @@
 ﻿using BusinessObjects;
-using BusinessObjects.DTO.Feedbacks;
+using Services.DTO.Feedbacks;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
