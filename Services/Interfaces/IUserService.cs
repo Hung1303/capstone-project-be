@@ -1,6 +1,6 @@
 ﻿using BusinessObjects;
-using Services.DTO.User;
 using Core.Base;
+using Services.DTO.User;
 
 namespace Services.Interfaces
 {

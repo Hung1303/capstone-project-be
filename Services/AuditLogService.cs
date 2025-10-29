@@ -1,8 +1,8 @@
 using BusinessObjects;
-using Services.DTO.AuditLog;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.AuditLog;
 using Services.Interfaces;
 
 namespace Services

@@ -1,11 +1,4 @@
-﻿using BusinessObjects;
-using BusinessObjects.DTO.CourseResult;
-using BusinessObjects.DTO.LessonPlan;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Services.DTO.CourseResult;
 
 namespace Services.Interfaces
 {

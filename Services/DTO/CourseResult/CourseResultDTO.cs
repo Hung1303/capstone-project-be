@@ -1,14 +1,8 @@
-﻿using Core.Base;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace BusinessObjects.DTO.CourseResult
+namespace Services.DTO.CourseResult
 {
-    public class CreateCourseResultRequest 
+    public class CreateCourseResultRequest
     {
         [Range(0.00, 10.00, ErrorMessage = "Mark must be 0 - 10")]
         public float Mark { get; set; }

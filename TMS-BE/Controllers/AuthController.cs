@@ -1,11 +1,11 @@
 ﻿using BusinessObjects;
-using Services.DTO.Result;
-using Services.DTO.Token;
 using Core.Base;
 using Core.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Repository.Interfaces;
+using Services.DTO.Result;
+using Services.DTO.Token;
 using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

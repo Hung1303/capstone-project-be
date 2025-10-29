@@ -1,5 +1,5 @@
-﻿using Services.DTO.Subject;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Services.DTO.Subject;
 using Services.Interfaces;
 
 namespace API.Controllers

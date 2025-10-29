@@ -1,8 +1,8 @@
 ﻿using BusinessObjects;
-using Services.DTO.EnrollmentDTO;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.EnrollmentDTO;
 using Services.Interfaces;
 
 namespace Services

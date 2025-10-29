@@ -1,8 +1,5 @@
-﻿using BusinessObjects.DTO.CourseResult;
-using BusinessObjects.DTO.LessonPlan;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using Services.DTO.CourseResult;
 using Services.Interfaces;
 
 namespace API.Controllers

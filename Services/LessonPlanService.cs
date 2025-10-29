@@ -1,7 +1,7 @@
 ﻿using BusinessObjects;
-using Services.DTO.LessonPlan;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.LessonPlan;
 using Services.Interfaces;
 
 namespace Services

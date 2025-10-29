@@ -1,14 +1,8 @@
 ﻿using BusinessObjects;
-using BusinessObjects.DTO.CourseResult;
-using BusinessObjects.DTO.LessonPlan;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.CourseResult;
 using Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services
 {
@@ -38,7 +32,7 @@ namespace Services
             }
             var checkCourseResult = await _unitOfWork.GetRepository<CourseResult>().Entities
                 .FirstOrDefaultAsync(a => a.CourseId == course.Id && a.StudentProfileId == student.Id && !a.IsDeleted);
-            if (checkCourseResult !=null)
+            if (checkCourseResult != null)
             {
                 throw new Exception("CourseResult for this student already exist");
             }

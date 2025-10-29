@@ -1,7 +1,7 @@
 ﻿using BusinessObjects;
-using Services.DTO.Syllabus;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.Syllabus;
 using Services.Interfaces;
 
 namespace Services

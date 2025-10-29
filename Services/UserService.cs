@@ -1,9 +1,9 @@
 ﻿using BusinessObjects;
-using Services.DTO.User;
 using Core.Base;
 using Core.Security;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.User;
 using Services.Interfaces;
 using System.Text.RegularExpressions;
 
@@ -750,7 +750,8 @@ namespace Services
                 .Take(pageSize)
                 .Select(x => new StudentListResponse
                 {
-                    Id = x.Student.Id,
+                    UserId = x.User.Id,
+                    ProfileId = x.Student.Id,
                     FullName = x.User.FullName,
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,

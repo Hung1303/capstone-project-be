@@ -1,5 +1,5 @@
-﻿using Services.DTO.LessonPlan;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Services.DTO.LessonPlan;
 using Services.Interfaces;
 
 namespace API.Controllers

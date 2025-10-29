@@ -1,7 +1,7 @@
 ﻿using BusinessObjects;
-using Services.DTO.ClassSchedule;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.ClassSchedule;
 using Services.Interfaces;
 
 namespace Services

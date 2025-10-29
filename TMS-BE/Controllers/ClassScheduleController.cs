@@ -1,5 +1,5 @@
-﻿using Services.DTO.ClassSchedule;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Services.DTO.ClassSchedule;
 using Services.Interfaces;
 
 namespace API.Controllers

@@ -1,5 +1,5 @@
-using Services.DTO.GeneratedReport;
 using Core.Base;
+using Services.DTO.GeneratedReport;
 
 namespace Services.Interfaces
 {

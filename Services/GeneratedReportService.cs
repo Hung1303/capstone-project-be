@@ -1,8 +1,8 @@
 using BusinessObjects;
-using Services.DTO.GeneratedReport;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.GeneratedReport;
 using Services.Interfaces;
 
 namespace Services

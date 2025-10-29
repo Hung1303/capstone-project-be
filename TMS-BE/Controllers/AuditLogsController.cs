@@ -1,5 +1,5 @@
-using Services.DTO.AuditLog;
 using Microsoft.AspNetCore.Mvc;
+using Services.DTO.AuditLog;
 using Services.Interfaces;
 
 namespace API.Controllers

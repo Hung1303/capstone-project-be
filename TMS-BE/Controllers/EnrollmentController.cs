@@ -1,5 +1,5 @@
-﻿using Services.DTO.EnrollmentDTO;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Services.DTO.EnrollmentDTO;
 using Services.Interfaces;
 
 namespace API.Controllers

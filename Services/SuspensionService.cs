@@ -1,8 +1,8 @@
 ﻿using BusinessObjects;
-using Services.DTO.Suspension;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.Suspension;
 using Services.Interfaces;
 
 namespace Services

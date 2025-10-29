@@ -1,6 +1,6 @@
-﻿using Services.DTO.User;
-using Core.Base;
+﻿using Core.Base;
 using Microsoft.AspNetCore.Mvc;
+using Services.DTO.User;
 using Services.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -54,7 +54,7 @@ namespace TMS_BE.Controllers
             return Ok(new { totalCount, students });
         }
 
-        [HttpGet("User/{id:guid}")]
+        [HttpGet("User/{id}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);

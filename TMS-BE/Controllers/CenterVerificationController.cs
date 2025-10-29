@@ -1,7 +1,7 @@
-using Services.DTO.CenterVerification;
 using Core.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.DTO.CenterVerification;
 using Services.Interfaces;
 
 namespace API.Controllers
