@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.LessonPlan;
+﻿using Services.DTO.LessonPlan;
 
 namespace Services.Interfaces
 {

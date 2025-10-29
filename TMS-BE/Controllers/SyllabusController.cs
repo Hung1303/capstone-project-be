@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.Syllabus;
+﻿using Services.DTO.Syllabus;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 

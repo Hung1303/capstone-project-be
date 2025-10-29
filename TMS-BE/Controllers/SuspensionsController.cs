@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.Suspension;
+﻿using Services.DTO.Suspension;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 

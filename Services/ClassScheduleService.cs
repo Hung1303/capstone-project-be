@@ -1,5 +1,5 @@
 ﻿using BusinessObjects;
-using BusinessObjects.DTO.ClassSchedule;
+using Services.DTO.ClassSchedule;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
 using Services.Interfaces;

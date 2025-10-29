@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.ClassSchedule;
+﻿using Services.DTO.ClassSchedule;
 
 namespace Services.Interfaces
 {

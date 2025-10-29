@@ -1,5 +1,5 @@
 using BusinessObjects;
-using BusinessObjects.DTO.AuditLog;
+using Services.DTO.AuditLog;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;

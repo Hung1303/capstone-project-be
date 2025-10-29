@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.EnrollmentDTO;
+﻿using Services.DTO.EnrollmentDTO;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 

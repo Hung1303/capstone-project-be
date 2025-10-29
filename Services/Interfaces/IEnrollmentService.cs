@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.EnrollmentDTO;
+﻿using Services.DTO.EnrollmentDTO;
 
 namespace Services.Interfaces
 {

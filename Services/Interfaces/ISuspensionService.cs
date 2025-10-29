@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.Suspension;
+﻿using Services.DTO.Suspension;
 using static Services.SuspensionService;
 
 namespace Services.Interfaces

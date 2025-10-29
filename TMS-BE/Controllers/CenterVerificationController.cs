@@ -1,4 +1,4 @@
-using BusinessObjects.DTO.CenterVerification;
+using Services.DTO.CenterVerification;
 using Core.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

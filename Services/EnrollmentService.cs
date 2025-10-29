@@ -1,5 +1,5 @@
 ﻿using BusinessObjects;
-using BusinessObjects.DTO.EnrollmentDTO;
+using Services.DTO.EnrollmentDTO;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;

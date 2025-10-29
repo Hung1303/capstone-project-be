@@ -1,4 +1,4 @@
-using BusinessObjects.DTO.CenterVerification;
+using Services.DTO.CenterVerification;
 using Core.Base;
 
 namespace Services.Interfaces

@@ -1,4 +1,4 @@
-using BusinessObjects.DTO.GeneratedReport;
+using Services.DTO.GeneratedReport;
 using Core.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

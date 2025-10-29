@@ -1,4 +1,4 @@
-﻿using BusinessObjects.DTO.User;
+﻿using Services.DTO.User;
 using Core.Base;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;

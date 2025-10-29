@@ -1,8 +1,8 @@
 ﻿using BusinessObjects;
-using BusinessObjects.DTO.ApprovalRequest;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
+using Services.DTO.ApprovalRequest;
 using Services.Interfaces;
 
 namespace API.Services
