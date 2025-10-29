@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace BusinessObjects.DTO.User
 {
@@ -93,6 +94,7 @@ namespace BusinessObjects.DTO.User
         [Phone(ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
         public string SchoolName { get; set; }
+        public string SchoolYear { get; set; }
         public string GradeLevel { get; set; }
     }
 
@@ -202,6 +204,7 @@ namespace BusinessObjects.DTO.User
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public string SchoolName { get; set; }
+        public string SchoolYear { get; set; }
         public string GradeLevel { get; set; }
         public string Status { get; set; }
     }
@@ -280,7 +283,15 @@ namespace BusinessObjects.DTO.User
         public string Status { get; set; }
 
         public string SchoolName { get; set; }
+        public string SchoolYear { get; set; }
         public string GradeLevel { get; set; }
+    }
+
+    public class UpdateCenterStatusRequest
+    {
+        [Required]
+        public CenterStatus Status { get; set; }
+        public string? Reason { get; set; }
     }
 
 

@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using Repository.Interfaces;
 using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,7 +22,7 @@ namespace API.Controllers
         private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public AuthController(IUnitOfWork unitOfWork,ITokenService tokenService, IUserService userService)
+        public AuthController(IUnitOfWork unitOfWork, ITokenService tokenService, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;

@@ -96,6 +96,25 @@ namespace Core.Base
         Summer = 2,
         Fall = 3,
     }
+
+    public enum CenterStatus
+    {
+        Pending = 0,
+        UnderVerification = 1,
+        Verified = 2,
+        Rejected = 3,
+        Active = 4,
+        Suspended = 5
+    }
+
+    public enum VerificationStatus
+    {
+        Pending = 0,
+        InProgress = 1,
+        Completed = 2,
+        Failed = 3,
+        Finalized = 4
+    }
 }
 
 

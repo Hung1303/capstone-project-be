@@ -56,6 +56,40 @@ namespace Services
             return request;
         }
 
+        public async Task<CreateAdminRequest> CreateInspectorRequest(CreateAdminRequest request)
+        {
+            var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
+            if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
+                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+
+            var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
+            if (checkUser != null)
+            {
+                if (checkUser.Email == request.Email)
+                    throw new Exception("Duplicate email");
+                else if (checkUser.UserName == request.UserName)
+                    throw new Exception("Duplicate Username");
+                else
+                    throw new Exception("Duplicate Phonenumber");
+            }
+
+            var user = new User
+            {
+                Email = request.Email,
+                UserName = request.UserName,
+                FullName = request.FullName,
+                PasswordHash = PasswordHasher.HashPassword(request.Password),
+                PhoneNumber = request.PhoneNumber,
+                Role = UserRole.Inspector,
+                Status = AccountStatus.Active
+            };
+
+            await _unitOfWork.GetRepository<User>().InsertAsync(user);
+            await _unitOfWork.SaveAsync();
+
+            return request;
+        }
+
         public async Task<CreateCenterRequest> CreateCenterRequest(CreateCenterRequest request)
         {
 
@@ -101,7 +135,8 @@ namespace Services
                     LicenseIssuedBy = request.LicenseIssuedBy,
                     Address = request.Address,
                     ContactEmail = request.Email,
-                    ContactPhone = request.PhoneNumber
+                    ContactPhone = request.PhoneNumber,
+                    Status = CenterStatus.Pending
                 };
 
                 await _unitOfWork.GetRepository<User>().InsertAsync(user);
@@ -167,31 +202,48 @@ namespace Services
 
         public async Task<CreateStudentRequest> CreateStudentRequest(Guid parentId, CreateStudentRequest request)
         {
-            var parent = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(o => o.Id == parentId && o.Role == UserRole.Parent && o.Status == AccountStatus.Active);
+            var parent = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(o => o.Id == parentId && o.Role == UserRole.Parent && o.Status == AccountStatus.Active);
             if (parent == null)
                 throw new Exception("Parent not found");
 
-            var parentProfile = await _unitOfWork.GetRepository<ParentProfile>().Entities.FirstOrDefaultAsync(c => c.UserId == parentId);
+            var parentProfile = await _unitOfWork.GetRepository<ParentProfile>().Entities
+                .FirstOrDefaultAsync(c => c.UserId == parentId);
             if (parentProfile == null)
-            {
                 throw new Exception("Parent Profile not found.");
-            }
 
+            // ✅ Validate FullName format
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
                 throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
 
-            var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
+            // ✅ Validate SchoolYear format (e.g., "2024-2025")
+            var yearRangePattern = @"^(\d{4})-(\d{4})$";
+            if (string.IsNullOrWhiteSpace(request.SchoolYear) || !Regex.IsMatch(request.SchoolYear.Trim(), yearRangePattern))
+                throw new Exception("School year must follow the format 'YYYY-YYYY' (e.g., 2024-2025).");
+
+            var match = Regex.Match(request.SchoolYear.Trim(), yearRangePattern);
+            int startYear = int.Parse(match.Groups[1].Value);
+            int endYear = int.Parse(match.Groups[2].Value);
+
+            if (endYear != startYear + 1)
+                throw new Exception("The second year in SchoolYear must be exactly one greater than the first (e.g., 2024-2025).");
+
+            // ✅ Check duplicates
+            var checkUser = await _unitOfWork.GetRepository<User>().Entities
+                .FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
+
             if (checkUser != null)
             {
                 if (checkUser.Email == request.Email)
                     throw new Exception("Duplicate email");
                 else if (checkUser.UserName == request.UserName)
-                    throw new Exception("Duplicate Username");
+                    throw new Exception("Duplicate username");
                 else
-                    throw new Exception("Duplicate Phonenumber");
+                    throw new Exception("Duplicate phone number");
             }
 
+            // ✅ Create User
             var user = new User
             {
                 Email = request.Email,
@@ -203,10 +255,12 @@ namespace Services
                 Status = AccountStatus.Pending
             };
 
+            // ✅ Create Student Profile
             var student = new StudentProfile
             {
                 UserId = user.Id,
                 SchoolName = request.SchoolName,
+                SchoolYear = request.SchoolYear.Trim(),
                 GradeLevel = request.GradeLevel,
                 ParentProfileId = parentProfile.Id
             };
@@ -556,7 +610,7 @@ namespace Services
 
             await _unitOfWork.GetRepository<User>().UpdateAsync(user);
             await _unitOfWork.SaveAsync();
-            
+
             return await GetStudentById(userId);
         }
 
@@ -701,6 +755,7 @@ namespace Services
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,
                     SchoolName = x.Student.SchoolName,
+                    SchoolYear = x.Student.SchoolYear,
                     GradeLevel = x.Student.GradeLevel,
                     Status = x.User.Status.ToString()
                 })
@@ -832,6 +887,7 @@ namespace Services
                     PhoneNumber = u.PhoneNumber,
                     Status = u.Status.ToString(),
                     SchoolName = u.StudentProfile.SchoolName,
+                    SchoolYear = u.StudentProfile.SchoolYear,
                     GradeLevel = u.StudentProfile.GradeLevel
                 });
 
@@ -913,6 +969,66 @@ namespace Services
             await _unitOfWork.SaveAsync();
 
             return result;
+        }
+
+        public async Task<(IEnumerable<CenterListResponse> Centers, int TotalCount)> GetCentersByStatusAsync(CenterStatus status, int pageNumber, int pageSize, string? centerName = null)
+        {
+            var query = _unitOfWork.GetRepository<CenterProfile>().Entities
+                .Where(c => !c.IsDeleted && c.Status == status);
+
+            if (!string.IsNullOrWhiteSpace(centerName))
+            {
+                query = query.Where(c => c.CenterName.Contains(centerName));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var centers = await query
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new CenterListResponse
+                {
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    CenterProfileId = c.Id,
+                    CenterName = c.CenterName,
+                    OwnerName = c.OwnerName ?? "",
+                    LicenseNumber = c.LicenseNumber,
+                    Address = c.Address,
+                    ContactEmail = c.ContactEmail ?? "",
+                    ContactPhone = c.ContactPhone ?? "",
+                    Status = c.Status.ToString()
+                })
+                .ToListAsync();
+
+            return (centers, totalCount);
+        }
+
+        public async Task<bool> UpdateCenterStatusAsync(Guid centerId, CenterStatus status, string? reason = null)
+        {
+            var center = await _unitOfWork.GetRepository<CenterProfile>().Entities
+                .FirstOrDefaultAsync(c => c.Id == centerId && !c.IsDeleted);
+
+            if (center == null)
+                return false;
+
+            center.Status = status;
+            center.LastUpdatedAt = DateTime.UtcNow;
+
+            if (status == CenterStatus.Rejected && !string.IsNullOrEmpty(reason))
+            {
+                center.RejectionReason = reason;
+            }
+            else if (status == CenterStatus.Verified)
+            {
+                center.VerificationCompletedAt = DateTime.UtcNow;
+            }
+
+            await _unitOfWork.GetRepository<CenterProfile>().UpdateAsync(center);
+            await _unitOfWork.SaveAsync();
+
+            return true;
         }
     }
 }

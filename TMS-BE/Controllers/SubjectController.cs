@@ -1,6 +1,4 @@
-﻿using BusinessObjects.DTO.Course;
-using BusinessObjects.DTO.Subject;
-using Microsoft.AspNetCore.Http;
+﻿using BusinessObjects.DTO.Subject;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 

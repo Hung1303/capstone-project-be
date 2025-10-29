@@ -25,6 +25,7 @@ namespace Repositories.Context
         public DbSet<LessonPlan> LessonPlans { get; set; }
         public DbSet<TeacherFeedback> TeacherFeedbacks { get; set; }
         public DbSet<Subject> Subjects { get; set; }
+        public DbSet<CenterVerificationRequest> CenterVerificationRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -290,7 +291,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     Email = "center.active@example.com",
                     UserName = "center_active",
-                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", 
+                    PasswordHash = "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337",
                     FullName = "Emily Clark",
                     PhoneNumber = "+10000000001",
                     Role = Core.Base.UserRole.Center,
@@ -401,7 +402,11 @@ namespace Repositories.Context
                     LicenseIssuedBy = "Education Dept",
                     Address = "123 Learning Ave, Cityville",
                     ContactEmail = "contact@brightfuture.example.com",
-                    ContactPhone = "+10000001001"
+                    ContactPhone = "+10000001001",
+                    Status = Core.Base.CenterStatus.Active,
+                    VerificationRequestedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    VerificationCompletedAt = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+                    VerificationNotes = "Successfully verified and approved"
                 },
                 new CenterProfile
                 {
@@ -417,7 +422,8 @@ namespace Repositories.Context
                     LicenseIssuedBy = "Education Dept",
                     Address = "456 Discovery Rd, Townsburg",
                     ContactEmail = "hello@newhorizons.example.com",
-                    ContactPhone = "+10000001002"
+                    ContactPhone = "+10000001002",
+                    Status = Core.Base.CenterStatus.Pending
                 }
             );
 
@@ -484,6 +490,7 @@ namespace Repositories.Context
                     IsDeleted = false,
                     UserId = userStudentActiveId,
                     SchoolName = "City High School",
+                    SchoolYear = "2024-2025",
                     GradeLevel = "10",
                     ParentProfileId = parentLiamProfileId
                 },
@@ -495,10 +502,30 @@ namespace Repositories.Context
                     IsDeleted = false,
                     UserId = userStudentPendingId,
                     SchoolName = "Town Middle School",
+                    SchoolYear = "2024-2025",
                     GradeLevel = "8",
                     ParentProfileId = parentLiamProfileId
                 }
             );
+
+            // CenterVerificationRequest configuration
+            modelBuilder.Entity<CenterVerificationRequest>(b =>
+            {
+                b.HasOne(x => x.CenterProfile)
+                    .WithMany(x => x.VerificationRequests)
+                    .HasForeignKey(x => x.CenterProfileId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne(x => x.Inspector)
+                    .WithMany()
+                    .HasForeignKey(x => x.InspectorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(x => x.Admin)
+                    .WithMany()
+                    .HasForeignKey(x => x.AdminId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }

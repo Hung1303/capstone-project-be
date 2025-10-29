@@ -12,8 +12,8 @@ using Repositories.Context;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251021164437_subject")]
-    partial class subject
+    [Migration("20251026175752_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -189,6 +189,9 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("BusinessRegistrationPath")
+                        .HasColumnType("text");
+
                     b.Property<string>("CenterName")
                         .IsRequired()
                         .HasMaxLength(256)
@@ -221,6 +224,9 @@ namespace Repositories.Migrations
                     b.Property<double?>("Latitude")
                         .HasColumnType("double precision");
 
+                    b.Property<string>("LicenseDocumentPath")
+                        .HasColumnType("text");
+
                     b.Property<string>("LicenseIssuedBy")
                         .IsRequired()
                         .HasColumnType("text");
@@ -233,11 +239,32 @@ namespace Repositories.Migrations
                     b.Property<double?>("Longitude")
                         .HasColumnType("double precision");
 
+                    b.Property<string>("OtherDocumentsPath")
+                        .HasColumnType("text");
+
                     b.Property<string>("OwnerName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TaxCodeDocumentPath")
                         .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("VerificationCompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("VerificationNotes")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("VerificationRequestedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -261,7 +288,11 @@ namespace Repositories.Migrations
                             LicenseIssuedBy = "Education Dept",
                             LicenseNumber = "LIC-2024-0001",
                             OwnerName = "Emily Clark",
-                            UserId = new Guid("22222222-2222-2222-2222-222222222222")
+                            Status = 4,
+                            UserId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            VerificationCompletedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            VerificationNotes = "Successfully verified and approved",
+                            VerificationRequestedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -277,17 +308,86 @@ namespace Repositories.Migrations
                             LicenseIssuedBy = "Education Dept",
                             LicenseNumber = "LIC-2025-0005",
                             OwnerName = "Michael Brown",
+                            Status = 0,
                             UserId = new Guid("33333333-3333-3333-3333-333333333333")
                         });
+                });
+
+            modelBuilder.Entity("BusinessObjects.CenterVerificationRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AdminDecision")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("AdminDecisionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("AdminId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AdminNotes")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CenterProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DocumentChecklist")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("InspectorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("InspectorNotes")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDocumentsVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsLicenseValid")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsLocationVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ScheduledDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("VerificationPhotos")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("CenterProfileId");
+
+                    b.HasIndex("InspectorId");
+
+                    b.ToTable("CenterVerificationRequests");
                 });
 
             modelBuilder.Entity("BusinessObjects.ClassSchedule", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("CourseId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -318,14 +418,12 @@ namespace Repositories.Migrations
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time without time zone");
 
-                    b.Property<Guid>("SubjectId")
+                    b.Property<Guid>("TeacherProfileId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("SubjectId");
+                    b.HasIndex("TeacherProfileId");
 
                     b.ToTable("ClassSchedules");
                 });
@@ -672,6 +770,10 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("SchoolYear")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -694,6 +796,7 @@ namespace Repositories.Migrations
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ParentProfileId = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
                             SchoolName = "City High School",
+                            SchoolYear = "2024-2025",
                             UserId = new Guid("77777777-7777-7777-7777-777777777777")
                         },
                         new
@@ -705,6 +808,7 @@ namespace Repositories.Migrations
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ParentProfileId = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
                             SchoolName = "Town Middle School",
+                            SchoolYear = "2024-2025",
                             UserId = new Guid("88888888-8888-8888-8888-888888888888")
                         });
                 });
@@ -713,9 +817,6 @@ namespace Repositories.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CourseId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -735,16 +836,48 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("TeacherProfileId")
+                    b.HasKey("Id");
+
+                    b.ToTable("Subjects");
+                });
+
+            modelBuilder.Entity("BusinessObjects.SubjectBuilder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClassScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClassScheduleId");
+
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("TeacherProfileId");
+                    b.HasIndex("SubjectId");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("SubjectBuilder");
                 });
 
             modelBuilder.Entity("BusinessObjects.SuspensionRecord", b =>
@@ -1245,19 +1378,41 @@ namespace Repositories.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BusinessObjects.ClassSchedule", b =>
+            modelBuilder.Entity("BusinessObjects.CenterVerificationRequest", b =>
                 {
-                    b.HasOne("BusinessObjects.Course", null)
-                        .WithMany("Schedules")
-                        .HasForeignKey("CourseId");
+                    b.HasOne("BusinessObjects.User", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("BusinessObjects.Subject", "Subject")
-                        .WithMany("ClassSchedules")
-                        .HasForeignKey("SubjectId")
+                    b.HasOne("BusinessObjects.CenterProfile", "CenterProfile")
+                        .WithMany("VerificationRequests")
+                        .HasForeignKey("CenterProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Subject");
+                    b.HasOne("BusinessObjects.User", "Inspector")
+                        .WithMany()
+                        .HasForeignKey("InspectorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("CenterProfile");
+
+                    b.Navigation("Inspector");
+                });
+
+            modelBuilder.Entity("BusinessObjects.ClassSchedule", b =>
+                {
+                    b.HasOne("BusinessObjects.TeacherProfile", "TeacherProfile")
+                        .WithMany()
+                        .HasForeignKey("TeacherProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TeacherProfile");
                 });
 
             modelBuilder.Entity("BusinessObjects.Course", b =>
@@ -1367,23 +1522,31 @@ namespace Repositories.Migrations
                     b.Navigation("ParentProfile");
                 });
 
-            modelBuilder.Entity("BusinessObjects.Subject", b =>
+            modelBuilder.Entity("BusinessObjects.SubjectBuilder", b =>
                 {
+                    b.HasOne("BusinessObjects.ClassSchedule", "ClassSchedule")
+                        .WithMany("SubjectBuilders")
+                        .HasForeignKey("ClassScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BusinessObjects.Course", "Course")
-                        .WithMany("Subjects")
+                        .WithMany("SubjectBuilders")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObjects.TeacherProfile", "TeacherProfile")
-                        .WithMany()
-                        .HasForeignKey("TeacherProfileId")
+                    b.HasOne("BusinessObjects.Subject", "Subject")
+                        .WithMany("SubjectBuilders")
+                        .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("ClassSchedule");
+
                     b.Navigation("Course");
 
-                    b.Navigation("TeacherProfile");
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("BusinessObjects.SuspensionRecord", b =>
@@ -1472,6 +1635,13 @@ namespace Repositories.Migrations
                     b.Navigation("Courses");
 
                     b.Navigation("TeacherProfiles");
+
+                    b.Navigation("VerificationRequests");
+                });
+
+            modelBuilder.Entity("BusinessObjects.ClassSchedule", b =>
+                {
+                    b.Navigation("SubjectBuilders");
                 });
 
             modelBuilder.Entity("BusinessObjects.Course", b =>
@@ -1480,9 +1650,7 @@ namespace Repositories.Migrations
 
                     b.Navigation("Enrollments");
 
-                    b.Navigation("Schedules");
-
-                    b.Navigation("Subjects");
+                    b.Navigation("SubjectBuilders");
                 });
 
             modelBuilder.Entity("BusinessObjects.ParentProfile", b =>
@@ -1497,7 +1665,7 @@ namespace Repositories.Migrations
 
             modelBuilder.Entity("BusinessObjects.Subject", b =>
                 {
-                    b.Navigation("ClassSchedules");
+                    b.Navigation("SubjectBuilders");
 
                     b.Navigation("Syllabus")
                         .IsRequired();
