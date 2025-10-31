@@ -53,6 +53,36 @@ namespace Services
                 centerToUse = teacher.CenterProfileId;
             }
 
+            // Circular 29: require verified teacher before organizing extra classes
+            if (teacher.VerificationStatus != VerificationStatus.Completed && teacher.VerificationStatus != VerificationStatus.Finalized)
+            {
+                throw new Exception("Teacher must be verified per Circular 29 before creating courses");
+            }
+
+            // Circular 29: institution teachers must not conduct off-campus in-person extra classes
+            if (teacher.CenterProfileId != null)
+            {
+                if (centerToUse == null || centerToUse != teacher.CenterProfileId)
+                {
+                    throw new Exception("Institution teacher cannot create off-campus classes (Circular 29)");
+                }
+
+                // If in-person, ensure location is at the center address
+                var center = await _unitOfWork
+                    .GetRepository<CenterProfile>()
+                    .Entities
+                    .FirstOrDefaultAsync(a => a.Id == centerToUse);
+                if (center != null && request.TeachingMethod == TeachingMethod.InPerson)
+                {
+                    var addr = (center.Address ?? string.Empty).Trim().ToLower();
+                    var loc = (request.Location ?? string.Empty).Trim().ToLower();
+                    if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
+                    {
+                        throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
+                    }
+                }
+            }
+
             var course = new Course
             {
                 Title = request.Title,
@@ -411,6 +441,32 @@ namespace Services
             if (request.Status.HasValue)
             {
                 course.Status = request.Status.Value;
+            }
+            // Circular 29: re-validate after potential updates
+            var effectiveTeacher = teacher;
+            if (effectiveTeacher.VerificationStatus != VerificationStatus.Completed && effectiveTeacher.VerificationStatus != VerificationStatus.Finalized)
+            {
+                throw new Exception("Teacher must be verified per Circular 29 before updating courses");
+            }
+            if (effectiveTeacher.CenterProfileId != null)
+            {
+                if (targetCenterId == null || targetCenterId != effectiveTeacher.CenterProfileId)
+                {
+                    throw new Exception("Institution teacher cannot set course off-campus (Circular 29)");
+                }
+                if (request.TeachingMethod.HasValue && request.TeachingMethod.Value == TeachingMethod.InPerson)
+                {
+                    var center = await _unitOfWork.GetRepository<CenterProfile>().Entities.FirstOrDefaultAsync(a => a.Id == targetCenterId);
+                    if (center != null)
+                    {
+                        var addr = (center.Address ?? string.Empty).Trim().ToLower();
+                        var loc = (request.Location ?? course.Location ?? string.Empty).Trim().ToLower();
+                        if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
+                        {
+                            throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
+                        }
+                    }
+                }
             }
             // Apply ownership updates after validation above
             course.TeacherProfileId = targetTeacherId;

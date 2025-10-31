@@ -1123,6 +1123,18 @@ namespace Repositories.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime?>("VerificationCompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("VerificationNotes")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("VerificationRequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("VerificationStatus")
+                        .HasColumnType("integer");
+
                     b.Property<int>("YearOfExperience")
                         .HasColumnType("integer");
 
@@ -1148,12 +1160,17 @@ namespace Repositories.Migrations
                             Qualifications = "B.Ed, M.Ed",
                             Subjects = "Math,Physics",
                             UserId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            VerificationCompletedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            VerificationNotes = "Verified per Circular 29",
+                            VerificationRequestedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            VerificationStatus = 2,
                             YearOfExperience = 5
                         },
                         new
                         {
                             Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
                             Bio = "Chemistry enthusiast",
+                            CenterProfileId = new Guid("99999999-9999-9999-9999-999999999999"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -1161,7 +1178,93 @@ namespace Repositories.Migrations
                             Qualifications = "B.Sc",
                             Subjects = "Chemistry",
                             UserId = new Guid("55555555-5555-5555-5555-555555555555"),
+                            VerificationStatus = 0,
                             YearOfExperience = 2
+                        });
+                });
+
+            modelBuilder.Entity("BusinessObjects.TeacherVerificationRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("AdminId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ApprovalFromCenterPath")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EmploymentContractPath")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("InspectorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OtherDocumentsPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("QualificationCertificatePath")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TeacherProfileId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("InspectorId");
+
+                    b.HasIndex("TeacherProfileId");
+
+                    b.ToTable("TeacherVerificationRequests");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            ApprovalFromCenterPath = "/docs/teachers/jane/center-approval.pdf",
+                            CompletedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmploymentContractPath = "/docs/teachers/jane/contract.pdf",
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Notes = "All documents verified",
+                            QualificationCertificatePath = "/docs/teachers/jane/qualification.pdf",
+                            RequestedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 2,
+                            TeacherProfileId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                        },
+                        new
+                        {
+                            Id = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 0,
+                            TeacherProfileId = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc")
                         });
                 });
 
@@ -1707,6 +1810,31 @@ namespace Repositories.Migrations
                         .HasForeignKey("BusinessObjects.TeacherProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BusinessObjects.TeacherVerificationRequest", b =>
+                {
+                    b.HasOne("BusinessObjects.User", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("BusinessObjects.User", "Inspector")
+                        .WithMany()
+                        .HasForeignKey("InspectorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("BusinessObjects.TeacherProfile", "TeacherProfile")
+                        .WithMany()
+                        .HasForeignKey("TeacherProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("Inspector");
+
+                    b.Navigation("TeacherProfile");
                 });
 
             modelBuilder.Entity("BusinessObjects.CenterProfile", b =>

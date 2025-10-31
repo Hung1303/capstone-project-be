@@ -26,6 +26,7 @@ namespace Repositories.Context
         public DbSet<TeacherFeedback> TeacherFeedbacks { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<CenterVerificationRequest> CenterVerificationRequests { get; set; }
+        public DbSet<TeacherVerificationRequest> TeacherVerificationRequests { get; set; }
         public DbSet<CourseResult> CourseResults { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -121,6 +122,25 @@ namespace Repositories.Context
 
                 // Optional: limit Notes length
                 b.Property(x => x.Notes).HasMaxLength(2000);
+            });
+
+            // TeacherVerificationRequest configuration
+            modelBuilder.Entity<TeacherVerificationRequest>(b =>
+            {
+                b.HasOne(x => x.TeacherProfile)
+                    .WithMany()
+                    .HasForeignKey(x => x.TeacherProfileId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne(x => x.Inspector)
+                    .WithMany()
+                    .HasForeignKey(x => x.InspectorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(x => x.Admin)
+                    .WithMany()
+                    .HasForeignKey(x => x.AdminId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<SuspensionRecord>(b =>
@@ -445,7 +465,11 @@ namespace Repositories.Context
                     LicenseNumber = "TCH-2020-123",
                     Subjects = "Math,Physics",
                     Bio = "Experienced STEM teacher",
-                    CenterProfileId = centerActiveProfileId
+                    CenterProfileId = centerActiveProfileId,
+                    VerificationStatus = Core.Base.VerificationStatus.Completed,
+                    VerificationRequestedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    VerificationCompletedAt = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+                    VerificationNotes = "Verified per Circular 29"
                 },
                 new TeacherProfile
                 {
@@ -459,7 +483,54 @@ namespace Repositories.Context
                     LicenseNumber = "TCH-2023-456",
                     Subjects = "Chemistry",
                     Bio = "Chemistry enthusiast",
-                    CenterProfileId = null
+                    CenterProfileId = centerActiveProfileId,
+                    VerificationStatus = Core.Base.VerificationStatus.Pending,
+                    VerificationRequestedAt = null,
+                    VerificationCompletedAt = null,
+                    VerificationNotes = null
+                }
+            );
+
+            // Seed Teacher Verification Requests (use valid fixed GUIDs)
+            var teacherJaneVerificationId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+            var teacherJohnVerificationId = Guid.Parse("dddddddd-dddd-dddd-dddd-dddddddddddd");
+
+            modelBuilder.Entity<TeacherVerificationRequest>().HasData(
+                new TeacherVerificationRequest
+                {
+                    Id = teacherJaneVerificationId,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    LastUpdatedAt = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+                    IsDeleted = false,
+                    TeacherProfileId = teacherJaneProfileId,
+                    Status = Core.Base.VerificationStatus.Completed,
+                    RequestedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CompletedAt = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+                    Notes = "All documents verified",
+                    QualificationCertificatePath = "/docs/teachers/jane/qualification.pdf",
+                    EmploymentContractPath = "/docs/teachers/jane/contract.pdf",
+                    ApprovalFromCenterPath = "/docs/teachers/jane/center-approval.pdf",
+                    OtherDocumentsPath = null,
+                    InspectorId = null,
+                    AdminId = null
+                },
+                new TeacherVerificationRequest
+                {
+                    Id = teacherJohnVerificationId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    TeacherProfileId = teacherJohnProfileId,
+                    Status = Core.Base.VerificationStatus.Pending,
+                    RequestedAt = null,
+                    CompletedAt = null,
+                    Notes = null,
+                    QualificationCertificatePath = null,
+                    EmploymentContractPath = null,
+                    ApprovalFromCenterPath = null,
+                    OtherDocumentsPath = null,
+                    InspectorId = null,
+                    AdminId = null
                 }
             );
 

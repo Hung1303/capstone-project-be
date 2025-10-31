@@ -13,6 +13,12 @@ namespace BusinessObjects
 
         public Guid? CenterProfileId { get; set; }
 
+        // Circular 29 verification fields
+        public VerificationStatus VerificationStatus { get; set; } = VerificationStatus.Pending;
+        public DateTime? VerificationRequestedAt { get; set; }
+        public DateTime? VerificationCompletedAt { get; set; }
+        public string? VerificationNotes { get; set; }
+
         public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
         public virtual ICollection<TeacherFeedback> TeacherFeedbacks { get; set; } = new List<TeacherFeedback>();
     }

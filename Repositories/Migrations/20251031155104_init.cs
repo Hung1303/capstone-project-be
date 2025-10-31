@@ -245,6 +245,10 @@ namespace Repositories.Migrations
                     Subjects = table.Column<string>(type: "text", nullable: false),
                     Bio = table.Column<string>(type: "text", nullable: true),
                     CenterProfileId = table.Column<Guid>(type: "uuid", nullable: true),
+                    VerificationStatus = table.Column<int>(type: "integer", nullable: false),
+                    VerificationRequestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    VerificationCompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    VerificationNotes = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -390,6 +394,49 @@ namespace Repositories.Migrations
                         principalTable: "TeacherProfiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TeacherVerificationRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TeacherProfileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    RequestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    QualificationCertificatePath = table.Column<string>(type: "text", nullable: true),
+                    EmploymentContractPath = table.Column<string>(type: "text", nullable: true),
+                    ApprovalFromCenterPath = table.Column<string>(type: "text", nullable: true),
+                    OtherDocumentsPath = table.Column<string>(type: "text", nullable: true),
+                    InspectorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    AdminId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeacherVerificationRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TeacherVerificationRequests_TeacherProfiles_TeacherProfileId",
+                        column: x => x.TeacherProfileId,
+                        principalTable: "TeacherProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TeacherVerificationRequests_Users_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TeacherVerificationRequests_Users_InspectorId",
+                        column: x => x.InspectorId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -757,11 +804,6 @@ namespace Repositories.Migrations
                 values: new object[] { new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "789 Family St, Suburbia", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "+10000002002", new Guid("66666666-6666-6666-6666-666666666666") });
 
             migrationBuilder.InsertData(
-                table: "TeacherProfiles",
-                columns: new[] { "Id", "Bio", "CenterProfileId", "CreatedAt", "IsDeleted", "LastUpdatedAt", "LicenseNumber", "Qualifications", "Subjects", "UserId", "YearOfExperience" },
-                values: new object[] { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), "Chemistry enthusiast", null, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TCH-2023-456", "B.Sc", "Chemistry", new Guid("55555555-5555-5555-5555-555555555555"), 2 });
-
-            migrationBuilder.InsertData(
                 table: "StudentProfiles",
                 columns: new[] { "Id", "CreatedAt", "GradeLevel", "IsDeleted", "LastUpdatedAt", "ParentProfileId", "SchoolName", "SchoolYear", "UserId" },
                 values: new object[,]
@@ -772,8 +814,21 @@ namespace Repositories.Migrations
 
             migrationBuilder.InsertData(
                 table: "TeacherProfiles",
-                columns: new[] { "Id", "Bio", "CenterProfileId", "CreatedAt", "IsDeleted", "LastUpdatedAt", "LicenseNumber", "Qualifications", "Subjects", "UserId", "YearOfExperience" },
-                values: new object[] { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), "Experienced STEM teacher", new Guid("99999999-9999-9999-9999-999999999999"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TCH-2020-123", "B.Ed, M.Ed", "Math,Physics", new Guid("44444444-4444-4444-4444-444444444444"), 5 });
+                columns: new[] { "Id", "Bio", "CenterProfileId", "CreatedAt", "IsDeleted", "LastUpdatedAt", "LicenseNumber", "Qualifications", "Subjects", "UserId", "VerificationCompletedAt", "VerificationNotes", "VerificationRequestedAt", "VerificationStatus", "YearOfExperience" },
+                values: new object[,]
+                {
+                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), "Experienced STEM teacher", new Guid("99999999-9999-9999-9999-999999999999"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TCH-2020-123", "B.Ed, M.Ed", "Math,Physics", new Guid("44444444-4444-4444-4444-444444444444"), new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), "Verified per Circular 29", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, 5 },
+                    { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), "Chemistry enthusiast", new Guid("99999999-9999-9999-9999-999999999999"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TCH-2023-456", "B.Sc", "Chemistry", new Guid("55555555-5555-5555-5555-555555555555"), null, null, null, 0, 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TeacherVerificationRequests",
+                columns: new[] { "Id", "AdminId", "ApprovalFromCenterPath", "CompletedAt", "CreatedAt", "EmploymentContractPath", "InspectorId", "IsDeleted", "LastUpdatedAt", "Notes", "OtherDocumentsPath", "QualificationCertificatePath", "RequestedAt", "Status", "TeacherProfileId" },
+                values: new object[,]
+                {
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), null, "/docs/teachers/jane/center-approval.pdf", new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "/docs/teachers/jane/contract.pdf", null, false, new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), "All documents verified", null, "/docs/teachers/jane/qualification.pdf", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
+                    { new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), null, null, null, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, null, null, 0, new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc") }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ApprovalRequests_CourseId",
@@ -1002,6 +1057,21 @@ namespace Repositories.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_TeacherVerificationRequests_AdminId",
+                table: "TeacherVerificationRequests",
+                column: "AdminId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeacherVerificationRequests_InspectorId",
+                table: "TeacherVerificationRequests",
+                column: "InspectorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeacherVerificationRequests_TeacherProfileId",
+                table: "TeacherVerificationRequests",
+                column: "TeacherProfileId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
@@ -1049,6 +1119,9 @@ namespace Repositories.Migrations
 
             migrationBuilder.DropTable(
                 name: "TeacherFeedbacks");
+
+            migrationBuilder.DropTable(
+                name: "TeacherVerificationRequests");
 
             migrationBuilder.DropTable(
                 name: "Tokens");
