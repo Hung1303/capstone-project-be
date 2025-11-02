@@ -10,9 +10,12 @@ namespace Services
     public class CourseService : ICourseService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public CourseService(IUnitOfWork unitOfWork)
+        private readonly ISubscriptionService _subscriptionService;
+
+        public CourseService(IUnitOfWork unitOfWork, ISubscriptionService subscriptionService)
         {
             _unitOfWork = unitOfWork;
+            _subscriptionService = subscriptionService;
         }
         public async Task<CourseResponse> CreateCourse(CreateCourseRequest request)
         {
@@ -79,6 +82,26 @@ namespace Services
                     if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
                     {
                         throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
+                    }
+                }
+            }
+
+            // Check subscription limits for centers
+            if (centerToUse != null)
+            {
+                var canPost = await _subscriptionService.CanCenterPostCourseAsync(centerToUse.Value);
+                if (!canPost)
+                {
+                    var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
+                    var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
+                    
+                    if (max == 0)
+                    {
+                        throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");
+                    }
+                    else
+                    {
+                        throw new Exception($"Center has reached the course posting limit ({max} courses). Remaining: {remaining}. Please upgrade your subscription package to post more courses.");
                     }
                 }
             }

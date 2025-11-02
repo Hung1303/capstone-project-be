@@ -12,7 +12,7 @@ using Repositories.Context;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251031155104_init")]
+    [Migration("20251102095244_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -313,6 +313,75 @@ namespace Repositories.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BusinessObjects.CenterSubscription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("AutoRenewalDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("AutoRenewalEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CancellationReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CenterProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SubscriptionPackageId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CenterProfileId");
+
+                    b.HasIndex("SubscriptionPackageId");
+
+                    b.HasIndex("CenterProfileId", "Status");
+
+                    b.ToTable("CenterSubscriptions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-cccc-dddd-eeee-111111111111"),
+                            AutoRenewalDate = new DateTime(2025, 2, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            AutoRenewalEnabled = true,
+                            CenterProfileId = new Guid("99999999-9999-9999-9999-999999999999"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndDate = new DateTime(2025, 2, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            StartDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1,
+                            SubscriptionPackageId = new Guid("aaaaaaaa-bbbb-cccc-dddd-222222222222")
+                        });
+                });
+
             modelBuilder.Entity("BusinessObjects.CenterVerificationRequest", b =>
                 {
                     b.Property<Guid>("Id")
@@ -426,6 +495,78 @@ namespace Repositories.Migrations
                     b.HasIndex("TeacherProfileId");
 
                     b.ToTable("ClassSchedules");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-1111-aaaa-bbbb-111111111111"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DayOfWeek = 1,
+                            EndDate = new DateOnly(2025, 5, 31),
+                            EndTime = new TimeOnly(10, 30, 0),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            RoomOrLink = "Room 101, 123 Learning Ave, Cityville",
+                            StartDate = new DateOnly(2025, 2, 1),
+                            StartTime = new TimeOnly(9, 0, 0),
+                            TeacherProfileId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                        },
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-2222-aaaa-bbbb-222222222222"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DayOfWeek = 3,
+                            EndDate = new DateOnly(2025, 5, 31),
+                            EndTime = new TimeOnly(15, 30, 0),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            RoomOrLink = "Room 101, 123 Learning Ave, Cityville",
+                            StartDate = new DateOnly(2025, 2, 1),
+                            StartTime = new TimeOnly(14, 0, 0),
+                            TeacherProfileId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                        },
+                        new
+                        {
+                            Id = new Guid("cccccccc-3333-aaaa-bbbb-333333333333"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DayOfWeek = 5,
+                            EndDate = new DateOnly(2025, 5, 31),
+                            EndTime = new TimeOnly(10, 30, 0),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            RoomOrLink = "Room 102, 123 Learning Ave, Cityville",
+                            StartDate = new DateOnly(2025, 2, 1),
+                            StartTime = new TimeOnly(9, 0, 0),
+                            TeacherProfileId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                        },
+                        new
+                        {
+                            Id = new Guid("dddddddd-4444-aaaa-bbbb-444444444444"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DayOfWeek = 2,
+                            EndDate = new DateOnly(2025, 5, 31),
+                            EndTime = new TimeOnly(16, 30, 0),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            RoomOrLink = "Lab Room 1, 123 Learning Ave, Cityville",
+                            StartDate = new DateOnly(2025, 2, 1),
+                            StartTime = new TimeOnly(15, 0, 0),
+                            TeacherProfileId = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc")
+                        },
+                        new
+                        {
+                            Id = new Guid("eeeeeeee-5555-aaaa-bbbb-555555555555"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DayOfWeek = 6,
+                            EndDate = new DateOnly(2025, 5, 31),
+                            EndTime = new TimeOnly(11, 30, 0),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            RoomOrLink = "https://zoom.us/j/1234567890",
+                            StartDate = new DateOnly(2025, 2, 1),
+                            StartTime = new TimeOnly(10, 0, 0),
+                            TeacherProfileId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                        });
                 });
 
             modelBuilder.Entity("BusinessObjects.Course", b =>
@@ -739,6 +880,80 @@ namespace Repositories.Migrations
                     b.HasIndex("SyllabusId");
 
                     b.ToTable("LessonPlans");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-ffff-eeee-dddd-111111111111"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaterialsUsed = "Whiteboard, Graphing calculator, Textbook",
+                            Notes = "Focus on standard form ax² + bx + c = 0",
+                            StudentTask = "Complete exercises 1-20 from textbook. Submit solutions before next class.",
+                            SyllabusId = new Guid("aaaaaaaa-1111-2222-3333-aaaaaaaaaaaa"),
+                            Topic = "Introduction to Quadratic Equations"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-ffff-eeee-dddd-222222222222"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaterialsUsed = "Graph paper, Graphing software, Calculator",
+                            Notes = "Practice identifying maximum and minimum points",
+                            StudentTask = "Graph 5 quadratic functions and identify vertex, axis of symmetry",
+                            SyllabusId = new Guid("aaaaaaaa-1111-2222-3333-aaaaaaaaaaaa"),
+                            Topic = "Graphing Quadratic Functions"
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-ffff-eeee-dddd-333333333333"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaterialsUsed = "Lab equipment, Stopwatch, Rulers, Masses",
+                            Notes = "Hands-on experiment to demonstrate F = ma",
+                            StudentTask = "Lab report on motion experiments. Calculate acceleration from data.",
+                            SyllabusId = new Guid("bbbbbbbb-1111-2222-3333-bbbbbbbbbbbb"),
+                            Topic = "Newton's Laws of Motion"
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-ffff-eeee-dddd-444444444444"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaterialsUsed = "Textbook, Calculator, Diagram sheets",
+                            Notes = "Emphasize conservation of energy principle",
+                            StudentTask = "Solve energy conservation problems. Complete worksheet.",
+                            SyllabusId = new Guid("bbbbbbbb-1111-2222-3333-bbbbbbbbbbbb"),
+                            Topic = "Energy and Work"
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-ffff-eeee-dddd-555555555555"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaterialsUsed = "Periodic table poster, Flashcards, Worksheets",
+                            Notes = "Focus on element symbols and atomic numbers",
+                            StudentTask = "Memorize first 20 elements. Complete periodic table worksheet.",
+                            SyllabusId = new Guid("cccccccc-1111-2222-3333-cccccccccccc"),
+                            Topic = "Introduction to Periodic Table"
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-ffff-eeee-dddd-666666666666"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaterialsUsed = "Molecular model kits, Lab chemicals, Safety goggles",
+                            Notes = "Emphasize safety procedures in lab",
+                            StudentTask = "Draw Lewis structures for 10 molecules. Lab: observe reactions.",
+                            SyllabusId = new Guid("cccccccc-1111-2222-3333-cccccccccccc"),
+                            Topic = "Chemical Bonding Basics"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObjects.ParentProfile", b =>
@@ -881,6 +1096,44 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Subjects");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-aaaa-bbbb-cccc-111111111111"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Algebra, Geometry, and Calculus for high school students",
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            SubjectName = "Mathematics"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-aaaa-bbbb-cccc-222222222222"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Classical mechanics, thermodynamics, and electromagnetism",
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            SubjectName = "Physics"
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-aaaa-bbbb-cccc-333333333333"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Organic and inorganic chemistry fundamentals",
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            SubjectName = "Chemistry"
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-aaaa-bbbb-cccc-444444444444"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "English language and literature for academic excellence",
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            SubjectName = "English"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObjects.SubjectBuilder", b =>
@@ -920,6 +1173,111 @@ namespace Repositories.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("SubjectBuilder");
+                });
+
+            modelBuilder.Entity("BusinessObjects.SubscriptionPackage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MaxCoursePosts")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("MonthlyPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("PackageName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("Tier")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Tier");
+
+                    b.ToTable("SubscriptionPackages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-bbbb-cccc-dddd-111111111111"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Perfect for small centers just starting out. Post up to 5 courses per month.",
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaxCoursePosts = 5,
+                            MonthlyPrice = 500000m,
+                            PackageName = "Basic Plan",
+                            Tier = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-bbbb-cccc-dddd-222222222222"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Ideal for growing centers. Post up to 15 courses per month.",
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaxCoursePosts = 15,
+                            MonthlyPrice = 1500000m,
+                            PackageName = "Standard Plan",
+                            Tier = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-bbbb-cccc-dddd-333333333333"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Best for established centers. Post up to 50 courses per month.",
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaxCoursePosts = 50,
+                            MonthlyPrice = 4000000m,
+                            PackageName = "Premium Plan",
+                            Tier = 3
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-bbbb-cccc-dddd-444444444444"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Unlimited growth potential. Post up to 200 courses per month.",
+                            DisplayOrder = 4,
+                            IsActive = true,
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            MaxCoursePosts = 200,
+                            MonthlyPrice = 10000000m,
+                            PackageName = "Enterprise Plan",
+                            Tier = 4
+                        });
                 });
 
             modelBuilder.Entity("BusinessObjects.SuspensionRecord", b =>
@@ -1023,6 +1381,50 @@ namespace Repositories.Migrations
                     b.HasIndex("TeacherProfileId");
 
                     b.ToTable("Syllabuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-1111-2222-3333-aaaaaaaaaaaa"),
+                            AssessmentMethod = "Weekly quizzes (20%), Mid-term exam (30%), Final exam (50%)",
+                            CourseMaterial = "Textbook: Mathematics Grade 10, Calculator, Graph paper",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Comprehensive mathematics syllabus covering algebra, geometry, and trigonometry for grade 10 students.",
+                            GradeLevel = "10",
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            SubjectId = new Guid("11111111-aaaa-bbbb-cccc-111111111111"),
+                            SyllabusName = "Advanced Mathematics Grade 10",
+                            TeacherProfileId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                        },
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-1111-2222-3333-bbbbbbbbbbbb"),
+                            AssessmentMethod = "Lab reports (25%), Weekly assignments (15%), Mid-term (30%), Final (30%)",
+                            CourseMaterial = "Textbook: Physics Grade 10, Lab equipment, Scientific calculator",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Introduction to physics covering mechanics, energy, and waves for grade 10 students.",
+                            GradeLevel = "10",
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            SubjectId = new Guid("22222222-aaaa-bbbb-cccc-222222222222"),
+                            SyllabusName = "Physics Fundamentals Grade 10",
+                            TeacherProfileId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                        },
+                        new
+                        {
+                            Id = new Guid("cccccccc-1111-2222-3333-cccccccccccc"),
+                            AssessmentMethod = "Lab practicals (30%), Quizzes (20%), Projects (20%), Final exam (30%)",
+                            CourseMaterial = "Textbook: Chemistry Basics, Lab manual, Safety equipment",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Basic chemistry concepts including periodic table, chemical reactions, and laboratory safety.",
+                            GradeLevel = "8-9",
+                            IsDeleted = false,
+                            LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            SubjectId = new Guid("33333333-aaaa-bbbb-cccc-333333333333"),
+                            SyllabusName = "Chemistry Basics Grade 8-9",
+                            TeacherProfileId = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc")
+                        });
                 });
 
             modelBuilder.Entity("BusinessObjects.TeacherFeedback", b =>
@@ -1528,6 +1930,25 @@ namespace Repositories.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BusinessObjects.CenterSubscription", b =>
+                {
+                    b.HasOne("BusinessObjects.CenterProfile", "CenterProfile")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("CenterProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObjects.SubscriptionPackage", "SubscriptionPackage")
+                        .WithMany("CenterSubscriptions")
+                        .HasForeignKey("SubscriptionPackageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CenterProfile");
+
+                    b.Navigation("SubscriptionPackage");
+                });
+
             modelBuilder.Entity("BusinessObjects.CenterVerificationRequest", b =>
                 {
                     b.HasOne("BusinessObjects.User", "Admin")
@@ -1844,6 +2265,8 @@ namespace Repositories.Migrations
                 {
                     b.Navigation("Courses");
 
+                    b.Navigation("Subscriptions");
+
                     b.Navigation("TeacherProfiles");
 
                     b.Navigation("VerificationRequests");
@@ -1881,6 +2304,11 @@ namespace Repositories.Migrations
 
                     b.Navigation("Syllabus")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BusinessObjects.SubscriptionPackage", b =>
+                {
+                    b.Navigation("CenterSubscriptions");
                 });
 
             modelBuilder.Entity("BusinessObjects.Syllabus", b =>

@@ -36,6 +36,7 @@ namespace BusinessObjects
         public virtual ICollection<TeacherProfile> TeacherProfiles { get; set; } = new List<TeacherProfile>();
         public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
         public virtual ICollection<CenterVerificationRequest> VerificationRequests { get; set; } = new List<CenterVerificationRequest>();
+        public virtual ICollection<CenterSubscription> Subscriptions { get; set; } = new List<CenterSubscription>();
     }
 }
 

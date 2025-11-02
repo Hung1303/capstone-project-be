@@ -88,7 +88,7 @@ namespace API.Controllers
 
         // ✅ NEW 1: APPROVE ENROLLMENT
         // POST: api/Enrollments/{id}/approve?approverProfileId={guid}
-        [HttpPost("{id}/approve")]
+        [HttpPut("{id}/approve")]
         public async Task<IActionResult> ApproveEnrollment(Guid id, [FromQuery] Guid approverProfileId)
         {
             try
@@ -108,7 +108,7 @@ namespace API.Controllers
 
         // ✅ NEW 2: REJECT ENROLLMENT
         // POST: api/Enrollments/{id}/reject?approverProfileId={guid}
-        [HttpPost("{id}/reject")]
+        [HttpPut("{id}/reject")]
         public async Task<IActionResult> RejectEnrollment(Guid id, [FromQuery] Guid approverProfileId, [FromBody] RejectEnrollmentRequest request)
         {
             try

@@ -115,6 +115,22 @@ namespace Core.Base
         Failed = 3,
         Finalized = 4
     }
+
+    public enum SubscriptionPackageTier
+    {
+        Basic = 1,
+        Standard = 2,
+        Premium = 3,
+        Enterprise = 4
+    }
+
+    public enum SubscriptionStatus
+    {
+        Inactive = 0,
+        Active = 1,
+        Expired = 2,
+        Cancelled = 3
+    }
 }
 
 

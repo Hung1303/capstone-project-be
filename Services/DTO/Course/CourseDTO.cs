@@ -24,7 +24,7 @@ namespace Services.DTO.Course
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (StartDate < EndDate)
+            if (StartDate > EndDate)
             {
                 yield return new ValidationResult(
                     "The StartDate must be lower than the EndDate.",
@@ -81,7 +81,7 @@ namespace Services.DTO.Course
         public Guid? CenterProfileId { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (StartDate < EndDate)
+            if (StartDate > EndDate)
             {
                 yield return new ValidationResult(
                     "The StartDate must be lower than the EndDate.",

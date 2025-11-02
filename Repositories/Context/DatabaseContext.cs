@@ -28,6 +28,8 @@ namespace Repositories.Context
         public DbSet<CenterVerificationRequest> CenterVerificationRequests { get; set; }
         public DbSet<TeacherVerificationRequest> TeacherVerificationRequests { get; set; }
         public DbSet<CourseResult> CourseResults { get; set; }
+        public DbSet<SubscriptionPackage> SubscriptionPackages { get; set; }
+        public DbSet<CenterSubscription> CenterSubscriptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -598,6 +600,383 @@ namespace Repositories.Context
                     .HasForeignKey(x => x.AdminId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
+            // SubscriptionPackage configuration
+            modelBuilder.Entity<SubscriptionPackage>(b =>
+            {
+                b.Property(x => x.PackageName).HasMaxLength(256).IsRequired();
+                b.Property(x => x.MonthlyPrice).HasPrecision(18, 2);
+                b.Property(x => x.Description).HasMaxLength(2000);
+                b.HasIndex(x => x.Tier);
+            });
+
+            // CenterSubscription configuration
+            modelBuilder.Entity<CenterSubscription>(b =>
+            {
+                b.HasOne(x => x.CenterProfile)
+                    .WithMany(c => c.Subscriptions)
+                    .HasForeignKey(x => x.CenterProfileId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne(x => x.SubscriptionPackage)
+                    .WithMany(p => p.CenterSubscriptions)
+                    .HasForeignKey(x => x.SubscriptionPackageId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasIndex(x => x.CenterProfileId);
+                b.HasIndex(x => x.SubscriptionPackageId);
+                b.HasIndex(x => new { x.CenterProfileId, x.Status });
+            });
+
+            // Seed Subscription Packages
+            var basicPackageId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-111111111111");
+            var standardPackageId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-222222222222");
+            var premiumPackageId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-333333333333");
+            var enterprisePackageId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-444444444444");
+
+            modelBuilder.Entity<SubscriptionPackage>().HasData(
+                new SubscriptionPackage
+                {
+                    Id = basicPackageId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    PackageName = "Basic Plan",
+                    Tier = Core.Base.SubscriptionPackageTier.Basic,
+                    MaxCoursePosts = 5,
+                    MonthlyPrice = 500000m, // 500,000 VND
+                    Description = "Perfect for small centers just starting out. Post up to 5 courses per month.",
+                    IsActive = true,
+                    DisplayOrder = 1
+                },
+                new SubscriptionPackage
+                {
+                    Id = standardPackageId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    PackageName = "Standard Plan",
+                    Tier = Core.Base.SubscriptionPackageTier.Standard,
+                    MaxCoursePosts = 15,
+                    MonthlyPrice = 1500000m, // 1,500,000 VND
+                    Description = "Ideal for growing centers. Post up to 15 courses per month.",
+                    IsActive = true,
+                    DisplayOrder = 2
+                },
+                new SubscriptionPackage
+                {
+                    Id = premiumPackageId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    PackageName = "Premium Plan",
+                    Tier = Core.Base.SubscriptionPackageTier.Premium,
+                    MaxCoursePosts = 50,
+                    MonthlyPrice = 4000000m, // 4,000,000 VND
+                    Description = "Best for established centers. Post up to 50 courses per month.",
+                    IsActive = true,
+                    DisplayOrder = 3
+                },
+                new SubscriptionPackage
+                {
+                    Id = enterprisePackageId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    PackageName = "Enterprise Plan",
+                    Tier = Core.Base.SubscriptionPackageTier.Enterprise,
+                    MaxCoursePosts = 200,
+                    MonthlyPrice = 10000000m, // 10,000,000 VND
+                    Description = "Unlimited growth potential. Post up to 200 courses per month.",
+                    IsActive = true,
+                    DisplayOrder = 4
+                }
+            );
+
+            // Seed Center Subscription for the active center (Bright Future Center)
+            var centerSubscriptionId = Guid.Parse("bbbbbbbb-cccc-dddd-eeee-111111111111");
+            var subscriptionStartDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var subscriptionEndDate = subscriptionStartDate.AddMonths(1); // One month from start
+
+            modelBuilder.Entity<CenterSubscription>().HasData(
+                new CenterSubscription
+                {
+                    Id = centerSubscriptionId,
+                    CreatedAt = subscriptionStartDate,
+                    LastUpdatedAt = subscriptionStartDate,
+                    IsDeleted = false,
+                    CenterProfileId = centerActiveProfileId,
+                    SubscriptionPackageId = standardPackageId, // Standard Plan (15 courses/month)
+                    Status = Core.Base.SubscriptionStatus.Active,
+                    StartDate = subscriptionStartDate,
+                    EndDate = subscriptionEndDate,
+                    AutoRenewalEnabled = true,
+                    AutoRenewalDate = subscriptionEndDate,
+                    CancelledAt = null,
+                    CancellationReason = null
+                }
+            );
+
+            // Seed Subjects
+            var mathSubjectId = Guid.Parse("11111111-aaaa-bbbb-cccc-111111111111");
+            var physicsSubjectId = Guid.Parse("22222222-aaaa-bbbb-cccc-222222222222");
+            var chemistrySubjectId = Guid.Parse("33333333-aaaa-bbbb-cccc-333333333333");
+            var englishSubjectId = Guid.Parse("44444444-aaaa-bbbb-cccc-444444444444");
+
+            modelBuilder.Entity<Subject>().HasData(
+                new Subject
+                {
+                    Id = mathSubjectId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SubjectName = "Mathematics",
+                    Description = "Algebra, Geometry, and Calculus for high school students"
+                },
+                new Subject
+                {
+                    Id = physicsSubjectId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SubjectName = "Physics",
+                    Description = "Classical mechanics, thermodynamics, and electromagnetism"
+                },
+                new Subject
+                {
+                    Id = chemistrySubjectId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SubjectName = "Chemistry",
+                    Description = "Organic and inorganic chemistry fundamentals"
+                },
+                new Subject
+                {
+                    Id = englishSubjectId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SubjectName = "English",
+                    Description = "English language and literature for academic excellence"
+                }
+            );
+
+            // Seed Syllabuses (linked to subjects and teachers)
+            var mathSyllabusId = Guid.Parse("aaaaaaaa-1111-2222-3333-aaaaaaaaaaaa");
+            var physicsSyllabusId = Guid.Parse("bbbbbbbb-1111-2222-3333-bbbbbbbbbbbb");
+            var chemistrySyllabusId = Guid.Parse("cccccccc-1111-2222-3333-cccccccccccc");
+
+            modelBuilder.Entity<Syllabus>().HasData(
+                new Syllabus
+                {
+                    Id = mathSyllabusId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SubjectId = mathSubjectId,
+                    TeacherProfileId = teacherJaneProfileId,
+                    SyllabusName = "Advanced Mathematics Grade 10",
+                    Description = "Comprehensive mathematics syllabus covering algebra, geometry, and trigonometry for grade 10 students.",
+                    GradeLevel = "10",
+                    AssessmentMethod = "Weekly quizzes (20%), Mid-term exam (30%), Final exam (50%)",
+                    CourseMaterial = "Textbook: Mathematics Grade 10, Calculator, Graph paper"
+                },
+                new Syllabus
+                {
+                    Id = physicsSyllabusId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SubjectId = physicsSubjectId,
+                    TeacherProfileId = teacherJaneProfileId,
+                    SyllabusName = "Physics Fundamentals Grade 10",
+                    Description = "Introduction to physics covering mechanics, energy, and waves for grade 10 students.",
+                    GradeLevel = "10",
+                    AssessmentMethod = "Lab reports (25%), Weekly assignments (15%), Mid-term (30%), Final (30%)",
+                    CourseMaterial = "Textbook: Physics Grade 10, Lab equipment, Scientific calculator"
+                },
+                new Syllabus
+                {
+                    Id = chemistrySyllabusId,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SubjectId = chemistrySubjectId,
+                    TeacherProfileId = teacherJohnProfileId,
+                    SyllabusName = "Chemistry Basics Grade 8-9",
+                    Description = "Basic chemistry concepts including periodic table, chemical reactions, and laboratory safety.",
+                    GradeLevel = "8-9",
+                    AssessmentMethod = "Lab practicals (30%), Quizzes (20%), Projects (20%), Final exam (30%)",
+                    CourseMaterial = "Textbook: Chemistry Basics, Lab manual, Safety equipment"
+                }
+            );
+
+            // Seed Lesson Plans (linked to syllabuses)
+            var lessonPlan1Id = Guid.Parse("11111111-ffff-eeee-dddd-111111111111");
+            var lessonPlan2Id = Guid.Parse("22222222-ffff-eeee-dddd-222222222222");
+            var lessonPlan3Id = Guid.Parse("33333333-ffff-eeee-dddd-333333333333");
+            var lessonPlan4Id = Guid.Parse("44444444-ffff-eeee-dddd-444444444444");
+            var lessonPlan5Id = Guid.Parse("55555555-ffff-eeee-dddd-555555555555");
+            var lessonPlan6Id = Guid.Parse("66666666-ffff-eeee-dddd-666666666666");
+
+            modelBuilder.Entity<LessonPlan>().HasData(
+                new LessonPlan
+                {
+                    Id = lessonPlan1Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SyllabusId = mathSyllabusId,
+                    Topic = "Introduction to Quadratic Equations",
+                    StudentTask = "Complete exercises 1-20 from textbook. Submit solutions before next class.",
+                    MaterialsUsed = "Whiteboard, Graphing calculator, Textbook",
+                    Notes = "Focus on standard form ax² + bx + c = 0"
+                },
+                new LessonPlan
+                {
+                    Id = lessonPlan2Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SyllabusId = mathSyllabusId,
+                    Topic = "Graphing Quadratic Functions",
+                    StudentTask = "Graph 5 quadratic functions and identify vertex, axis of symmetry",
+                    MaterialsUsed = "Graph paper, Graphing software, Calculator",
+                    Notes = "Practice identifying maximum and minimum points"
+                },
+                new LessonPlan
+                {
+                    Id = lessonPlan3Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SyllabusId = physicsSyllabusId,
+                    Topic = "Newton's Laws of Motion",
+                    StudentTask = "Lab report on motion experiments. Calculate acceleration from data.",
+                    MaterialsUsed = "Lab equipment, Stopwatch, Rulers, Masses",
+                    Notes = "Hands-on experiment to demonstrate F = ma"
+                },
+                new LessonPlan
+                {
+                    Id = lessonPlan4Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SyllabusId = physicsSyllabusId,
+                    Topic = "Energy and Work",
+                    StudentTask = "Solve energy conservation problems. Complete worksheet.",
+                    MaterialsUsed = "Textbook, Calculator, Diagram sheets",
+                    Notes = "Emphasize conservation of energy principle"
+                },
+                new LessonPlan
+                {
+                    Id = lessonPlan5Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SyllabusId = chemistrySyllabusId,
+                    Topic = "Introduction to Periodic Table",
+                    StudentTask = "Memorize first 20 elements. Complete periodic table worksheet.",
+                    MaterialsUsed = "Periodic table poster, Flashcards, Worksheets",
+                    Notes = "Focus on element symbols and atomic numbers"
+                },
+                new LessonPlan
+                {
+                    Id = lessonPlan6Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    SyllabusId = chemistrySyllabusId,
+                    Topic = "Chemical Bonding Basics",
+                    StudentTask = "Draw Lewis structures for 10 molecules. Lab: observe reactions.",
+                    MaterialsUsed = "Molecular model kits, Lab chemicals, Safety goggles",
+                    Notes = "Emphasize safety procedures in lab"
+                }
+            );
+
+            // Seed Class Schedules (for different days and times)
+            var classSchedule1Id = Guid.Parse("aaaaaaaa-1111-aaaa-bbbb-111111111111");
+            var classSchedule2Id = Guid.Parse("bbbbbbbb-2222-aaaa-bbbb-222222222222");
+            var classSchedule3Id = Guid.Parse("cccccccc-3333-aaaa-bbbb-333333333333");
+            var classSchedule4Id = Guid.Parse("dddddddd-4444-aaaa-bbbb-444444444444");
+            var classSchedule5Id = Guid.Parse("eeeeeeee-5555-aaaa-bbbb-555555555555");
+
+            var courseStartDate = new DateOnly(2025, 2, 1);
+            var courseEndDate = new DateOnly(2025, 5, 31);
+
+            modelBuilder.Entity<ClassSchedule>().HasData(
+                new ClassSchedule
+                {
+                    Id = classSchedule1Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    TeacherProfileId = teacherJaneProfileId,
+                    DayOfWeek = DayOfWeek.Monday,
+                    StartTime = new TimeOnly(9, 0), // 9:00 AM
+                    EndTime = new TimeOnly(10, 30), // 10:30 AM
+                    StartDate = courseStartDate,
+                    EndDate = courseEndDate,
+                    RoomOrLink = "Room 101, 123 Learning Ave, Cityville"
+                },
+                new ClassSchedule
+                {
+                    Id = classSchedule2Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    TeacherProfileId = teacherJaneProfileId,
+                    DayOfWeek = DayOfWeek.Wednesday,
+                    StartTime = new TimeOnly(14, 0), // 2:00 PM
+                    EndTime = new TimeOnly(15, 30), // 3:30 PM
+                    StartDate = courseStartDate,
+                    EndDate = courseEndDate,
+                    RoomOrLink = "Room 101, 123 Learning Ave, Cityville"
+                },
+                new ClassSchedule
+                {
+                    Id = classSchedule3Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    TeacherProfileId = teacherJaneProfileId,
+                    DayOfWeek = DayOfWeek.Friday,
+                    StartTime = new TimeOnly(9, 0), // 9:00 AM
+                    EndTime = new TimeOnly(10, 30), // 10:30 AM
+                    StartDate = courseStartDate,
+                    EndDate = courseEndDate,
+                    RoomOrLink = "Room 102, 123 Learning Ave, Cityville"
+                },
+                new ClassSchedule
+                {
+                    Id = classSchedule4Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    TeacherProfileId = teacherJohnProfileId,
+                    DayOfWeek = DayOfWeek.Tuesday,
+                    StartTime = new TimeOnly(15, 0), // 3:00 PM
+                    EndTime = new TimeOnly(16, 30), // 4:30 PM
+                    StartDate = courseStartDate,
+                    EndDate = courseEndDate,
+                    RoomOrLink = "Lab Room 1, 123 Learning Ave, Cityville"
+                },
+                new ClassSchedule
+                {
+                    Id = classSchedule5Id,
+                    CreatedAt = now,
+                    LastUpdatedAt = now,
+                    IsDeleted = false,
+                    TeacherProfileId = teacherJaneProfileId,
+                    DayOfWeek = DayOfWeek.Saturday,
+                    StartTime = new TimeOnly(10, 0), // 10:00 AM
+                    EndTime = new TimeOnly(11, 30), // 11:30 AM
+                    StartDate = courseStartDate,
+                    EndDate = courseEndDate,
+                    RoomOrLink = "https://zoom.us/j/1234567890" // Online class example
+                }
+            );
         }
     }
 }
