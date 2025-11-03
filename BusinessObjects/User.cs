@@ -19,6 +19,7 @@ namespace BusinessObjects
         public ParentProfile? ParentProfile { get; set; }
 
         public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
 }
 

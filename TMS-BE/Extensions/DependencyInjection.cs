@@ -44,6 +44,7 @@ namespace API.Extensions
             services.AddScoped<ICourseResultService, CourseResultService>();
             services.AddScoped<ITeacherVerificationService, TeacherVerificationService>();
             services.AddScoped<ISubscriptionService, SubscriptionService>();
+            services.AddScoped<IPaymentService, PaymentService>();
 
             return services;
         }

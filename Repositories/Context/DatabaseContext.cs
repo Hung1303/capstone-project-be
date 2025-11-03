@@ -30,6 +30,7 @@ namespace Repositories.Context
         public DbSet<CourseResult> CourseResults { get; set; }
         public DbSet<SubscriptionPackage> SubscriptionPackages { get; set; }
         public DbSet<CenterSubscription> CenterSubscriptions { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
