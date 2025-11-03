@@ -94,7 +94,7 @@ namespace Services
                 {
                     var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
                     var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
-                    
+
                     if (max == 0)
                     {
                         throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");

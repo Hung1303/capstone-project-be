@@ -35,5 +35,7 @@ namespace Services.Interfaces
         Task<bool> ChangePassword(Guid userId, string currentPassword, string newPassword);
         Task<(IEnumerable<CenterListResponse> Centers, int TotalCount)> GetCentersByStatusAsync(CenterStatus status, int pageNumber, int pageSize, string? centerName = null);
         Task<bool> UpdateCenterStatusAsync(Guid centerId, CenterStatus status, string? reason = null);
+        Task<(IEnumerable<StudentListResponse> Students, int TotalCount)> GetStudentsByParentIdAsync(
+           Guid parentProfileId, int pageNumber, int pageSize, string? fullName = null);
     }
 }

@@ -179,6 +179,7 @@ namespace Services.DTO.User
     public class TeacherListResponse
     {
         public Guid Id { get; set; }
+        public Guid ProfileId { get; set; }
         public string FullName { get; set; }
         public int YearOfExperience { get; set; }
         public string Qualification { get; set; }
@@ -189,6 +190,7 @@ namespace Services.DTO.User
     public class ParentListResponse
     {
         public Guid Id { get; set; }
+        public Guid ProfileId { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }

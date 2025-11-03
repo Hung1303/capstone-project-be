@@ -72,7 +72,9 @@ namespace Services
 
         public async Task<IEnumerable<CourseResultResponse>> GetAllCourseResult(string? searchTerm, int pageNumber, int pageSize, Guid? TeacherProfileId, Guid? CourseId, Guid? StudentProfileId)
         {
-            var courseResult = _unitOfWork.GetRepository<CourseResult>().Entities.Where(a => !a.IsDeleted);
+            var courseResult = _unitOfWork.GetRepository<CourseResult>().Entities
+                .Include(c => c.Course)
+                .Where(a => !a.IsDeleted);
             if (TeacherProfileId.HasValue)
             {
                 courseResult = courseResult.Where(a => a.TeacherProfileId == TeacherProfileId);
@@ -102,6 +104,7 @@ namespace Services
                 .Take(pageSize)
                 .Select(a => new CourseResultResponse
                 {
+                    Subject = a.Course.Subject,
                     Mark = a.Mark,
                     Comment = a.Comment,
                     StudentId = a.StudentProfileId,
@@ -113,13 +116,16 @@ namespace Services
 
         public async Task<CourseResultResponse> GetCourseResultById(Guid id)
         {
-            var courseResult = await _unitOfWork.GetRepository<CourseResult>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+            var courseResult = await _unitOfWork.GetRepository<CourseResult>().Entities
+                .Include(c => c.Course)
+                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (courseResult == null)
             {
                 throw new Exception("CourseResult Not Found");
             }
             var result = new CourseResultResponse
             {
+                Subject = courseResult.Course.Subject,
                 Mark = courseResult.Mark,
                 Comment = courseResult.Comment,
                 StudentId = courseResult.StudentProfileId,
@@ -131,7 +137,9 @@ namespace Services
 
         public async Task<CourseResultResponse> UpdateCourseResult(Guid id, UpdateCourseResultRequest request)
         {
-            var courseResult = await _unitOfWork.GetRepository<CourseResult>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+            var courseResult = await _unitOfWork.GetRepository<CourseResult>().Entities
+                .Include(c => c.Course)
+                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (courseResult == null)
             {
                 throw new Exception("CourseResult Not Found");
@@ -176,6 +184,7 @@ namespace Services
 
             var result = new CourseResultResponse
             {
+                Subject = courseResult.Course.Subject,
                 Mark = courseResult.Mark,
                 Comment = courseResult.Comment,
                 StudentId = courseResult.StudentProfileId,
@@ -183,6 +192,86 @@ namespace Services
                 TeacherId = courseResult.TeacherProfileId,
             };
             return result;
+        }
+
+        public async Task<IEnumerable<CourseResultResponse>> GetAllCourseResultsByStudentId(Guid StudentProfileId, string? Subject, string? searchTerm, int pageNumber, int pageSize)
+        {
+            var courseResult = _unitOfWork.GetRepository<CourseResult>().Entities
+                .Include(c => c.Course)
+                .Where(a => !a.IsDeleted && a.StudentProfileId == StudentProfileId);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                courseResult = courseResult.Where(c =>
+                    (c.Comment != null && c.Comment.ToLower().Contains(searchTerm.Trim().ToLower()))
+                );
+            }
+
+            if (!string.IsNullOrWhiteSpace(Subject))
+            {
+                courseResult = courseResult.Where(c =>
+                    (c.Course.Subject != null && c.Course.Subject.ToLower().Contains(Subject.Trim().ToLower()))
+                );
+            }
+
+            var totalCount = await courseResult.CountAsync();
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+            var paginatedCourseResult = await courseResult
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .Select(a => new CourseResultResponse
+                {
+                    Subject = a.Course.Subject,
+                    Mark = a.Mark,
+                    Comment = a.Comment,
+                    StudentId = a.StudentProfileId,
+                    CourseId = a.CourseId,
+                    TeacherId = a.TeacherProfileId,
+                }).ToListAsync();
+            return paginatedCourseResult;
+        }
+
+        public async Task<IEnumerable<CourseResultResponse>> GetAllCourseResultsByTeacherId(Guid TeacherProfileId, string? Subject, string? searchTerm, int pageNumber, int pageSize)
+        {
+            var courseResult = _unitOfWork.GetRepository<CourseResult>().Entities
+                .Include(c => c.Course)
+                .Where(a => !a.IsDeleted && a.TeacherProfileId == TeacherProfileId);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                courseResult = courseResult.Where(c =>
+                    (c.Comment != null && c.Comment.ToLower().Contains(searchTerm.Trim().ToLower()))
+                );
+            }
+
+            if (!string.IsNullOrWhiteSpace(Subject))
+            {
+                courseResult = courseResult.Where(c =>
+                    (c.Course.Subject != null && c.Course.Subject.ToLower().Contains(Subject.Trim().ToLower()))
+                );
+            }
+
+            var totalCount = await courseResult.CountAsync();
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+            var paginatedCourseResult = await courseResult
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .Select(a => new CourseResultResponse
+                {
+                    Subject = a.Course.Subject,
+                    Mark = a.Mark,
+                    Comment = a.Comment,
+                    StudentId = a.StudentProfileId,
+                    CourseId = a.CourseId,
+                    TeacherId = a.TeacherProfileId,
+                }).ToListAsync();
+            return paginatedCourseResult;
         }
     }
 }

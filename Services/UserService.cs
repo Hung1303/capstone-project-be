@@ -679,7 +679,8 @@ namespace Services
                 .Take(pageSize)
                 .Select(x => new TeacherListResponse
                 {
-                    Id = x.Teacher.Id,
+                    Id = x.User.Id,
+                    ProfileId = x.Teacher.Id,
                     FullName = x.User.FullName,
                     YearOfExperience = x.Teacher.YearOfExperience,
                     Qualification = x.Teacher.Qualifications,
@@ -714,7 +715,8 @@ namespace Services
                 .Take(pageSize)
                 .Select(x => new ParentListResponse
                 {
-                    Id = x.Parent.Id,
+                    Id = x.User.Id,
+                    ProfileId = x.Parent.Id,
                     FullName = x.User.FullName,
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,
@@ -818,7 +820,8 @@ namespace Services
                 .Take(pageSize)
                 .Select(x => new TeacherListResponse
                 {
-                    Id = x.Teacher.Id,
+                    Id = x.User.Id,
+                    ProfileId = x.Teacher.Id,
                     FullName = x.User.FullName,
                     YearOfExperience = x.Teacher.YearOfExperience,
                     Qualification = x.Teacher.Qualifications,
@@ -1030,6 +1033,43 @@ namespace Services
             await _unitOfWork.SaveAsync();
 
             return true;
+        }
+
+        public async Task<(IEnumerable<StudentListResponse> Students, int TotalCount)> GetStudentsByParentIdAsync(
+           Guid parentProfileId, int pageNumber, int pageSize, string? fullName = null)
+        {
+            var query = _unitOfWork.GetRepository<User>().Entities.
+                 Include(s => s.StudentProfile)
+                 .Where(u => u.StudentProfile.ParentProfileId == parentProfileId && !u.IsDeleted && u.Status == AccountStatus.Active);
+
+            // Optional search by teacher full name
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                query = query.Where(x => EF.Functions.Like(x.FullName, $"%{fullName}%"));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            // Paginate + project into DTO
+            var students = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new StudentListResponse
+                {
+                    UserId = x.Id,
+                    ProfileId = x.StudentProfile.Id,
+                    FullName = x.FullName,
+                    Email = x.Email,
+                    PhoneNumber = x.PhoneNumber,
+                    SchoolName = x.StudentProfile.SchoolName,
+                    SchoolYear = x.StudentProfile.SchoolYear,
+                    GradeLevel = x.StudentProfile.SchoolYear,
+                    Status = x.Status.ToString()
+                })
+                .ToListAsync();
+
+            return (students, totalCount);
         }
     }
 }

@@ -57,6 +57,36 @@ namespace API.Controllers
             }
 
         }
+
+        [HttpGet("{studentProfileId}/CourseResults")]
+        public async Task<IActionResult> GetAllCourseResultsByStudentProfileId(Guid studentProfileId, [FromQuery] string? Subject, [FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        {
+            try
+            {
+                var result = await _courseResultService.GetAllCourseResultsByStudentId(studentProfileId, Subject, searchTerm, pageNumber, pageSize);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("CourseResults/{teacherProfileId}")]
+        public async Task<IActionResult> GetAllCourseResultsByTeacherProfileId(Guid teacherProfileId, [FromQuery] string? Subject, [FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        {
+            try
+            {
+                var result = await _courseResultService.GetAllCourseResultsByTeacherId(teacherProfileId, Subject, searchTerm, pageNumber, pageSize);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCourseResult(Guid id, UpdateCourseResultRequest request)
         {
