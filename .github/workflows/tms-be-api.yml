@@ -5,7 +5,7 @@ on:
     - main
 env:
   AZURE_WEBAPP_NAME: tms-be-api
-  AZURE_WEBAPP_PACKAGE_PATH: publish
+  AZURE_WEBAPP_PACKAGE_PATH: ./publish
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   WORKING_DIRECTORY: ./TMS-BE
@@ -43,7 +43,7 @@ jobs:
     - name: Azure Login
       uses: azure/login@v2
       with:
-        creds: ${{ secrets.tms_be_api_SPN }}
+        creds: ${{ secrets.TMS_BE_API_SPN }}
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
@@ -52,5 +52,5 @@ jobs:
     - name: Debug files
       run: |
         echo "Files in publish directory:"
-        dir publish
+        dir ./publish
 
