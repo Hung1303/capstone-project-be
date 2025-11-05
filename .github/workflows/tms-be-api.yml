@@ -26,6 +26,10 @@ jobs:
       run: dotnet test "${{ env.WORKING_DIRECTORY }}/TMS-BE.sln" --no-build
     - name: Publish
       run: dotnet publish "${{ env.WORKING_DIRECTORY }}/API.csproj" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+    - name: Debug publish output
+      run: |
+        echo "📦 Checking publish directory:"
+        dir ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} /s
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
