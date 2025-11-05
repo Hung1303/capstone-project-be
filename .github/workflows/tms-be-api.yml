@@ -43,7 +43,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: webapp
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}.zip
+        path: publish.zip
 
   deploy:
     runs-on: windows-latest
@@ -61,24 +61,10 @@ jobs:
         Write-Host "📦 Files after download:"
         Get-ChildItem -Recurse
 
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        creds: ${{ secrets.TMS_BE_API_SPN }}
-
-    - name: Stop Azure App before deploy
-      shell: pwsh
-      run: |
-        az webapp stop --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group tms-rg
-
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         package: publish.zip
-
-    - name: Start Azure App after deploy
-      shell: pwsh
-      run: |
-        az webapp start --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group tms-rg
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
