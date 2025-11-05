@@ -39,7 +39,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: webapp
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        path: ./publish
     - name: Azure Login
       uses: azure/login@v2
       with:
@@ -48,7 +48,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        package: ./publish
     - name: Debug files
       run: |
         echo "Files in publish directory:"
