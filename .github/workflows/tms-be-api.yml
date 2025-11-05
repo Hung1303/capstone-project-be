@@ -52,6 +52,13 @@ jobs:
         Write-Host "Zipping publish folder..."
         Compress-Archive -Path "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\*" -DestinationPath "app.zip"
 
+    - name: Check zip contents
+      shell: pwsh
+      run: |
+        Write-Host "Contents of app.zip:"
+        Expand-Archive -Path "app.zip" -DestinationPath "unzipped" -Force
+        Get-ChildItem -Recurse "unzipped"
+
     - name: Azure Login
       uses: azure/login@v2
       with:
