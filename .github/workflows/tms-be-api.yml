@@ -31,15 +31,12 @@ jobs:
       run: |
         echo "📦 Checking publish directory:"
         ls -R ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-
-    - name: Zip published files
-      run: Compress-Archive -Path "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/*" -DestinationPath "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}.zip"
-    
+        
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: webapp
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/*
   deploy:
     runs-on: windows-latest
     needs: build
@@ -64,7 +61,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}.zip
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
     - name: Start Azure App after deploy
       shell: pwsh
