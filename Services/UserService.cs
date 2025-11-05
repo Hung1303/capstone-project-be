@@ -92,61 +92,64 @@ namespace Services
 
         public async Task<CreateCenterRequest> CreateCenterRequest(CreateCenterRequest request)
         {
+            var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            if (!Regex.IsMatch(request.Email, emailPattern))
+                throw new Exception("Invalid Email.");
 
+            var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
+            if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
+                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+
+            var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
+            if (checkUser != null)
+            {
+                if (checkUser.Email == request.Email)
+                    throw new Exception("Duplicate email");
+                else if (checkUser.UserName == request.UserName)
+                    throw new Exception("Duplicate Username");
+                else
+                    throw new Exception("Duplicate Phonenumber");
+            }
+
+            var user = new User
+            {
+                Email = request.Email,
+                UserName = request.UserName,
+                FullName = request.FullName,
+                PasswordHash = PasswordHasher.HashPassword(request.Password),
+                PhoneNumber = request.PhoneNumber,
+                Role = UserRole.Center,
+                Status = AccountStatus.Pending
+            };
+
+            var center = new CenterProfile
+            {
+                UserId = user.Id,
+                CenterName = request.CenterName,
+                OwnerName = request.FullName,
+                LicenseNumber = request.LicenseNumber,
+                IssueDate = request.IssueDate,
+                LicenseIssuedBy = request.LicenseIssuedBy,
+                Address = request.Address,
+                ContactEmail = request.Email,
+                ContactPhone = request.PhoneNumber,
+                Status = CenterStatus.Pending
+            };
+
+            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
             try
             {
-                var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-                if (!Regex.IsMatch(request.Email, emailPattern))
-                    throw new Exception("Invalid Email.");
-
-                var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
-                if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
-                    throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
-
-                var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
-                if (checkUser != null)
-                {
-                    if (checkUser.Email == request.Email)
-                        throw new Exception("Duplicate email");
-                    else if (checkUser.UserName == request.UserName)
-                        throw new Exception("Duplicate Username");
-                    else
-                        throw new Exception("Duplicate Phonenumber");
-                }
-
-                var user = new User
-                {
-                    Email = request.Email,
-                    UserName = request.UserName,
-                    FullName = request.FullName,
-                    PasswordHash = PasswordHasher.HashPassword(request.Password),
-                    PhoneNumber = request.PhoneNumber,
-                    Role = UserRole.Center,
-                    Status = AccountStatus.Pending
-                };
-
-                var center = new CenterProfile
-                {
-                    UserId = user.Id,
-                    CenterName = request.CenterName,
-                    OwnerName = request.FullName,
-                    LicenseNumber = request.LicenseNumber,
-                    IssueDate = request.IssueDate,
-                    LicenseIssuedBy = request.LicenseIssuedBy,
-                    Address = request.Address,
-                    ContactEmail = request.Email,
-                    ContactPhone = request.PhoneNumber,
-                    Status = CenterStatus.Pending
-                };
+                _unitOfWork.BeginTransaction();
 
                 await _unitOfWork.GetRepository<User>().InsertAsync(user);
-                await _unitOfWork.SaveAsync();
-
                 await _unitOfWork.GetRepository<CenterProfile>().InsertAsync(center);
                 await _unitOfWork.SaveAsync();
+
+                _unitOfWork.CommitTransaction();
             }
             catch
             {
+                _unitOfWork.RollBack();
                 throw;
             }
 
@@ -191,11 +194,22 @@ namespace Services
                 PhoneSecondary = request.PhoneSecondary
             };
 
-            await _unitOfWork.GetRepository<User>().InsertAsync(user);
-            await _unitOfWork.SaveAsync();
+            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
+            try
+            {
+                _unitOfWork.BeginTransaction();
 
-            await _unitOfWork.GetRepository<ParentProfile>().InsertAsync(parent);
-            await _unitOfWork.SaveAsync();
+                await _unitOfWork.GetRepository<User>().InsertAsync(user);
+                await _unitOfWork.GetRepository<ParentProfile>().InsertAsync(parent);
+                await _unitOfWork.SaveAsync();
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
 
             return request;
         }
@@ -262,14 +276,26 @@ namespace Services
                 SchoolName = request.SchoolName,
                 SchoolYear = request.SchoolYear.Trim(),
                 GradeLevel = request.GradeLevel,
+                ClassName = request.ClassName,
                 ParentProfileId = parentProfile.Id
             };
 
-            await _unitOfWork.GetRepository<User>().InsertAsync(user);
-            await _unitOfWork.SaveAsync();
+            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
+            try
+            {
+                _unitOfWork.BeginTransaction();
 
-            await _unitOfWork.GetRepository<StudentProfile>().InsertAsync(student);
-            await _unitOfWork.SaveAsync();
+                await _unitOfWork.GetRepository<User>().InsertAsync(user);
+                await _unitOfWork.GetRepository<StudentProfile>().InsertAsync(student);
+                await _unitOfWork.SaveAsync();
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
 
             return request;
         }
@@ -309,14 +335,27 @@ namespace Services
                 Qualifications = request.Qualifications,
                 LicenseNumber = request.LicenseNumber,
                 Subjects = request.Subjects,
-                Bio = request.Bio
+                Bio = request.Bio,
+                TeachingAtSchool = request.TeachingAtSchool,
+                TeachAtClasses = request.TeachAtClasses
             };
 
-            await _unitOfWork.GetRepository<User>().InsertAsync(user);
-            await _unitOfWork.SaveAsync();
+            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
+            try
+            {
+                _unitOfWork.BeginTransaction();
 
-            await _unitOfWork.GetRepository<TeacherProfile>().InsertAsync(teacher);
-            await _unitOfWork.SaveAsync();
+                await _unitOfWork.GetRepository<User>().InsertAsync(user);
+                await _unitOfWork.GetRepository<TeacherProfile>().InsertAsync(teacher);
+                await _unitOfWork.SaveAsync();
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
 
             return request;
         }
@@ -367,14 +406,27 @@ namespace Services
                 LicenseNumber = request.LicenseNumber,
                 Subjects = request.Subjects,
                 Bio = request.Bio,
+                TeachingAtSchool = request.TeachingAtSchool,
+                TeachAtClasses = request.TeachAtClasses,
                 CenterProfileId = center.Id
             };
 
-            await _unitOfWork.GetRepository<User>().InsertAsync(user);
-            await _unitOfWork.SaveAsync();
+            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
+            try
+            {
+                _unitOfWork.BeginTransaction();
 
-            await _unitOfWork.GetRepository<TeacherProfile>().InsertAsync(teacher);
-            await _unitOfWork.SaveAsync();
+                await _unitOfWork.GetRepository<User>().InsertAsync(user);
+                await _unitOfWork.GetRepository<TeacherProfile>().InsertAsync(teacher);
+                await _unitOfWork.SaveAsync();
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
 
             return request;
         }
@@ -685,6 +737,8 @@ namespace Services
                     YearOfExperience = x.Teacher.YearOfExperience,
                     Qualification = x.Teacher.Qualifications,
                     Subject = x.Teacher.Subjects,
+                    TeachingAtSchool = x.Teacher.TeachingAtSchool,
+                    TeachAtClasses = x.Teacher.TeachAtClasses,
                     Status = x.User.Status.ToString()
                 })
                 .ToListAsync();
@@ -760,6 +814,7 @@ namespace Services
                     SchoolName = x.Student.SchoolName,
                     SchoolYear = x.Student.SchoolYear,
                     GradeLevel = x.Student.GradeLevel,
+                    ClassName = x.Student.ClassName,
                     Status = x.User.Status.ToString()
                 })
                 .ToListAsync();
@@ -826,6 +881,8 @@ namespace Services
                     YearOfExperience = x.Teacher.YearOfExperience,
                     Qualification = x.Teacher.Qualifications,
                     Subject = x.Teacher.Subjects,
+                    TeachingAtSchool = x.Teacher.TeachingAtSchool,
+                    TeachAtClasses = x.Teacher.TeachAtClasses,
                     Status = x.User.Status.ToString()
                 })
                 .ToListAsync();
@@ -892,7 +949,8 @@ namespace Services
                     Status = u.Status.ToString(),
                     SchoolName = u.StudentProfile.SchoolName,
                     SchoolYear = u.StudentProfile.SchoolYear,
-                    GradeLevel = u.StudentProfile.GradeLevel
+                    GradeLevel = u.StudentProfile.GradeLevel,
+                    ClassName = u.StudentProfile.ClassName
                 });
 
             return await query.FirstOrDefaultAsync();
@@ -1064,7 +1122,7 @@ namespace Services
                     PhoneNumber = x.PhoneNumber,
                     SchoolName = x.StudentProfile.SchoolName,
                     SchoolYear = x.StudentProfile.SchoolYear,
-                    GradeLevel = x.StudentProfile.SchoolYear,
+                    GradeLevel = x.StudentProfile.GradeLevel,
                     Status = x.Status.ToString()
                 })
                 .ToListAsync();

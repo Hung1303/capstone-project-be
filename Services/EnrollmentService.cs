@@ -16,6 +16,37 @@ namespace Services
             _unitOfWork = unitOfWork;
         }
 
+        // ✅ Helper method to check if teacher teaches at the same school and class as student
+        private bool IsTeacherTeachingOwnStudent(TeacherProfile teacher, StudentProfile student)
+        {
+            // Check if teacher teaches at a school (if not set, they can teach anyone)
+            if (string.IsNullOrWhiteSpace(teacher.TeachingAtSchool))
+                return false;
+
+            // Check if student is from the same school (case-insensitive)
+            if (string.IsNullOrWhiteSpace(student.SchoolName))
+                return false;
+
+            if (!string.Equals(teacher.TeachingAtSchool.Trim(), student.SchoolName.Trim(), StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            // If same school, check if teacher teaches the student's class
+            if (string.IsNullOrWhiteSpace(teacher.TeachAtClasses) || string.IsNullOrWhiteSpace(student.ClassName))
+                return false;
+
+            // Split TeachAtClasses by comma or space and check if it contains student's class
+            var teacherClasses = teacher.TeachAtClasses
+                .Split(new[] { ',', ';', ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(c => c.Trim())
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .ToList();
+
+            var studentClassName = student.ClassName.Trim();
+
+            // Check if any of the teacher's classes matches the student's class (case-insensitive)
+            return teacherClasses.Any(tc => string.Equals(tc, studentClassName, StringComparison.OrdinalIgnoreCase));
+        }
+
         // ✅ CREATE
         public async Task<EnrollmentResponse> CreateEnrollment(CreateEnrollmentRequest request)
         {
@@ -33,6 +64,22 @@ namespace Services
             var student = await _unitOfWork.GetRepository<StudentProfile>().Entities.FirstOrDefaultAsync(s => s.Id == request.StudentProfileId && !s.IsDeleted);
             if (student == null)
                 throw new Exception("Student profile not found");
+
+            // ✅ Validate grade level match
+            if (student.GradeLevel != course.GradeLevel)
+                throw new Exception($"Student grade level ({student.GradeLevel}) does not match course grade level ({course.GradeLevel}). Only students with grade {course.GradeLevel} can enroll in this course.");
+
+            // ✅ Validate that teacher is not teaching their own student
+            if (course.TeacherProfileId.HasValue)
+            {
+                var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
+                    .FirstOrDefaultAsync(t => t.Id == course.TeacherProfileId.Value && !t.IsDeleted);
+
+                if (teacher != null && IsTeacherTeachingOwnStudent(teacher, student))
+                {
+                    throw new Exception($"Cannot enroll: The teacher teaches at the same school ({student.SchoolName}) and class ({student.ClassName}) as this student. Teachers cannot teach their own students.");
+                }
+            }
 
             var enrollment = new Enrollment
             {
@@ -144,6 +191,24 @@ namespace Services
                 if (course == null)
                     throw new Exception("Course not found");
 
+                // ✅ Validate grade level match if course is being changed
+                var studentForValidation = await _unitOfWork.GetRepository<StudentProfile>().Entities
+                    .FirstOrDefaultAsync(s => s.Id == enrollment.StudentProfileId && !s.IsDeleted);
+                if (studentForValidation != null && studentForValidation.GradeLevel != course.GradeLevel)
+                    throw new Exception($"Student grade level ({studentForValidation.GradeLevel}) does not match course grade level ({course.GradeLevel}). Only students with grade {course.GradeLevel} can enroll in this course.");
+
+                // ✅ Validate that teacher is not teaching their own student
+                if (course.TeacherProfileId.HasValue && studentForValidation != null)
+                {
+                    var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
+                        .FirstOrDefaultAsync(t => t.Id == course.TeacherProfileId.Value && !t.IsDeleted);
+
+                    if (teacher != null && IsTeacherTeachingOwnStudent(teacher, studentForValidation))
+                    {
+                        throw new Exception($"Cannot update enrollment: The teacher teaches at the same school ({studentForValidation.SchoolName}) and class ({studentForValidation.ClassName}) as this student. Teachers cannot teach their own students.");
+                    }
+                }
+
                 enrollment.CourseId = request.CourseId.Value;
             }
 
@@ -152,6 +217,24 @@ namespace Services
                 var student = await _unitOfWork.GetRepository<StudentProfile>().Entities.FirstOrDefaultAsync(s => s.Id == request.StudentProfileId.Value && !s.IsDeleted);
                 if (student == null)
                     throw new Exception("Student profile not found");
+
+                // ✅ Validate grade level match if student is being changed
+                var courseForValidation = await _unitOfWork.GetRepository<Course>().Entities
+                    .FirstOrDefaultAsync(c => c.Id == enrollment.CourseId && !c.IsDeleted);
+                if (courseForValidation != null && student.GradeLevel != courseForValidation.GradeLevel)
+                    throw new Exception($"Student grade level ({student.GradeLevel}) does not match course grade level ({courseForValidation.GradeLevel}). Only students with grade {courseForValidation.GradeLevel} can enroll in this course.");
+
+                // ✅ Validate that teacher is not teaching their own student
+                if (courseForValidation != null && courseForValidation.TeacherProfileId.HasValue)
+                {
+                    var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
+                        .FirstOrDefaultAsync(t => t.Id == courseForValidation.TeacherProfileId.Value && !t.IsDeleted);
+
+                    if (teacher != null && IsTeacherTeachingOwnStudent(teacher, student))
+                    {
+                        throw new Exception($"Cannot update enrollment: The teacher teaches at the same school ({student.SchoolName}) and class ({student.ClassName}) as this student. Teachers cannot teach their own students.");
+                    }
+                }
 
                 enrollment.StudentProfileId = request.StudentProfileId.Value;
             }
@@ -213,6 +296,29 @@ namespace Services
                 throw new Exception("Enrollment not found");
 
             var course = enrollment.Course;
+
+            // ✅ Load student profile to validate grade level
+            var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
+                .FirstOrDefaultAsync(s => s.Id == enrollment.StudentProfileId && !s.IsDeleted);
+
+            if (student == null)
+                throw new Exception("Student profile not found");
+
+            // ✅ Validate grade level match before approving
+            if (student.GradeLevel != course.GradeLevel)
+                throw new Exception($"Student grade level ({student.GradeLevel}) does not match course grade level ({course.GradeLevel}). Only students with grade {course.GradeLevel} can enroll in this course.");
+
+            // ✅ Validate that teacher is not teaching their own student
+            if (course.TeacherProfileId.HasValue)
+            {
+                var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
+                    .FirstOrDefaultAsync(t => t.Id == course.TeacherProfileId.Value && !t.IsDeleted);
+
+                if (teacher != null && IsTeacherTeachingOwnStudent(teacher, student))
+                {
+                    throw new Exception($"Cannot approve enrollment: The teacher teaches at the same school ({student.SchoolName}) and class ({student.ClassName}) as this student. Teachers cannot teach their own students.");
+                }
+            }
 
             // ✅ Kiểm tra quyền duyệt
             bool isAuthorized = (course.TeacherProfileId == approverProfileId) ||

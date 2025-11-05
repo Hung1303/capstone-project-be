@@ -12,7 +12,7 @@ using Repositories.Context;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251102095244_init")]
+    [Migration("20251105201535_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -591,6 +591,9 @@ namespace Repositories.Migrations
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
+                    b.Property<int>("GradeLevel")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -1006,13 +1009,16 @@ namespace Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ClassName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("GradeLevel")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                    b.Property<int>("GradeLevel")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -1047,8 +1053,9 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+                            ClassName = "10A01",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            GradeLevel = "10",
+                            GradeLevel = 10,
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ParentProfileId = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
@@ -1059,8 +1066,9 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
+                            ClassName = "08A12",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            GradeLevel = "8",
+                            GradeLevel = 8,
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ParentProfileId = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
@@ -1351,10 +1359,9 @@ namespace Repositories.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 
-                    b.Property<string>("GradeLevel")
-                        .IsRequired()
+                    b.Property<int>("GradeLevel")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -1390,7 +1397,7 @@ namespace Repositories.Migrations
                             CourseMaterial = "Textbook: Mathematics Grade 10, Calculator, Graph paper",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Comprehensive mathematics syllabus covering algebra, geometry, and trigonometry for grade 10 students.",
-                            GradeLevel = "10",
+                            GradeLevel = 10,
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             SubjectId = new Guid("11111111-aaaa-bbbb-cccc-111111111111"),
@@ -1404,7 +1411,7 @@ namespace Repositories.Migrations
                             CourseMaterial = "Textbook: Physics Grade 10, Lab equipment, Scientific calculator",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Introduction to physics covering mechanics, energy, and waves for grade 10 students.",
-                            GradeLevel = "10",
+                            GradeLevel = 10,
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             SubjectId = new Guid("22222222-aaaa-bbbb-cccc-222222222222"),
@@ -1418,11 +1425,11 @@ namespace Repositories.Migrations
                             CourseMaterial = "Textbook: Chemistry Basics, Lab manual, Safety equipment",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Basic chemistry concepts including periodic table, chemical reactions, and laboratory safety.",
-                            GradeLevel = "8-9",
+                            GradeLevel = 8,
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             SubjectId = new Guid("33333333-aaaa-bbbb-cccc-333333333333"),
-                            SyllabusName = "Chemistry Basics Grade 8-9",
+                            SyllabusName = "Chemistry Basics Grade 8",
                             TeacherProfileId = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc")
                         });
                 });
@@ -1525,6 +1532,12 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("TeachAtClasses")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TeachingAtSchool")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -1564,6 +1577,8 @@ namespace Repositories.Migrations
                             LicenseNumber = "TCH-2020-123",
                             Qualifications = "B.Ed, M.Ed",
                             Subjects = "Math,Physics",
+                            TeachAtClasses = "10A01",
+                            TeachingAtSchool = "City High School",
                             UserId = new Guid("44444444-4444-4444-4444-444444444444"),
                             VerificationCompletedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             VerificationNotes = "Verified per Circular 29",
@@ -1582,6 +1597,8 @@ namespace Repositories.Migrations
                             LicenseNumber = "TCH-2023-456",
                             Qualifications = "B.Sc",
                             Subjects = "Chemistry",
+                            TeachAtClasses = "08A05",
+                            TeachingAtSchool = "City High School",
                             UserId = new Guid("55555555-5555-5555-5555-555555555555"),
                             VerificationStatus = 0,
                             YearOfExperience = 2

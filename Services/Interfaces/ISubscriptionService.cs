@@ -19,7 +19,7 @@ namespace Services.Interfaces
         Task<CenterSubscriptionResponse?> GetActiveSubscriptionAsync(Guid centerProfileId);
         Task<IEnumerable<CenterSubscriptionResponse>> GetCenterSubscriptionsAsync(Guid centerProfileId);
         Task<IEnumerable<CenterSubscriptionResponse>> GetAllCenterSubscriptionsAsync(int pageNumber, int pageSize, SubscriptionStatus? status = null);
-        
+
         // Subscription Validation
         Task<bool> CanCenterPostCourseAsync(Guid centerProfileId);
         Task<int> GetRemainingCoursePostsAsync(Guid centerProfileId);
