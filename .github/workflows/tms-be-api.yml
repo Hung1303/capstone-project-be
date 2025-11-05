@@ -64,9 +64,19 @@ jobs:
       with:
         creds: ${{ secrets.TMS_BE_API_SPN }}
 
+    - name: Stop Azure App before deploy
+      shell: pwsh
+      run: |
+        az webapp stop --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group tms-rg
+
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         package: ./app.zip
+
+    - name: Start Azure App after deploy
+      shell: pwsh
+      run: |
+        az webapp start --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group tms-rg
 
