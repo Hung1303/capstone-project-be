@@ -102,8 +102,8 @@ namespace Services
             // Check if package has active subscriptions
             var hasActiveSubscriptions = await _unitOfWork.GetRepository<CenterSubscription>()
                 .Entities
-                .AnyAsync(s => s.SubscriptionPackageId == id &&
-                              s.Status == SubscriptionStatus.Active &&
+                .AnyAsync(s => s.SubscriptionPackageId == id && 
+                              s.Status == SubscriptionStatus.Active && 
                               !s.IsDeleted);
 
             if (hasActiveSubscriptions)
@@ -197,8 +197,8 @@ namespace Services
             // Cancel existing active subscription if any
             var existingActiveSubscription = await _unitOfWork.GetRepository<CenterSubscription>()
                 .Entities
-                .FirstOrDefaultAsync(s => s.CenterProfileId == request.CenterProfileId &&
-                                         s.Status == SubscriptionStatus.Active &&
+                .FirstOrDefaultAsync(s => s.CenterProfileId == request.CenterProfileId && 
+                                         s.Status == SubscriptionStatus.Active && 
                                          !s.IsDeleted);
 
             if (existingActiveSubscription != null)
@@ -253,8 +253,8 @@ namespace Services
 
             var currentSubscription = await _unitOfWork.GetRepository<CenterSubscription>()
                 .Entities
-                .FirstOrDefaultAsync(s => s.CenterProfileId == request.CenterProfileId &&
-                                         s.Status == SubscriptionStatus.Active &&
+                .FirstOrDefaultAsync(s => s.CenterProfileId == request.CenterProfileId && 
+                                         s.Status == SubscriptionStatus.Active && 
                                          !s.IsDeleted);
 
             if (currentSubscription == null)
@@ -339,8 +339,8 @@ namespace Services
         {
             var subscription = await _unitOfWork.GetRepository<CenterSubscription>()
                 .Entities
-                .Where(s => s.CenterProfileId == centerProfileId &&
-                           s.Status == SubscriptionStatus.Active &&
+                .Where(s => s.CenterProfileId == centerProfileId && 
+                           s.Status == SubscriptionStatus.Active && 
                            s.EndDate >= DateTime.UtcNow &&
                            !s.IsDeleted)
                 .OrderByDescending(s => s.StartDate)
@@ -467,7 +467,7 @@ namespace Services
             // because creating a course uses up a posting slot regardless of its status
             var currentCoursePosts = await _unitOfWork.GetRepository<Course>()
                 .Entities
-                .CountAsync(c => c.CenterProfileId == subscription.CenterProfileId &&
+                .CountAsync(c => c.CenterProfileId == subscription.CenterProfileId && 
                                 !c.IsDeleted &&
                                 c.CreatedAt >= subscription.StartDate &&
                                 c.CreatedAt <= subscription.EndDate);

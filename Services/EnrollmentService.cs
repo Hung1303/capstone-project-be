@@ -23,6 +23,13 @@ namespace Services
             if (course == null)
                 throw new Exception("Course not found");
 
+            // ✅ Block new enrollments if course is full (count only confirmed enrollments)
+            var confirmedCount = await _unitOfWork.GetRepository<Enrollment>().Entities
+                .CountAsync(e => e.CourseId == request.CourseId && e.Status == EnrollmentStatus.Confirmed && !e.IsDeleted);
+
+            if (confirmedCount >= course.Capacity)
+                throw new Exception("Course capacity reached");
+
             var student = await _unitOfWork.GetRepository<StudentProfile>().Entities.FirstOrDefaultAsync(s => s.Id == request.StudentProfileId && !s.IsDeleted);
             if (student == null)
                 throw new Exception("Student profile not found");
@@ -151,6 +158,22 @@ namespace Services
 
             if (request.Status.HasValue)
             {
+                // ✅ If attempting to confirm, ensure capacity not exceeded
+                if (request.Status.Value == EnrollmentStatus.Confirmed)
+                {
+                    var courseForCapacity = await _unitOfWork.GetRepository<Course>().Entities
+                        .FirstOrDefaultAsync(c => c.Id == enrollment.CourseId && !c.IsDeleted);
+
+                    if (courseForCapacity == null)
+                        throw new Exception("Course not found");
+
+                    var confirmedCountForCourse = await _unitOfWork.GetRepository<Enrollment>().Entities
+                        .CountAsync(e => e.CourseId == enrollment.CourseId && e.Status == EnrollmentStatus.Confirmed && !e.IsDeleted);
+
+                    if (confirmedCountForCourse >= courseForCapacity.Capacity)
+                        throw new Exception("Course capacity reached");
+                }
+
                 enrollment.Status = request.Status.Value;
 
                 if (request.Status == EnrollmentStatus.Confirmed)
@@ -197,6 +220,13 @@ namespace Services
 
             if (!isAuthorized)
                 throw new Exception("You do not have permission to approve this enrollment");
+
+            // ✅ Ensure course capacity is not exceeded before confirming
+            var confirmedCount = await _unitOfWork.GetRepository<Enrollment>().Entities
+                .CountAsync(e => e.CourseId == course.Id && e.Status == EnrollmentStatus.Confirmed && !e.IsDeleted);
+
+            if (confirmedCount >= course.Capacity)
+                throw new Exception("Course capacity reached");
 
             // ✅ Cập nhật trạng thái
             enrollment.Status = EnrollmentStatus.Confirmed;
