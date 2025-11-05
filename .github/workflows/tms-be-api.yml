@@ -31,6 +31,10 @@ jobs:
       run: |
         echo "📦 Checking publish directory:"
         ls -R ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+    - name: Zip published files
+      run: Compress-Archive -Path "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/*" -DestinationPath "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}.zip"
+    
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -45,19 +49,6 @@ jobs:
       with:
         name: webapp
         path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-    
-    - name: Zip published output
-      shell: pwsh
-      run: |
-        Write-Host "Zipping publish folder..."
-        Compress-Archive -Path "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\*" -DestinationPath "app.zip"
-
-    - name: Check zip contents
-      shell: pwsh
-      run: |
-        Write-Host "Contents of app.zip:"
-        Expand-Archive -Path "app.zip" -DestinationPath "unzipped" -Force
-        Get-ChildItem -Recurse "unzipped"
 
     - name: Azure Login
       uses: azure/login@v2
@@ -73,7 +64,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        package: ./app.zip
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}.zip
 
     - name: Start Azure App after deploy
       shell: pwsh
