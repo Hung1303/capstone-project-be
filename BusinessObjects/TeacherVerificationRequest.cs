@@ -11,10 +11,10 @@ namespace BusinessObjects
         public string? Notes { get; set; }
 
         // Document storage paths required by Circular 29
-        public string? QualificationCertificatePath { get; set; }
-        public string? EmploymentContractPath { get; set; }
-        public string? ApprovalFromCenterPath { get; set; }
-        public string? OtherDocumentsPath { get; set; }
+        public string? QualificationCertificatePath { get; set; } //Teacher's qualification certificate
+        public string? EmploymentContractPath { get; set; } //Teacher's employment contract with the center
+        public string? ApprovalFromCenterPath { get; set; } //Teacher's permission to teach at the center
+        public string? OtherDocumentsPath { get; set; } //Other documents required by Circular 29
 
         public Guid? InspectorId { get; set; }
         public Guid? AdminId { get; set; }

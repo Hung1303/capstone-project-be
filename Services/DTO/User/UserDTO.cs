@@ -58,6 +58,8 @@ namespace Services.DTO.User
         public string LicenseNumber { get; set; }
         public string Subjects { get; set; }
         public string Bio { get; set; }
+        public string? TeachingAtSchool { get; set; }
+        public string? TeachAtClasses { get; set; } // list of classes the teacher teaches
     }
 
     public class CreateParentRequest
@@ -95,7 +97,9 @@ namespace Services.DTO.User
         public string PhoneNumber { get; set; }
         public string SchoolName { get; set; }
         public string SchoolYear { get; set; }
-        public string GradeLevel { get; set; }
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        public int GradeLevel { get; set; }
+        public string ClassName { get; set; }
     }
 
     public class UserSummaryDto
@@ -184,6 +188,8 @@ namespace Services.DTO.User
         public int YearOfExperience { get; set; }
         public string Qualification { get; set; }
         public string Subject { get; set; }
+        public string? TeachingAtSchool { get; set; }
+        public string? TeachAtClasses { get; set; } // list of classes the teacher teaches
         public string Status { get; set; }
     }
 
@@ -208,7 +214,9 @@ namespace Services.DTO.User
         public string PhoneNumber { get; set; }
         public string SchoolName { get; set; }
         public string SchoolYear { get; set; }
-        public string GradeLevel { get; set; }
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        public int GradeLevel { get; set; }
+        public string ClassName { get; set; }
         public string Status { get; set; }
     }
 
@@ -260,6 +268,8 @@ namespace Services.DTO.User
         public string Qualifications { get; set; }
         public string LicenseNumber { get; set; }
         public string Subjects { get; set; }
+        public string? TeachingAtSchool { get; set; }
+        public string? TeachAtClasses { get; set; } // list of classes the teacher teaches
         public string? Bio { get; set; }
     }
 
@@ -287,7 +297,9 @@ namespace Services.DTO.User
 
         public string SchoolName { get; set; }
         public string SchoolYear { get; set; }
-        public string GradeLevel { get; set; }
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        public int GradeLevel { get; set; }
+        public string ClassName { get; set; }
     }
 
     public class UpdateCenterStatusRequest

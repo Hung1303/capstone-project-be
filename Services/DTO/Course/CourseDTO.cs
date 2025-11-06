@@ -17,6 +17,8 @@ namespace Services.DTO.Course
         public decimal TuitionFee { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1")]
         public int Capacity { get; set; }
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        public int GradeLevel { get; set; }
         //public CourseStatus Status { get; set; }
         [Required]
         public Guid? TeacherProfileId { get; set; }
@@ -76,6 +78,8 @@ namespace Services.DTO.Course
         public decimal? TuitionFee { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1")]
         public int? Capacity { get; set; }
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        public int? GradeLevel { get; set; }
         public CourseStatus? Status { get; set; }
         public Guid? TeacherProfileId { get; set; }
         public Guid? CenterProfileId { get; set; }
@@ -103,6 +107,7 @@ namespace Services.DTO.Course
         public TeachingMethod TeachingMethod { get; set; }
         public decimal TuitionFee { get; set; }
         public int Capacity { get; set; }
+        public int GradeLevel { get; set; }
         public CourseStatus Status { get; set; }
         public Guid? TeacherProfileId { get; set; }
         public Guid? CenterProfileId { get; set; }

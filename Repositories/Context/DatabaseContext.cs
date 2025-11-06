@@ -57,7 +57,8 @@ namespace Repositories.Context
             modelBuilder.Entity<StudentProfile>(b =>
             {
                 b.HasIndex(x => x.UserId).IsUnique();
-                b.Property(x => x.GradeLevel).HasMaxLength(32);
+                b.Property(x => x.GradeLevel).IsRequired();
+                b.Property(x => x.ClassName).HasMaxLength(50).IsRequired();
             });
             modelBuilder.Entity<ParentProfile>(b =>
             {
@@ -70,6 +71,7 @@ namespace Repositories.Context
                 b.Property(x => x.Subject).HasMaxLength(128).IsRequired();
                 b.Property(x => x.Location).HasMaxLength(512).IsRequired();
                 b.Property(x => x.TuitionFee).HasPrecision(18, 2);
+                b.Property(x => x.GradeLevel).IsRequired();
                 //b.HasMany(x => x.Schedules).WithOne().HasForeignKey(s => s.CourseId).OnDelete(DeleteBehavior.Cascade);
                 b.HasMany(x => x.Enrollments).WithOne().HasForeignKey(e => e.CourseId).OnDelete(DeleteBehavior.Cascade);
                 b.HasMany(x => x.CourseFeedbacks).WithOne().HasForeignKey(r => r.CourseId).OnDelete(DeleteBehavior.Cascade);
@@ -467,6 +469,8 @@ namespace Repositories.Context
                     LicenseNumber = "TCH-2020-123",
                     Subjects = "Math,Physics",
                     Bio = "Experienced STEM teacher",
+                    TeachingAtSchool = "City High School",
+                    TeachAtClasses = "10A01",
                     CenterProfileId = centerActiveProfileId,
                     VerificationStatus = Core.Base.VerificationStatus.Completed,
                     VerificationRequestedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -485,6 +489,8 @@ namespace Repositories.Context
                     LicenseNumber = "TCH-2023-456",
                     Subjects = "Chemistry",
                     Bio = "Chemistry enthusiast",
+                    TeachingAtSchool = "City High School",
+                    TeachAtClasses = "08A05",
                     CenterProfileId = centerActiveProfileId,
                     VerificationStatus = Core.Base.VerificationStatus.Pending,
                     VerificationRequestedAt = null,
@@ -565,7 +571,8 @@ namespace Repositories.Context
                     UserId = userStudentActiveId,
                     SchoolName = "City High School",
                     SchoolYear = "2024-2025",
-                    GradeLevel = "10",
+                    GradeLevel = 10,
+                    ClassName = "10A01",
                     ParentProfileId = parentLiamProfileId
                 },
                 new StudentProfile
@@ -577,7 +584,8 @@ namespace Repositories.Context
                     UserId = userStudentPendingId,
                     SchoolName = "Town Middle School",
                     SchoolYear = "2024-2025",
-                    GradeLevel = "8",
+                    GradeLevel = 8,
+                    ClassName = "08A12",
                     ParentProfileId = parentLiamProfileId
                 }
             );
@@ -778,7 +786,7 @@ namespace Repositories.Context
                     TeacherProfileId = teacherJaneProfileId,
                     SyllabusName = "Advanced Mathematics Grade 10",
                     Description = "Comprehensive mathematics syllabus covering algebra, geometry, and trigonometry for grade 10 students.",
-                    GradeLevel = "10",
+                    GradeLevel = 10,
                     AssessmentMethod = "Weekly quizzes (20%), Mid-term exam (30%), Final exam (50%)",
                     CourseMaterial = "Textbook: Mathematics Grade 10, Calculator, Graph paper"
                 },
@@ -792,7 +800,7 @@ namespace Repositories.Context
                     TeacherProfileId = teacherJaneProfileId,
                     SyllabusName = "Physics Fundamentals Grade 10",
                     Description = "Introduction to physics covering mechanics, energy, and waves for grade 10 students.",
-                    GradeLevel = "10",
+                    GradeLevel = 10,
                     AssessmentMethod = "Lab reports (25%), Weekly assignments (15%), Mid-term (30%), Final (30%)",
                     CourseMaterial = "Textbook: Physics Grade 10, Lab equipment, Scientific calculator"
                 },
@@ -804,9 +812,9 @@ namespace Repositories.Context
                     IsDeleted = false,
                     SubjectId = chemistrySubjectId,
                     TeacherProfileId = teacherJohnProfileId,
-                    SyllabusName = "Chemistry Basics Grade 8-9",
+                    SyllabusName = "Chemistry Basics Grade 8",
                     Description = "Basic chemistry concepts including periodic table, chemical reactions, and laboratory safety.",
-                    GradeLevel = "8-9",
+                    GradeLevel = 8,
                     AssessmentMethod = "Lab practicals (30%), Quizzes (20%), Projects (20%), Final exam (30%)",
                     CourseMaterial = "Textbook: Chemistry Basics, Lab manual, Safety equipment"
                 }
