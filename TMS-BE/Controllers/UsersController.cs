@@ -111,6 +111,13 @@ namespace TMS_BE.Controllers
             return Ok(center);
         }
 
+        [HttpGet("{parentProfileId}/Students")]
+        public async Task<IActionResult> GetStudentsByParentProfileId(Guid parentProfileId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (students, totalCount) = await _userService.GetStudentsByParentIdAsync(parentProfileId, pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, students });
+        }
+
 
         [HttpPost("Admin")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] CreateAdminRequest request)

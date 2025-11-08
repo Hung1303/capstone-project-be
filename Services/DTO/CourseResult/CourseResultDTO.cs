@@ -13,6 +13,7 @@ namespace Services.DTO.CourseResult
     }
     public class CourseResultResponse
     {
+        public string Subject { get; set; }
         public float Mark { get; set; }
         public string Comment { get; set; }
         public Guid StudentId { get; set; }

@@ -94,7 +94,7 @@ namespace Services
                 {
                     var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
                     var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
-                    
+
                     if (max == 0)
                     {
                         throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");
@@ -118,6 +118,7 @@ namespace Services
                 TeachingMethod = request.TeachingMethod,
                 TuitionFee = request.TuitionFee,
                 Capacity = request.Capacity,
+                GradeLevel = request.GradeLevel,
                 Status = CourseStatus.Draft,
                 TeacherProfileId = request.TeacherProfileId,
                 CenterProfileId = centerToUse,
@@ -137,6 +138,7 @@ namespace Services
                 TeachingMethod = course.TeachingMethod,
                 TuitionFee = course.TuitionFee,
                 Capacity = course.Capacity,
+                GradeLevel = course.GradeLevel,
                 Status = course.Status,
                 TeacherProfileId = course.TeacherProfileId,
                 CenterProfileId = course.CenterProfileId,
@@ -252,6 +254,7 @@ namespace Services
                     TeachingMethod = a.TeachingMethod,
                     TuitionFee = a.TuitionFee,
                     Capacity = a.Capacity,
+                    GradeLevel = a.GradeLevel,
                     Status = a.Status,
                     TeacherProfileId = a.TeacherProfileId,
                     CenterProfileId = a.CenterProfileId,
@@ -333,6 +336,7 @@ namespace Services
                 TeachingMethod = course.TeachingMethod,
                 TuitionFee = course.TuitionFee,
                 Capacity = course.Capacity,
+                GradeLevel = course.GradeLevel,
                 Status = course.Status,
                 TeacherProfileId = course.TeacherProfileId,
                 CenterProfileId = course.CenterProfileId,
@@ -461,6 +465,10 @@ namespace Services
             {
                 course.Capacity = request.Capacity.Value;
             }
+            if (request.GradeLevel.HasValue)
+            {
+                course.GradeLevel = request.GradeLevel.Value;
+            }
             if (request.Status.HasValue)
             {
                 course.Status = request.Status.Value;
@@ -510,6 +518,7 @@ namespace Services
                 TeachingMethod = course.TeachingMethod,
                 TuitionFee = course.TuitionFee,
                 Capacity = course.Capacity,
+                GradeLevel = course.GradeLevel,
                 Status = course.Status,
                 TeacherProfileId = course.TeacherProfileId,
                 CenterProfileId = course.CenterProfileId,

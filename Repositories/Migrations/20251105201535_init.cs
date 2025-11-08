@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -300,6 +299,8 @@ namespace Repositories.Migrations
                     LicenseNumber = table.Column<string>(type: "text", nullable: false),
                     Subjects = table.Column<string>(type: "text", nullable: false),
                     Bio = table.Column<string>(type: "text", nullable: true),
+                    TeachingAtSchool = table.Column<string>(type: "text", nullable: true),
+                    TeachAtClasses = table.Column<string>(type: "text", nullable: true),
                     CenterProfileId = table.Column<Guid>(type: "uuid", nullable: true),
                     VerificationStatus = table.Column<int>(type: "integer", nullable: false),
                     VerificationRequestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -333,7 +334,8 @@ namespace Repositories.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SchoolName = table.Column<string>(type: "text", nullable: false),
                     SchoolYear = table.Column<string>(type: "text", nullable: false),
-                    GradeLevel = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    GradeLevel = table.Column<int>(type: "integer", nullable: false),
+                    ClassName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     ParentProfileId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastUpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -397,6 +399,7 @@ namespace Repositories.Migrations
                     TeachingMethod = table.Column<int>(type: "integer", nullable: false),
                     TuitionFee = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     Capacity = table.Column<int>(type: "integer", nullable: false),
+                    GradeLevel = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     TeacherProfileId = table.Column<Guid>(type: "uuid", nullable: true),
                     CenterProfileId = table.Column<Guid>(type: "uuid", nullable: true),
@@ -428,7 +431,7 @@ namespace Repositories.Migrations
                     TeacherProfileId = table.Column<Guid>(type: "uuid", nullable: false),
                     SyllabusName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
-                    GradeLevel = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    GradeLevel = table.Column<int>(type: "integer", maxLength: 64, nullable: false),
                     AssessmentMethod = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     CourseMaterial = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -888,20 +891,20 @@ namespace Repositories.Migrations
 
             migrationBuilder.InsertData(
                 table: "StudentProfiles",
-                columns: new[] { "Id", "CreatedAt", "GradeLevel", "IsDeleted", "LastUpdatedAt", "ParentProfileId", "SchoolName", "SchoolYear", "UserId" },
+                columns: new[] { "Id", "ClassName", "CreatedAt", "GradeLevel", "IsDeleted", "LastUpdatedAt", "ParentProfileId", "SchoolName", "SchoolYear", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "10", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "City High School", "2024-2025", new Guid("77777777-7777-7777-7777-777777777777") },
-                    { new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "8", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "Town Middle School", "2024-2025", new Guid("88888888-8888-8888-8888-888888888888") }
+                    { new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"), "10A01", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 10, false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "City High School", "2024-2025", new Guid("77777777-7777-7777-7777-777777777777") },
+                    { new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"), "08A12", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 8, false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "Town Middle School", "2024-2025", new Guid("88888888-8888-8888-8888-888888888888") }
                 });
 
             migrationBuilder.InsertData(
                 table: "TeacherProfiles",
-                columns: new[] { "Id", "Bio", "CenterProfileId", "CreatedAt", "IsDeleted", "LastUpdatedAt", "LicenseNumber", "Qualifications", "Subjects", "UserId", "VerificationCompletedAt", "VerificationNotes", "VerificationRequestedAt", "VerificationStatus", "YearOfExperience" },
+                columns: new[] { "Id", "Bio", "CenterProfileId", "CreatedAt", "IsDeleted", "LastUpdatedAt", "LicenseNumber", "Qualifications", "Subjects", "TeachAtClasses", "TeachingAtSchool", "UserId", "VerificationCompletedAt", "VerificationNotes", "VerificationRequestedAt", "VerificationStatus", "YearOfExperience" },
                 values: new object[,]
                 {
-                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), "Experienced STEM teacher", new Guid("99999999-9999-9999-9999-999999999999"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TCH-2020-123", "B.Ed, M.Ed", "Math,Physics", new Guid("44444444-4444-4444-4444-444444444444"), new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), "Verified per Circular 29", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, 5 },
-                    { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), "Chemistry enthusiast", new Guid("99999999-9999-9999-9999-999999999999"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TCH-2023-456", "B.Sc", "Chemistry", new Guid("55555555-5555-5555-5555-555555555555"), null, null, null, 0, 2 }
+                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), "Experienced STEM teacher", new Guid("99999999-9999-9999-9999-999999999999"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TCH-2020-123", "B.Ed, M.Ed", "Math,Physics", "10A01", "City High School", new Guid("44444444-4444-4444-4444-444444444444"), new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), "Verified per Circular 29", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, 5 },
+                    { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), "Chemistry enthusiast", new Guid("99999999-9999-9999-9999-999999999999"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TCH-2023-456", "B.Sc", "Chemistry", "08A05", "City High School", new Guid("55555555-5555-5555-5555-555555555555"), null, null, null, 0, 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -921,9 +924,9 @@ namespace Repositories.Migrations
                 columns: new[] { "Id", "AssessmentMethod", "CourseMaterial", "CreatedAt", "Description", "GradeLevel", "IsDeleted", "LastUpdatedAt", "SubjectId", "SyllabusName", "TeacherProfileId" },
                 values: new object[,]
                 {
-                    { new Guid("aaaaaaaa-1111-2222-3333-aaaaaaaaaaaa"), "Weekly quizzes (20%), Mid-term exam (30%), Final exam (50%)", "Textbook: Mathematics Grade 10, Calculator, Graph paper", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Comprehensive mathematics syllabus covering algebra, geometry, and trigonometry for grade 10 students.", "10", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("11111111-aaaa-bbbb-cccc-111111111111"), "Advanced Mathematics Grade 10", new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
-                    { new Guid("bbbbbbbb-1111-2222-3333-bbbbbbbbbbbb"), "Lab reports (25%), Weekly assignments (15%), Mid-term (30%), Final (30%)", "Textbook: Physics Grade 10, Lab equipment, Scientific calculator", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Introduction to physics covering mechanics, energy, and waves for grade 10 students.", "10", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("22222222-aaaa-bbbb-cccc-222222222222"), "Physics Fundamentals Grade 10", new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
-                    { new Guid("cccccccc-1111-2222-3333-cccccccccccc"), "Lab practicals (30%), Quizzes (20%), Projects (20%), Final exam (30%)", "Textbook: Chemistry Basics, Lab manual, Safety equipment", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Basic chemistry concepts including periodic table, chemical reactions, and laboratory safety.", "8-9", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("33333333-aaaa-bbbb-cccc-333333333333"), "Chemistry Basics Grade 8-9", new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc") }
+                    { new Guid("aaaaaaaa-1111-2222-3333-aaaaaaaaaaaa"), "Weekly quizzes (20%), Mid-term exam (30%), Final exam (50%)", "Textbook: Mathematics Grade 10, Calculator, Graph paper", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Comprehensive mathematics syllabus covering algebra, geometry, and trigonometry for grade 10 students.", 10, false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("11111111-aaaa-bbbb-cccc-111111111111"), "Advanced Mathematics Grade 10", new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
+                    { new Guid("bbbbbbbb-1111-2222-3333-bbbbbbbbbbbb"), "Lab reports (25%), Weekly assignments (15%), Mid-term (30%), Final (30%)", "Textbook: Physics Grade 10, Lab equipment, Scientific calculator", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Introduction to physics covering mechanics, energy, and waves for grade 10 students.", 10, false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("22222222-aaaa-bbbb-cccc-222222222222"), "Physics Fundamentals Grade 10", new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
+                    { new Guid("cccccccc-1111-2222-3333-cccccccccccc"), "Lab practicals (30%), Quizzes (20%), Projects (20%), Final exam (30%)", "Textbook: Chemistry Basics, Lab manual, Safety equipment", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Basic chemistry concepts including periodic table, chemical reactions, and laboratory safety.", 8, false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("33333333-aaaa-bbbb-cccc-333333333333"), "Chemistry Basics Grade 8", new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc") }
                 });
 
             migrationBuilder.InsertData(

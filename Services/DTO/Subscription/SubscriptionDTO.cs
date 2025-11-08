@@ -40,20 +40,20 @@ namespace Services.DTO.Subscription
         [Required]
         [MaxLength(256)]
         public string PackageName { get; set; } = string.Empty;
-        
+
         [Required]
         public SubscriptionPackageTier Tier { get; set; }
-        
+
         [Range(1, int.MaxValue)]
         public int MaxCoursePosts { get; set; }
-        
+
         [Range(0, double.MaxValue)]
         public decimal MonthlyPrice { get; set; }
-        
+
         public string? Description { get; set; }
-        
+
         public bool IsActive { get; set; } = true;
-        
+
         public int DisplayOrder { get; set; } = 0;
     }
 
@@ -61,19 +61,19 @@ namespace Services.DTO.Subscription
     {
         [MaxLength(256)]
         public string? PackageName { get; set; }
-        
+
         public SubscriptionPackageTier? Tier { get; set; }
-        
+
         [Range(1, int.MaxValue)]
         public int? MaxCoursePosts { get; set; }
-        
+
         [Range(0, double.MaxValue)]
         public decimal? MonthlyPrice { get; set; }
-        
+
         public string? Description { get; set; }
-        
+
         public bool? IsActive { get; set; }
-        
+
         public int? DisplayOrder { get; set; }
     }
 
@@ -81,10 +81,10 @@ namespace Services.DTO.Subscription
     {
         [Required]
         public Guid CenterProfileId { get; set; }
-        
+
         [Required]
         public Guid SubscriptionPackageId { get; set; }
-        
+
         public bool AutoRenewalEnabled { get; set; } = true;
     }
 
@@ -92,10 +92,10 @@ namespace Services.DTO.Subscription
     {
         [Required]
         public Guid CenterProfileId { get; set; }
-        
+
         [Required]
         public Guid NewSubscriptionPackageId { get; set; }
-        
+
         public bool AutoRenewalEnabled { get; set; } = true;
     }
 
@@ -103,7 +103,7 @@ namespace Services.DTO.Subscription
     {
         [Required]
         public Guid CenterSubscriptionId { get; set; }
-        
+
         public string? CancellationReason { get; set; }
     }
 }

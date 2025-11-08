@@ -11,6 +11,9 @@ namespace BusinessObjects
         public string Subjects { get; set; } = string.Empty;
         public string? Bio { get; set; }
 
+        public string? TeachingAtSchool { get; set; }
+        public string? TeachAtClasses { get; set; } // list of classes the teacher teaches
+
         public Guid? CenterProfileId { get; set; }
 
         // Circular 29 verification fields

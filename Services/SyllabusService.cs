@@ -82,7 +82,7 @@ namespace Services
                 syllabus = syllabus.Where(c =>
                     (c.SyllabusName != null && c.SyllabusName.ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     (c.Description != null && c.Description.ToLower().Contains(searchTerm.Trim().ToLower())) ||
-                    (c.GradeLevel != null && c.GradeLevel.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.GradeLevel != null && c.GradeLevel.ToString().ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     //(c.Subject != null && c.Subject.ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     (c.AssessmentMethod != null && c.AssessmentMethod.ToLower().Contains(searchTerm.Trim().ToLower())) ||
                     (c.CourseMaterial != null && c.CourseMaterial.ToLower().Contains(searchTerm.Trim().ToLower()))
@@ -151,7 +151,7 @@ namespace Services
             }
             if (request.GradeLevel != null)
             {
-                syllabus.GradeLevel = request.GradeLevel;
+                syllabus.GradeLevel = (int)request.GradeLevel;
             }
             //if (request.Subject != null)
             //{

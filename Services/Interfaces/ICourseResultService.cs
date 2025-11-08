@@ -9,5 +9,7 @@ namespace Services.Interfaces
         Task<IEnumerable<CourseResultResponse>> GetAllCourseResult(string? searchTerm, int pageNumber, int pageSize, Guid? TeacherProfileId, Guid? CourseId, Guid? StudentProfileId);
         Task<CourseResultResponse> GetCourseResultById(Guid id);
         Task<bool> DeleteCourseResult(Guid id);
+        Task<IEnumerable<CourseResultResponse>> GetAllCourseResultsByStudentId(Guid StudentProfileId, string? Subject, string? searchTerm, int pageNumber, int pageSize);
+        Task<IEnumerable<CourseResultResponse>> GetAllCourseResultsByTeacherId(Guid TeacherProfileId, string? Subject, string? searchTerm, int pageNumber, int pageSize);
     }
 }
