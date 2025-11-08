@@ -117,6 +117,21 @@ namespace API.Controllers
             }
 
         }
+        [HttpGet("/StudentSchedule")]
+        public async Task<IActionResult> GetAllStudentSchedule([FromQuery] string? searchTerm, Guid StudentId,
+            [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        {
+            try
+            {
+                var result = await _courseService.GetAllStudentSchedules(searchTerm, pageNumber, pageSize, StudentId);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
         [HttpGet("/Subject/{id}")]
         public async Task<IActionResult> GetAllCourseSubjectById(Guid id)
         {

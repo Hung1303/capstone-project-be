@@ -316,6 +316,54 @@ namespace Services
             return paginatedCourseSubjct;
         }
 
+        public async Task<IEnumerable<CourseSubjectResponse>> GetAllStudentSchedules(string? searchTerm, int pageNumber, int pageSize, Guid StudentId)
+        {
+            var enroll = await _unitOfWork.GetRepository<Enrollment>().Entities
+                .FirstOrDefaultAsync(a => a.StudentProfileId == StudentId && a.Status != EnrollmentStatus.Pending && a.Status != EnrollmentStatus.Cancelled && !a.IsDeleted);
+            if (enroll == null)
+            {
+                throw new Exception("Student Enrollments not found or confirmed");
+            }
+            var subjectBuilder = _unitOfWork.GetRepository<SubjectBuilder>().Entities
+                .Include(a => a.Course)
+                .Include(a => a.Subject)
+                .Include(a => a.ClassSchedule)
+                .Where(a => a.CourseId == enroll.CourseId && !a.IsDeleted);
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                subjectBuilder = subjectBuilder.Where(c =>
+                    (c.Subject.SubjectName != null && c.Subject.SubjectName.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Subject.Description != null && c.Subject.Description.ToLower().Contains(searchTerm.Trim().ToLower()))
+                );
+            }
+
+            var totalCount = await subjectBuilder.CountAsync();
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+            var paginatedStuddentSchedules = await subjectBuilder
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .Select(a => new CourseSubjectResponse
+                {
+                    id = a.Id,
+                    CourseId = a.CourseId,
+                    ClassScheduleId = a.ClassScheduleId,
+                    SubjectId = a.SubjectId,
+                    status = a.status,
+                    SubjectName = a.Subject.SubjectName,
+                    Description = a.Subject.Description,
+                    DayOfWeek = a.ClassSchedule.DayOfWeek,
+                    StartDate = a.ClassSchedule.StartDate ?? null,
+                    EndDate = a.ClassSchedule.EndDate ?? null,
+                    StartTime = a.ClassSchedule.EndTime,
+                    RoomOrLink = a.ClassSchedule.RoomOrLink,
+                    TeacherProfileId = a.ClassSchedule.TeacherProfileId,
+                }).ToListAsync();
+            return paginatedStuddentSchedules;
+        }
+
         public async Task<CourseResponse> GetCourseById(Guid id)
         {
             var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
