@@ -155,6 +155,12 @@ namespace Services.DTO.User
         public string Email { get; set; }
         [Phone(ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
+        public string SchoolName { get; set; }
+        public string SchoolYear { get; set; }
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        public int GradeLevel { get; set; }
+        public string ClassName { get; set; }
+
     }
 
     public class UserUpdateRequest
