@@ -118,12 +118,12 @@ namespace API.Controllers
 
         }
         [HttpGet("/StudentSchedule")]
-        public async Task<IActionResult> GetAllStudentSchedule([FromQuery] string? searchTerm, Guid StudentId,
+        public async Task<IActionResult> GetAllStudentSchedule([FromQuery] string? searchTerm, Guid StudentId, Guid CourseId,
             [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
-                var result = await _courseService.GetAllStudentSchedules(searchTerm, pageNumber, pageSize, StudentId);
+                var result = await _courseService.GetAllStudentSchedules(searchTerm, pageNumber, pageSize, StudentId, CourseId);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)

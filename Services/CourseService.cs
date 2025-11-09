@@ -316,14 +316,20 @@ namespace Services
             return paginatedCourseSubjct;
         }
 
-        public async Task<IEnumerable<CourseSubjectResponse>> GetAllStudentSchedules(string? searchTerm, int pageNumber, int pageSize, Guid StudentId)
+        public async Task<IEnumerable<CourseSubjectResponse>> GetAllStudentSchedules(string? searchTerm, int pageNumber, int pageSize, Guid StudentId, Guid CourseId)
         {
+            var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == CourseId && !a.IsDeleted);
+            if (course == null)
+            {
+                throw new Exception("Course not found");
+            }
             var enroll = await _unitOfWork.GetRepository<Enrollment>().Entities
-                .FirstOrDefaultAsync(a => a.StudentProfileId == StudentId && a.Status != EnrollmentStatus.Pending && a.Status != EnrollmentStatus.Cancelled && !a.IsDeleted);
+                .FirstOrDefaultAsync(a => a.StudentProfileId == StudentId && a.CourseId == course.Id && a.Status != EnrollmentStatus.Pending && a.Status != EnrollmentStatus.Cancelled && !a.IsDeleted);
             if (enroll == null)
             {
                 throw new Exception("Student Enrollments not found or confirmed");
             }
+
             var subjectBuilder = _unitOfWork.GetRepository<SubjectBuilder>().Entities
                 .Include(a => a.Course)
                 .Include(a => a.Subject)
