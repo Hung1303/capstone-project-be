@@ -17,7 +17,7 @@ namespace Services.Interfaces
         Task<CenterDetailRespone?> UpdateCenterAsync(Guid userId, CenterUpdateRequest request);
         Task<TeacherDetailResponse?> UpdateTeacherAsynce(Guid userId, TeacherUpdateRequest request);
         Task<ParentDetailResponse?> UpdateParentAsynce(Guid userId, ParentUpdateRequest request);
-        Task<StudentDetailResponse?> UpdateStudentAsynce(Guid userId, StudentUpdateRequest request);
+        Task<StudentDetailResponse?> UpdateStudentAsync(Guid parentProfileId, Guid studentId, StudentUpdateRequest request);
         Task<(IEnumerable<CenterListResponse> Centers, int TotalCount)> GetAllCentersAsync(int pageNumber, int pageSize, string? centerName = null);
         Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetAllTeachersAsync(int pageNumber, int pageSize, string? fullName = null);
         Task<(IEnumerable<ParentListResponse> Parents, int TotalCount)> GetAllParentsAsync(int pageNumber, int pageSize, string? fullName = null);

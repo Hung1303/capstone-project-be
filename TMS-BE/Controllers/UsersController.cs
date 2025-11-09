@@ -200,11 +200,11 @@ namespace TMS_BE.Controllers
             return result != null ? Ok(result) : NotFound();
         }
 
-        [HttpPut("Student/{userId}")]
-        public async Task<IActionResult> UpdateStudent(Guid userId, [FromBody] StudentUpdateRequest request)
+        [HttpPut("{parentProfileId}/Student")]
+        public async Task<IActionResult> UpdateStudent(Guid parentProfileId, [FromQuery] Guid studentId, [FromBody] StudentUpdateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _userService.UpdateStudentAsynce(userId, request);
+            var result = await _userService.UpdateStudentAsync(parentProfileId ,studentId, request);
             return result != null ? Ok(result) : NotFound();
         }
 
