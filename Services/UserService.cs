@@ -629,41 +629,56 @@ namespace Services
             return await GetParentById(userId);
         }
 
-        public async Task<StudentDetailResponse?> UpdateStudentAsynce(Guid userId, StudentUpdateRequest request)
+        public async Task<StudentDetailResponse?> UpdateStudentAsync(Guid parentProfileId, Guid studentId, StudentUpdateRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
+            
+
             var user = await _unitOfWork.GetRepository<User>().Entities
-                .FirstOrDefaultAsync(o => o.Id == userId && o.Status == AccountStatus.Active && o.Role == UserRole.Student && !o.IsDeleted);
+                .Include(s => s.StudentProfile)
+                .FirstOrDefaultAsync(o => o.Id == studentId && o.Status == AccountStatus.Active && o.Role == UserRole.Student && !o.IsDeleted);
             if (user == null)
             {
                 return null;
             }
 
+            var parentCheck = await _unitOfWork.GetRepository<ParentProfile>().GetByIdAsync(parentProfileId);
+            if (parentCheck == null || user.StudentProfile.ParentProfileId != parentProfileId)
+            {
+                return null;
+            }
+
             var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
-                .FirstOrDefaultAsync(c => c.UserId == userId);
+                .FirstOrDefaultAsync(c => c.UserId == studentId);
             if (student == null)
             {
                 return null;
             }
 
             bool emailExists = await _unitOfWork.GetRepository<User>().Entities
-                .AnyAsync(u => u.Email == request.Email && u.Id != userId && !u.IsDeleted);
+                .AnyAsync(u => u.Email == request.Email && u.Id != studentId && !u.IsDeleted);
             if (emailExists)
                 throw new InvalidOperationException("Email is already in use by another user.");
 
             bool phoneExists = await _unitOfWork.GetRepository<User>().Entities
-                .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != userId && !u.IsDeleted);
+                .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != studentId && !u.IsDeleted);
             if (phoneExists)
                 throw new InvalidOperationException("Phone number is already in use by another user.");
 
             user.Email = request.Email;
             user.PhoneNumber = request.PhoneNumber;
+            user.StudentProfile.SchoolName = request.SchoolName;
+            user.StudentProfile.SchoolYear = request.SchoolYear;
+            user.StudentProfile.GradeLevel = request.GradeLevel;
+            user.StudentProfile.ClassName = request.ClassName;
+            user.LastUpdatedAt = DateTime.UtcNow;
+            user.StudentProfile.LastUpdatedAt = DateTime.UtcNow;
 
             await _unitOfWork.GetRepository<User>().UpdateAsync(user);
             await _unitOfWork.SaveAsync();
 
-            return await GetStudentById(userId);
+            return await GetStudentById(studentId);
         }
 
         public async Task<(IEnumerable<CenterListResponse> Centers, int TotalCount)> GetAllCentersAsync(int pageNumber, int pageSize, string? centerName = null)
@@ -1123,6 +1138,7 @@ namespace Services
                     SchoolName = x.StudentProfile.SchoolName,
                     SchoolYear = x.StudentProfile.SchoolYear,
                     GradeLevel = x.StudentProfile.GradeLevel,
+                    ClassName = x.StudentProfile.ClassName,
                     Status = x.Status.ToString()
                 })
                 .ToListAsync();
