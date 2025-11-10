@@ -7,6 +7,7 @@ namespace Services.Interfaces
         Task<CourseResultResponse> CreateCourseResult(CreateCourseResultRequest request);
         Task<CourseResultResponse> UpdateCourseResult(Guid id, UpdateCourseResultRequest request);
         Task<IEnumerable<CourseResultResponse>> GetAllCourseResult(string? searchTerm, int pageNumber, int pageSize, Guid? TeacherProfileId, Guid? CourseId, Guid? StudentProfileId);
+        Task<IEnumerable<CourseResultResponse>> GetAllCourseResultByParentId(string? searchTerm, string? Subject, int pageNumber, int pageSize, Guid ParentId);
         Task<CourseResultResponse> GetCourseResultById(Guid id);
         Task<bool> DeleteCourseResult(Guid id);
         Task<IEnumerable<CourseResultResponse>> GetAllCourseResultsByStudentId(Guid StudentProfileId, string? Subject, string? searchTerm, int pageNumber, int pageSize);

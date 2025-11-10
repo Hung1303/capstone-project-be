@@ -15,15 +15,18 @@ namespace Services
         }
         public async Task<CourseResultResponse> CreateCourseResult(CreateCourseResultRequest request)
         {
-            var student = await _unitOfWork.GetRepository<StudentProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.StudentId && !a.IsDeleted);
+            var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
+                .Include(a => a.Enrollments)
+                .FirstOrDefaultAsync(a => a.Id == request.StudentId && !a.IsDeleted);
             if (student == null)
             {
                 throw new Exception("Student Not Found");
             }
-            var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == request.CourseId && !a.IsDeleted);
+            var enrollments = student.Enrollments.Select(s => s.CourseId).ToList();
+            var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == request.CourseId && enrollments.Contains(request.CourseId) && !a.IsDeleted);
             if (course == null)
             {
-                throw new Exception("Course Not Found");
+                throw new Exception("Course Not Found or not enroll");
             }
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherId && !a.IsDeleted);
             if (teacher == null)
@@ -239,6 +242,54 @@ namespace Services
             var courseResult = _unitOfWork.GetRepository<CourseResult>().Entities
                 .Include(c => c.Course)
                 .Where(a => !a.IsDeleted && a.TeacherProfileId == TeacherProfileId);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                courseResult = courseResult.Where(c =>
+                    (c.Comment != null && c.Comment.ToLower().Contains(searchTerm.Trim().ToLower()))
+                );
+            }
+
+            if (!string.IsNullOrWhiteSpace(Subject))
+            {
+                courseResult = courseResult.Where(c =>
+                    (c.Course.Subject != null && c.Course.Subject.ToLower().Contains(Subject.Trim().ToLower()))
+                );
+            }
+
+            var totalCount = await courseResult.CountAsync();
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+            var paginatedCourseResult = await courseResult
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .Select(a => new CourseResultResponse
+                {
+                    Subject = a.Course.Subject,
+                    Mark = a.Mark,
+                    Comment = a.Comment,
+                    StudentId = a.StudentProfileId,
+                    CourseId = a.CourseId,
+                    TeacherId = a.TeacherProfileId,
+                }).ToListAsync();
+            return paginatedCourseResult;
+        }
+
+        public async Task<IEnumerable<CourseResultResponse>> GetAllCourseResultByParentId(string? searchTerm, string? Subject, int pageNumber, int pageSize, Guid ParentId)
+        {
+            var parent = await _unitOfWork.GetRepository<ParentProfile>().Entities
+                .Include(c => c.StudentProfiles)
+                .FirstOrDefaultAsync(a => !a.IsDeleted && a.Id == ParentId);
+            if (parent == null)
+            {
+                throw new Exception("parent not found");
+            }
+            var studentList = parent.StudentProfiles.Select(s => s.Id).ToList();
+            var courseResult = _unitOfWork.GetRepository<CourseResult>().Entities
+                .Include(c => c.Course)
+                .Where(a => !a.IsDeleted && studentList.Contains(a.StudentProfileId));
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
