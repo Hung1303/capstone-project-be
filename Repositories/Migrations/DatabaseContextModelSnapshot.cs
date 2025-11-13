@@ -276,7 +276,7 @@ namespace Repositories.Migrations
                             Id = new Guid("99999999-9999-9999-9999-999999999999"),
                             Address = "123 Learning Ave, Cityville",
                             CenterName = "Bright Future Center",
-                            ContactEmail = "contact@brightfuture.example.com",
+                            ContactEmail = "thung01032003@gmail.com",
                             ContactPhone = "+10000001001",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
@@ -1773,7 +1773,7 @@ namespace Repositories.Migrations
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "admin@example.com",
+                            Email = "hungdtse172297@fpt.edu.vn",
                             FullName = "System Admin",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -1787,7 +1787,7 @@ namespace Repositories.Migrations
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "center.active@example.com",
+                            Email = "thung01032003@gmail.com",
                             FullName = "Emily Clark",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -860,8 +861,8 @@ namespace Repositories.Migrations
                 columns: new[] { "Id", "CreatedAt", "Email", "FullName", "IsDeleted", "LastUpdatedAt", "PasswordHash", "PhoneNumber", "Role", "Status", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@example.com", "System Admin", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000000", 1, 1, "admin" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "center.active@example.com", "Emily Clark", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000001", 2, 1, "center_active" },
+                    { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "hungdtse172297@fpt.edu.vn", "System Admin", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000000", 1, 1, "admin" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "thung01032003@gmail.com", "Emily Clark", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000001", 2, 1, "center_active" },
                     { new Guid("33333333-3333-3333-3333-333333333333"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "center.pending@example.com", "Michael Brown", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000002", 2, 0, "center_pending" },
                     { new Guid("44444444-4444-4444-4444-444444444444"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "teacher.jane@example.com", "Jane Doe", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000003", 3, 1, "teacher_jane" },
                     { new Guid("55555555-5555-5555-5555-555555555555"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "teacher.john@example.com", "John Smith", false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "0362795b2ee7235b3b4d28f0698a85366703eacf0ba4085796ffd980d7653337", "+10000000004", 3, 0, "teacher_john" },
@@ -875,7 +876,7 @@ namespace Repositories.Migrations
                 columns: new[] { "Id", "Address", "BusinessRegistrationPath", "CenterName", "City", "ContactEmail", "ContactPhone", "CreatedAt", "District", "IsDeleted", "IssueDate", "LastUpdatedAt", "Latitude", "LicenseDocumentPath", "LicenseIssuedBy", "LicenseNumber", "Longitude", "OtherDocumentsPath", "OwnerName", "RejectionReason", "Status", "TaxCodeDocumentPath", "UserId", "VerificationCompletedAt", "VerificationNotes", "VerificationRequestedAt" },
                 values: new object[,]
                 {
-                    { new Guid("99999999-9999-9999-9999-999999999999"), "123 Learning Ave, Cityville", null, "Bright Future Center", null, "contact@brightfuture.example.com", "+10000001001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2024, 1, 15), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, "Education Dept", "LIC-2024-0001", null, null, "Emily Clark", null, 4, null, new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), "Successfully verified and approved", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("99999999-9999-9999-9999-999999999999"), "123 Learning Ave, Cityville", null, "Bright Future Center", null, "thung01032003@gmail.com", "+10000001001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2024, 1, 15), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, "Education Dept", "LIC-2024-0001", null, null, "Emily Clark", null, 4, null, new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), "Successfully verified and approved", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
                     { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "456 Discovery Rd, Townsburg", null, "New Horizons Center", null, "hello@newhorizons.example.com", "+10000001002", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, new DateOnly(2025, 2, 1), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, "Education Dept", "LIC-2025-0005", null, null, "Michael Brown", null, 0, null, new Guid("33333333-3333-3333-3333-333333333333"), null, null, null }
                 });
 
