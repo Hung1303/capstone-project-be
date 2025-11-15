@@ -96,9 +96,9 @@ namespace API.Controllers
         /// </summary>
         [HttpGet("inspector/{inspectorId}")]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetVerificationRequestsByInspector(Guid inspectorId)
+        public async Task<IActionResult> GetVerificationRequestsByInspector(Guid inspectorId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var result = await _verificationService.GetVerificationRequestsByInspectorAsync(inspectorId);
+            var result = await _verificationService.GetVerificationRequestsByInspectorAsync(inspectorId, pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -107,9 +107,9 @@ namespace API.Controllers
         /// </summary>
         [HttpGet("pending")]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetPendingVerificationRequests()
+        public async Task<IActionResult> GetPendingVerificationRequests([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var result = await _verificationService.GetPendingVerificationRequestsAsync();
+            var result = await _verificationService.GetPendingVerificationRequestsAsync(pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -118,9 +118,9 @@ namespace API.Controllers
         /// </summary>
         [HttpGet("centers/pending")]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetCentersPendingVerification()
+        public async Task<IActionResult> GetCentersPendingVerification([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var result = await _verificationService.GetCentersPendingVerificationAsync();
+            var result = await _verificationService.GetCentersPendingVerificationAsync(pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -129,9 +129,9 @@ namespace API.Controllers
         /// </summary>
         [HttpGet("centers/status/{status}")]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetCentersByStatus(CenterStatus status)
+        public async Task<IActionResult> GetCentersByStatus(CenterStatus status, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var result = await _verificationService.GetCentersByStatusAsync(status);
+            var result = await _verificationService.GetCentersByStatusAsync(status, pageNumber, pageSize);
             return Ok(result);
         }
 

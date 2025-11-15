@@ -9,10 +9,10 @@ namespace Services.Interfaces
         Task<UpdateVerificationRequestDto> UpdateVerificationRequestAsync(Guid verificationId, UpdateVerificationRequestDto request);
         Task<AdminDecisionDto> MakeAdminDecisionAsync(Guid verificationId, AdminDecisionDto decision);
         Task<VerificationRequestResponseDto?> GetVerificationRequestByIdAsync(Guid verificationId);
-        Task<List<VerificationRequestResponseDto>> GetVerificationRequestsByInspectorAsync(Guid inspectorId);
-        Task<List<VerificationRequestResponseDto>> GetPendingVerificationRequestsAsync();
-        Task<List<CenterVerificationListDto>> GetCentersPendingVerificationAsync();
-        Task<List<CenterVerificationListDto>> GetCentersByStatusAsync(CenterStatus status);
+        Task<List<VerificationRequestResponseDto>> GetVerificationRequestsByInspectorAsync(Guid inspectorId, int pageNumber = 1, int pageSize = 10);
+        Task<List<VerificationRequestResponseDto>> GetPendingVerificationRequestsAsync(int pageNumber = 1, int pageSize = 10);
+        Task<List<CenterVerificationListDto>> GetCentersPendingVerificationAsync(int pageNumber = 1, int pageSize = 10);
+        Task<List<CenterVerificationListDto>> GetCentersByStatusAsync(CenterStatus status, int pageNumber = 1, int pageSize = 10);
         Task<bool> CompleteVerificationAsync(Guid verificationId);
         Task<bool> SuspendCenterAsync(Guid centerId, string reason, Guid adminId);
         Task<bool> RestoreCenterAsync(Guid centerId, string reason, Guid adminId);

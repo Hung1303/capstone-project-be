@@ -34,7 +34,7 @@ namespace Services.DTO.CenterVerification
 
     public class VerificationRequestResponseDto
     {
-        public Guid Id { get; set; }
+        public Guid VerificationId { get; set; }
         public Guid CenterProfileId { get; set; }
         public string CenterName { get; set; } = string.Empty;
         public Guid InspectorId { get; set; }
@@ -58,7 +58,8 @@ namespace Services.DTO.CenterVerification
 
     public class CenterVerificationListDto
     {
-        public Guid Id { get; set; }
+        public Guid VerificationId { get; set; }
+        public Guid CenterId { get; set; }
         public string CenterName { get; set; } = string.Empty;
         public string OwnerName { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
