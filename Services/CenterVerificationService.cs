@@ -149,7 +149,7 @@ namespace Services
 
             return new VerificationRequestResponseDto
             {
-                Id = verificationRequest.Id,
+                VerificationId = verificationRequest.Id,
                 CenterProfileId = verificationRequest.CenterProfileId,
                 CenterName = verificationRequest.CenterProfile.CenterName,
                 InspectorId = verificationRequest.InspectorId,
@@ -172,8 +172,12 @@ namespace Services
             };
         }
 
-        public async Task<List<VerificationRequestResponseDto>> GetVerificationRequestsByInspectorAsync(Guid inspectorId)
+        public async Task<List<VerificationRequestResponseDto>> GetVerificationRequestsByInspectorAsync(Guid inspectorId, int pageNumber = 1, int pageSize = 10)
         {
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+
             var verificationRequests = await _unitOfWork.GetRepository<CenterVerificationRequest>()
                 .Entities
                 .Include(vr => vr.CenterProfile)
@@ -181,11 +185,13 @@ namespace Services
                 .Include(vr => vr.Admin)
                 .Where(vr => vr.InspectorId == inspectorId)
                 .OrderByDescending(vr => vr.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
                 .ToListAsync();
 
             return verificationRequests.Select(vr => new VerificationRequestResponseDto
             {
-                Id = vr.Id,
+                VerificationId = vr.Id,
                 CenterProfileId = vr.CenterProfileId,
                 CenterName = vr.CenterProfile.CenterName,
                 InspectorId = vr.InspectorId,
@@ -208,8 +214,12 @@ namespace Services
             }).ToList();
         }
 
-        public async Task<List<VerificationRequestResponseDto>> GetPendingVerificationRequestsAsync()
+        public async Task<List<VerificationRequestResponseDto>> GetPendingVerificationRequestsAsync(int pageNumber = 1, int pageSize = 10)
         {
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+
             var verificationRequests = await _unitOfWork.GetRepository<CenterVerificationRequest>()
                 .Entities
                 .Include(vr => vr.CenterProfile)
@@ -217,11 +227,13 @@ namespace Services
                 .Include(vr => vr.Admin)
                 .Where(vr => vr.Status == VerificationStatus.Pending || vr.Status == VerificationStatus.InProgress || vr.Status == VerificationStatus.Completed)
                 .OrderByDescending(vr => vr.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
                 .ToListAsync();
 
             return verificationRequests.Select(vr => new VerificationRequestResponseDto
             {
-                Id = vr.Id,
+                VerificationId = vr.Id,
                 CenterProfileId = vr.CenterProfileId,
                 CenterName = vr.CenterProfile.CenterName,
                 InspectorId = vr.InspectorId,
@@ -244,17 +256,27 @@ namespace Services
             }).ToList();
         }
 
-        public async Task<List<CenterVerificationListDto>> GetCentersPendingVerificationAsync()
+        public async Task<List<CenterVerificationListDto>> GetCentersPendingVerificationAsync(int pageNumber = 1, int pageSize = 10)
         {
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+
             var centers = await _unitOfWork.GetRepository<CenterProfile>()
                 .Entities
+                .Include(c => c.VerificationRequests)
                 .Where(c => c.Status == CenterStatus.Pending || c.Status == CenterStatus.UnderVerification)
                 .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
                 .ToListAsync();
 
             return centers.Select(c => new CenterVerificationListDto
             {
-                Id = c.Id,
+                VerificationId = c.VerificationRequests
+                    .OrderByDescending(vr => vr.CreatedAt)
+                    .FirstOrDefault()?.Id ?? Guid.Empty,
+                CenterId = c.Id,
                 CenterName = c.CenterName,
                 OwnerName = c.OwnerName ?? "",
                 Address = c.Address,
@@ -268,17 +290,27 @@ namespace Services
             }).ToList();
         }
 
-        public async Task<List<CenterVerificationListDto>> GetCentersByStatusAsync(CenterStatus status)
+        public async Task<List<CenterVerificationListDto>> GetCentersByStatusAsync(CenterStatus status, int pageNumber = 1, int pageSize = 10)
         {
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+
             var centers = await _unitOfWork.GetRepository<CenterProfile>()
                 .Entities
+                .Include(c => c.VerificationRequests)
                 .Where(c => c.Status == status)
                 .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
                 .ToListAsync();
 
             return centers.Select(c => new CenterVerificationListDto
             {
-                Id = c.Id,
+                VerificationId = c.VerificationRequests
+                    .OrderByDescending(vr => vr.CreatedAt)
+                    .FirstOrDefault()?.Id ?? Guid.Empty,
+                CenterId = c.Id,
                 CenterName = c.CenterName,
                 OwnerName = c.OwnerName ?? "",
                 Address = c.Address,
