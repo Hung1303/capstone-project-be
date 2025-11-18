@@ -44,11 +44,8 @@ namespace API.Extensions
             services.AddScoped<ICourseResultService, CourseResultService>();
             services.AddScoped<ITeacherVerificationService, TeacherVerificationService>();
             services.AddScoped<ISubscriptionService, SubscriptionService>();
-<<<<<<< HEAD
             services.AddScoped<IEmailService, EmailService>();
-=======
             services.AddScoped<IPaymentService, PaymentService>();
->>>>>>> TuanAnh
 
             return services;
         }

@@ -12,11 +12,7 @@ using Repositories.Context;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-<<<<<<<< HEAD:Repositories/Migrations/20251113071341_init.Designer.cs
-    [Migration("20251113071341_init")]
-========
-    [Migration("20251108113258_init")]
->>>>>>>> TuanAnh:Repositories/Migrations/20251108113258_init.Designer.cs
+    [Migration("20251118145557_init")]
     partial class init
     {
         /// <inheritdoc />
