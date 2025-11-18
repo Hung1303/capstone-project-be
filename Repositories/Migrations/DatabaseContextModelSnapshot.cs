@@ -1000,6 +1000,45 @@ namespace Repositories.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BusinessObjects.Payment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Payments");
+                });
+
             modelBuilder.Entity("BusinessObjects.StudentProfile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2119,6 +2158,17 @@ namespace Repositories.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BusinessObjects.Payment", b =>
+                {
+                    b.HasOne("BusinessObjects.User", "User")
+                        .WithMany("Payments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BusinessObjects.StudentProfile", b =>
                 {
                     b.HasOne("BusinessObjects.ParentProfile", "ParentProfile")
@@ -2344,6 +2394,8 @@ namespace Repositories.Migrations
                     b.Navigation("CenterProfile");
 
                     b.Navigation("ParentProfile");
+
+                    b.Navigation("Payments");
 
                     b.Navigation("StudentProfile");
 

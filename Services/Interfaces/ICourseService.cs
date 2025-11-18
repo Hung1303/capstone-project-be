@@ -10,6 +10,8 @@ namespace Services.Interfaces
         Task<CourseSubjectResponse> UpdateCourseSubject(Guid id, UpdateCourseSubject request);
         Task<IEnumerable<CourseResponse>> GetAllCourse(string? searchTerm, int pageNumber, int pageSize, Guid? TeacherProfileId, Guid? CenterProfileId);
         Task<IEnumerable<CourseSubjectResponse>> GetAllCourseSubject(string? searchTerm, int pageNumber, int pageSize, Guid? CourseId, Guid? TeacherProfileId, string? status);
+        Task<IEnumerable<CourseSubjectResponse>> GetAllStudentSchedules(string? searchTerm, int pageNumber, int pageSize, Guid StudentId, Guid CourseId);
+        Task<IEnumerable<CourseSubjectResponse>> GetAllStudentSchedulesByParentsId(string? searchTerm, int pageNumber, int pageSize, Guid ParentId);
         Task<CourseResponse> GetCourseById(Guid id);
         Task<CourseSubjectResponse> GetCourseSubjectById(Guid id);
         Task<bool> DeleteCourse(Guid id);
