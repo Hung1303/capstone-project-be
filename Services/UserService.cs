@@ -716,6 +716,10 @@ namespace Services
                     Address = x.Center.Address,
                     ContactEmail = x.Center.ContactEmail,
                     ContactPhone = x.Center.ContactPhone,
+                    Latitude = x.Center.Latitude,
+                    Longitude = x.Center.Longitude,
+                    City = x.Center.City,
+                    District = x.Center.District,
                     Status = x.User.Status.ToString()
                 })
                 .ToListAsync();
