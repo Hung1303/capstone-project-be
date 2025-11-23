@@ -1,4 +1,5 @@
 ﻿using Core.Base;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTO.User;
 using Services.Interfaces;
@@ -128,6 +129,7 @@ namespace TMS_BE.Controllers
         }
 
         [HttpPost("Inspector")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateInspectorAccount([FromBody] CreateAdminRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -135,6 +137,7 @@ namespace TMS_BE.Controllers
             return Ok(user);
         }
 
+        //Center register at the platform
         [HttpPost("Center")]
         public async Task<IActionResult> CreateCenterAccount([FromBody] CreateCenterRequest request)
         {
@@ -151,7 +154,9 @@ namespace TMS_BE.Controllers
             return Ok(user);
         }
 
+        //Centers create new account for Teacher
         [HttpPost("Center{centerOwnerId}/Teacher")]
+        [Authorize(Policy = "Center")]
         public async Task<IActionResult> CenterAddTeacher(Guid centerOwnerId, [FromBody] CreateTeacherRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -167,7 +172,9 @@ namespace TMS_BE.Controllers
             return Ok(user);
         }
 
+        //Parents create new account for their children
         [HttpPost("{parentId}/Student")]
+        [Authorize(Policy = "Parent")]
         public async Task<IActionResult> CreateStudentAccount(Guid parentId, [FromBody] CreateStudentRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -177,6 +184,7 @@ namespace TMS_BE.Controllers
 
 
         [HttpPut("Center/{userId}")]
+        [Authorize(Policy = "Center")]
         public async Task<IActionResult> UpdateCenter(Guid userId, [FromBody] CenterUpdateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -192,7 +200,9 @@ namespace TMS_BE.Controllers
             return result != null ? Ok(result) : NotFound();
         }
 
+        //Parents update their profile
         [HttpPut("Parent/{userId}")]
+        [Authorize(Policy = "Parent")]
         public async Task<IActionResult> UpdateParent(Guid userId, [FromBody] ParentUpdateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -200,7 +210,9 @@ namespace TMS_BE.Controllers
             return result != null ? Ok(result) : NotFound();
         }
 
+        //Parents update their children profile
         [HttpPut("{parentProfileId}/Student")]
+        [Authorize(Policy = "Parent")]
         public async Task<IActionResult> UpdateStudent(Guid parentProfileId, [FromQuery] Guid studentId, [FromBody] StudentUpdateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -208,7 +220,9 @@ namespace TMS_BE.Controllers
             return result != null ? Ok(result) : NotFound();
         }
 
+        //Update user status for Admin
         [HttpPut("Status/{userId}")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> UpdateUserStatus(Guid userId, int status)
         {
             var result = await _userService.UpdateUserStatus(userId, status);
@@ -223,13 +237,16 @@ namespace TMS_BE.Controllers
         }
 
         [HttpGet("Centers/Status/{status}")]
+        [Authorize(Policy = "InspectionAccess")]
         public async Task<IActionResult> GetCentersByStatus(CenterStatus status, int pageNumber = 1, int pageSize = 5, string? centerName = null)
         {
             var (centers, totalCount) = await _userService.GetCentersByStatusAsync(status, pageNumber, pageSize, centerName);
             return Ok(new { centers, totalCount, pageNumber, pageSize });
         }
 
+        //Update Center status for Admin
         [HttpPut("Centers/{centerId}/Status")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> UpdateCenterStatus(Guid centerId, [FromBody] UpdateCenterStatusRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -238,8 +255,9 @@ namespace TMS_BE.Controllers
             return result ? Ok(new { message = "Center status updated successfully" }) : NotFound();
         }
 
-        // DELETE api/<UsersController>/5
+        //Delete user
         [HttpDelete("{userId}")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
             var result = await _userService.DeleteUser(userId);

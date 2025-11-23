@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Services;
 using Services.DTO.Feedbacks;
 using Services.Interfaces;
 
@@ -32,6 +34,21 @@ namespace API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("teacher/{teacherProfileId}")]
+        public async Task<IActionResult> GetAllFeedbacksByCourse(Guid teacherProfileId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] int? rating = null)
+        {
+            var (items, count) = await _teacherFeedbackService.GetAllFeedbackByTeacher(teacherProfileId, pageNumber, pageSize, rating);
+            var response = new
+            {
+                TotalCount = count,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling(count / (double)pageSize),
+                Data = items
+            };
+            return Ok(response);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTeacherFeedbackById(Guid id)
         {
@@ -41,15 +58,17 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTeacherFeedback(Guid teacherProfileId, Guid reviewerProfileId, [FromBody] CreateTeacherFeedbackRequest request)
+        [Authorize(Policy = "ParentStudent")]
+        public async Task<IActionResult> CreateTeacherFeedback(Guid teacherProfileId, Guid reviewerId, [FromBody] CreateTeacherFeedbackRequest request)
         {
-            var result = await _teacherFeedbackService.CreateTeacherFeedback(teacherProfileId, reviewerProfileId, request);
+            var result = await _teacherFeedbackService.CreateTeacherFeedback(teacherProfileId, reviewerId, request);
 
             if (result == null) return NotFound("Teacher not found.");
             return Ok(result);
         }
 
         [HttpPut("Approve/{feedbackId}")]
+        [Authorize(Policy = "InspectionAccess")]
         public async Task<IActionResult> ApproveTeacherFeedback(Guid feedbackId, Guid moderatorId, [FromBody] TeacherFeedbackModerationRequest request)
         {
             var result = await _teacherFeedbackService.ApproveTeacherFeedback(feedbackId, moderatorId, request);
@@ -59,6 +78,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{feedbackId}")]
+        [Authorize(Policy = "ParentStudent")]
         public async Task<IActionResult> UpdateTeacherFeedback(Guid feedbackId, [FromBody] UpdateTeacherFeedbackRequest request)
         {
             var result = await _teacherFeedbackService.UpdateTeacherFeedback(feedbackId, request);

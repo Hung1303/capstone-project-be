@@ -186,12 +186,12 @@ namespace API.Controllers
             }
         }
 
-        // Admin: Get all subscriptions
+        // Admin: Get all subscriptions of centers
         [HttpGet("all")]
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> GetAllCenterSubscriptions(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageSize = 5,
             [FromQuery] SubscriptionStatus? status = null)
         {
             try

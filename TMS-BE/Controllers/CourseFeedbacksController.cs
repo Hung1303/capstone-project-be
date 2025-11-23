@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Services.DTO.Feedbacks;
 using Services.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -32,6 +34,21 @@ namespace API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("course/{courseId}")]
+        public async Task<IActionResult> GetAllFeedbacksByCourse(Guid courseId, [FromQuery]int pageNumber =1, [FromQuery]int pageSize =5, [FromQuery]int? rating =null)
+        {
+            var (items, count) = await _courseFeedbackService.GetAllFeedbackByCourse(courseId, pageNumber, pageSize, rating);
+            var response = new
+            {
+                TotalCount = count,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling(count / (double)pageSize),
+                Data = items
+            };
+            return Ok(response);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCourseFeedbackById(Guid id)
         {
@@ -41,6 +58,7 @@ namespace API.Controllers
         }
 
         [HttpPost("{courseId}")]
+        [Authorize(Policy = "ParentStudent")]
         public async Task<IActionResult> CreateCourseFeedback(Guid courseId, Guid reviewerId, CreateCourseFeedbackRequest request)
         {
             var result = await _courseFeedbackService.CreateCourseFeedback(courseId, reviewerId, request);
@@ -50,6 +68,7 @@ namespace API.Controllers
         }
 
         [HttpPut("Approve/{feedbackId}")]
+        [Authorize(Policy = "InspectionAccess")]
         public async Task<IActionResult> ApproveCourseFeedback(Guid feedbackId, Guid moderatorId, [FromBody] CourseFeedbackModerationRequest request)
         {
             var result = await _courseFeedbackService.ApproveCourseFeedback(feedbackId, moderatorId, request);
@@ -59,6 +78,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{feedbackId}")]
+        [Authorize(Policy = "ParentStudent")]
         public async Task<IActionResult> UpdateCourseFeedback(Guid feedbackId, [FromBody] UpdateCourseFeedbackRequest request)
         {
             var result = await _courseFeedbackService.UpdateCourseFeedback(feedbackId, request);
