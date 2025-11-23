@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Services.DTO.Suspension;
 using Services.Interfaces;
 
@@ -57,23 +58,28 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        // POST api/<SuspensionsController>
+        //Ban user by Admin
         [HttpPost("User/{userId}")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> BanUser(Guid userId, Guid supervisorId, BanRequest record)
         {
             var result = await _suspensionService.BanUser(userId, supervisorId, record);
             return result ? Ok(new { message = "User Banned!!!!" }) : BadRequest();
         }
 
+        //Ban course by Admin
         [HttpPost("Course/{courseId}")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> BanCourse(Guid courseId, Guid supervisorId, BanRequest record)
         {
             var result = await _suspensionService.BanCourse(courseId, supervisorId, record);
             return result ? Ok(new { message = "Course Banned!!!!" }) : BadRequest();
         }
 
-        // PUT api/<SuspensionsController>/5
+
+        //Update ban record
         [HttpPut("{suspensionRecordId}")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> UpdateSuspensionRecord(Guid suspensionRecordId, UpdateSuspensionRecordRequest request)
         {
             var result = await _suspensionService.UpdateSuspensionRecord(suspensionRecordId, request);
@@ -82,8 +88,10 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        // DELETE api/<SuspensionsController>/5
+        
+        //Unban
         [HttpDelete("{suspensionRecordId}")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> RemoveBan(Guid suspensionRecordId, Guid moderatorId)
         {
             var result = await _suspensionService.RemoveBan(suspensionRecordId, moderatorId);

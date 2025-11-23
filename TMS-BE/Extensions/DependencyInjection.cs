@@ -112,6 +112,15 @@ namespace API.Extensions
                         return roleClaim == UserRole.Inspector.ToString()
                             || roleClaim == UserRole.Admin.ToString();
                     }));
+
+                //Parent hoặc Student
+                options.AddPolicy("ParentStudent", policy =>
+                    policy.RequireAssertion(context =>
+                    {
+                        var roleClaim = context.User.FindFirst("Role")?.Value;
+                        return roleClaim == UserRole.Parent.ToString()
+                            || roleClaim == UserRole.Student.ToString();
+                    }));
             });
 
             return services;

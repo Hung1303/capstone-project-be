@@ -69,15 +69,38 @@ namespace Services
             return Map(ver);
         }
 
-        public async Task<IEnumerable<TeacherVerificationResponse>> GetAll(string? search, int pageNumber, int pageSize, Guid? teacherProfileId)
+        public async Task<IEnumerable<TeacherVerificationResponse>> GetAll(string? search, int pageNumber, int pageSize, Guid? teacherProfileId, Guid? centerProfileId, VerificationStatus? status)
         {
-            var q = _unitOfWork.GetRepository<TeacherVerificationRequest>().Entities.Where(x => !x.IsDeleted);
+            var q = _unitOfWork.GetRepository<TeacherVerificationRequest>().Entities
+                .Include(x => x.TeacherProfile)
+                .Where(x => !x.IsDeleted);
             if (teacherProfileId.HasValue) q = q.Where(x => x.TeacherProfileId == teacherProfileId);
+            if (centerProfileId.HasValue)
+            {
+                q = q.Where(x => x.TeacherProfile != null && x.TeacherProfile.CenterProfileId == centerProfileId && !x.TeacherProfile.IsDeleted);
+            }
+            if (status.HasValue) q = q.Where(x => x.Status == status);
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var s = search.Trim().ToLower();
                 q = q.Where(x => (x.Notes != null && x.Notes.ToLower().Contains(s)));
             }
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var items = await q.OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return items.Select(Map);
+        }
+
+        public async Task<IEnumerable<TeacherVerificationResponse>> GetByCenter(Guid centerProfileId, int pageNumber, int pageSize, Guid? teacherProfileId, VerificationStatus? status)
+        {
+            var q = _unitOfWork.GetRepository<TeacherVerificationRequest>().Entities
+                .Include(x => x.TeacherProfile)
+                .Where(x => !x.IsDeleted && x.TeacherProfile != null && x.TeacherProfile.CenterProfileId == centerProfileId && !x.TeacherProfile.IsDeleted);
+            if (teacherProfileId.HasValue) q = q.Where(x => x.TeacherProfileId == teacherProfileId);
+            if (status.HasValue) q = q.Where(x => x.Status == status);
             pageNumber = Math.Max(1, pageNumber);
             pageSize = Math.Max(1, pageSize);
             var items = await q.OrderByDescending(x => x.CreatedAt)
@@ -120,7 +143,7 @@ namespace Services
             await _unitOfWork.GetRepository<TeacherVerificationRequest>().UpdateAsync(ver);
 
             // reflect into teacher profile
-            var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(t => t.Id == ver.TeacherProfileId && !t.IsDeleted);
+            var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(t => t.Id == ver.TeacherProfileId && !t.IsDeleted && t.VerificationStatus == VerificationStatus.InProgress);
             if (teacher != null)
             {
                 teacher.VerificationStatus = request.Status;

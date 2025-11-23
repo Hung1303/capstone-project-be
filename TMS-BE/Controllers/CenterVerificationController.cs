@@ -22,7 +22,7 @@ namespace API.Controllers
         /// Create a new verification request for a center
         /// </summary>
         [HttpPost("request")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateVerificationRequest([FromBody] CreateVerificationRequestDto request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -42,7 +42,7 @@ namespace API.Controllers
         /// Update verification request details (for inspectors)
         /// </summary>
         [HttpPut("request/{verificationId}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "InspectionAccess")]
         public async Task<IActionResult> UpdateVerificationRequest(Guid verificationId, [FromBody] UpdateVerificationRequestDto request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -62,7 +62,7 @@ namespace API.Controllers
         /// Make admin decision on verification request
         /// </summary>
         [HttpPut("request/{verificationId}/decision")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> MakeAdminDecision(Guid verificationId, [FromBody] AdminDecisionDto decision)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -95,7 +95,7 @@ namespace API.Controllers
         /// Get verification requests by inspector
         /// </summary>
         [HttpGet("inspector/{inspectorId}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "InspectionAccess")]
         public async Task<IActionResult> GetVerificationRequestsByInspector(Guid inspectorId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var result = await _verificationService.GetVerificationRequestsByInspectorAsync(inspectorId, pageNumber, pageSize);
@@ -117,7 +117,7 @@ namespace API.Controllers
         /// Get centers pending verification
         /// </summary>
         [HttpGet("centers/pending")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> GetCentersPendingVerification([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var result = await _verificationService.GetCentersPendingVerificationAsync(pageNumber, pageSize);
@@ -128,7 +128,7 @@ namespace API.Controllers
         /// Get centers by status
         /// </summary>
         [HttpGet("centers/status/{status}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> GetCentersByStatus(CenterStatus status, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var result = await _verificationService.GetCentersByStatusAsync(status, pageNumber, pageSize);
@@ -139,7 +139,7 @@ namespace API.Controllers
         /// Complete verification (mark as completed by inspector)
         /// </summary>
         [HttpPut("request/{verificationId}/complete")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "Inspector")]
         public async Task<IActionResult> CompleteVerification(Guid verificationId)
         {
             try
@@ -160,7 +160,7 @@ namespace API.Controllers
         /// Suspend a center
         /// </summary>
         [HttpPut("centers/{centerId}/suspend")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> SuspendCenter(Guid centerId, [FromBody] SuspendCenterRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -183,7 +183,7 @@ namespace API.Controllers
         /// Restore a suspended center
         /// </summary>
         [HttpPut("centers/{centerId}/restore")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> RestoreCenter(Guid centerId, [FromBody] RestoreCenterRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

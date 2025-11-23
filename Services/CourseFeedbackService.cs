@@ -16,24 +16,24 @@ namespace Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<CourseFeedbackResponse> CreateCourseFeedback(Guid courseId, Guid reviewerProfileId, CreateCourseFeedbackRequest request)
+        public async Task<CourseFeedbackResponse> CreateCourseFeedback(Guid courseId, Guid reviewerId, CreateCourseFeedbackRequest request)
         {
             var course = await _unitOfWork.GetRepository<Course>().Entities
                 .FirstOrDefaultAsync(t => t.Id == courseId && t.Status == CourseStatus.Approved && !t.IsDeleted);
 
-            var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
-                .FirstOrDefaultAsync(s => s.Id == reviewerProfileId && !s.IsDeleted);
+            var reviewer = await _unitOfWork.GetRepository<User>().Entities
+                .Include(s => s.StudentProfile)
+                .Include(p => p.ParentProfile)
+                .FirstOrDefaultAsync(x => x.Id == reviewerId && !x.IsDeleted && x.Status == AccountStatus.Active);
 
-            var parent = await _unitOfWork.GetRepository<ParentProfile>().Entities
-                .FirstOrDefaultAsync(s => s.Id == reviewerProfileId && !s.IsDeleted);
 
             if (course == null) return null;
-            if (student != null && parent == null)
+            if (reviewer != null && reviewer.Role == UserRole.Student)
             {
                 var feedback = new CourseFeedback
                 {
                     CourseId = course.Id,
-                    StudentProfileId = student.Id,
+                    StudentProfileId = reviewer.StudentProfile.Id,
                     ParentProfileId = null,
                     Rating = request.Rating,
                     Comment = request.Comment,
@@ -59,13 +59,13 @@ namespace Services
                     LastUpdatedAt = feedback.LastUpdatedAt
                 };
             }
-            else if (student == null && parent != null)
+            else if (reviewer != null && reviewer.Role == UserRole.Teacher)
             {
                 var feedback = new CourseFeedback
                 {
                     CourseId = course.Id,
                     StudentProfileId = null,
-                    ParentProfileId = parent.Id,
+                    ParentProfileId = reviewer.ParentProfile.Id,
                     Rating = request.Rating,
                     Comment = request.Comment,
                     Status = ReviewStatus.PendingModeration,
@@ -224,5 +224,33 @@ namespace Services
             return (feedbacks, totalCount);
         }
 
+        public async Task<(IEnumerable<CourseFeedbackDetailResponse> Feedbacks, int TotalCount)> GetAllFeedbackByCourse(Guid courseId, int pageNumber, int pageSize, int? rating)
+        {
+            int totalCount;
+            var query = _unitOfWork.GetRepository<CourseFeedback>().Entities
+                .Where(x => x.CourseId == courseId && !x.IsDeleted && x.Status == ReviewStatus.Approved);
+            if (rating.HasValue && rating >= 1 && rating <= 5) query = query.Where(x => x.Rating == rating);
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var items = await query.OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(f => new CourseFeedbackDetailResponse
+                {
+                    Id = f.Id,
+                    CourseId = f.CourseId,
+                    StudentProfileId = f.StudentProfileId,
+                    ParentProfileId = f.ParentProfileId,
+                    Rating = f.Rating,
+                    Comment = f.Comment,
+                    Status = f.Status,
+                    ModerateByUserId = f.ModeratedByUserId ?? Guid.Empty,
+                    ModerationNotes = f.ModerationNotes ?? string.Empty,
+                    ModeratedAt = f.ModeratedAt ?? DateTimeOffset.MinValue
+                })
+                .ToListAsync();
+            totalCount = items.Count();
+            return (items, totalCount);
+        }
     }
 }

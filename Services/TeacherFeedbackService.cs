@@ -15,24 +15,23 @@ namespace Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<TeacherFeedbackResponse> CreateTeacherFeedback(Guid teacherProfileId, Guid reviewerProfileId, CreateTeacherFeedbackRequest request)
+        public async Task<TeacherFeedbackResponse> CreateTeacherFeedback(Guid teacherProfileId, Guid reviewerId, CreateTeacherFeedbackRequest request)
         {
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
                 .FirstOrDefaultAsync(t => t.Id == teacherProfileId);
 
-            var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
-                .FirstOrDefaultAsync(s => s.Id == reviewerProfileId);
-
-            var parent = await _unitOfWork.GetRepository<ParentProfile>().Entities
-                .FirstOrDefaultAsync(s => s.Id == reviewerProfileId);
+            var reviewer = await _unitOfWork.GetRepository<User>().Entities
+                .Include(s => s.StudentProfile)
+                .Include(p => p.ParentProfile)
+                .FirstOrDefaultAsync(x => x.Id == reviewerId && !x.IsDeleted && x.Status == AccountStatus.Active);
 
             if (teacher == null) return null;
-            if (student != null && parent == null)
+            if (reviewer != null && reviewer.Role == UserRole.Student)
             {
                 var feedback = new TeacherFeedback
                 {
                     TeacherProfileId = teacher.Id,
-                    StudentProfileId = student.Id,
+                    StudentProfileId = reviewer.StudentProfile.Id,
                     ParentProfileId = null,
                     Rating = request.Rating,
                     Comment = request.Comment,
@@ -60,13 +59,13 @@ namespace Services
                     LastUpdatedAt = feedback.LastUpdatedAt
                 };
             }
-            else if (student == null && parent != null)
+            else if (reviewer != null && reviewer.Role == UserRole.Teacher)
             {
                 var feedback = new TeacherFeedback
                 {
                     TeacherProfileId = teacher.Id,
                     StudentProfileId = null,
-                    ParentProfileId = parent.Id,
+                    ParentProfileId = reviewer.ParentProfile.Id,
                     Rating = request.Rating,
                     Comment = request.Comment,
                     SubmittedAt = DateTimeOffset.UtcNow,
@@ -242,5 +241,34 @@ namespace Services
             return (feedbacks, totalCount);
         }
 
+        public async Task<(IEnumerable<TeacherFeedbackDetailResponse> Feedbacks, int TotalCount)> GetAllFeedbackByTeacher(Guid teacherProfileId, int pageNumber, int pageSize, int? rating)
+        {
+            int totalCount;
+            var query = _unitOfWork.GetRepository<TeacherFeedback>().Entities
+                .Where(x => x.TeacherProfileId == teacherProfileId && !x.IsDeleted && x.Status == ReviewStatus.Approved);
+            if (rating.HasValue && rating >= 1 && rating <= 5) query = query.Where(x => x.Rating == rating);
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var items = await query.OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(f => new TeacherFeedbackDetailResponse
+                {
+                    Id = f.Id,
+                    TeacherProfileId = f.TeacherProfileId,
+                    StudentProfileId = f.StudentProfileId,
+                    ParentProfileId = f.ParentProfileId,
+                    Rating = f.Rating,
+                    Comment = f.Comment,
+                    SubmittedAt = f.SubmittedAt,
+                    Status = f.Status,
+                    ModerateByUserId = f.ModeratedByUserId ?? Guid.Empty,
+                    ModerationNotes = f.ModerationNotes ?? string.Empty,
+                    ModeratedAt = f.ModeratedAt ?? DateTimeOffset.MinValue
+                })
+                .ToListAsync();
+            totalCount = items.Count();
+            return (items, totalCount);
+        }
     }
 }
