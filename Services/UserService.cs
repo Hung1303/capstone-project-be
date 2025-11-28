@@ -979,7 +979,7 @@ namespace Services
         {
             var result = false;
             var user = await _unitOfWork.GetRepository<User>().Entities
-                .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
+                .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
                 throw new Exception("User not found");
@@ -987,7 +987,7 @@ namespace Services
             user.IsDeleted = true;
             result = true;
 
-            await _unitOfWork.GetRepository<User>().UpdateAsync(user);
+            await _unitOfWork.GetRepository<User>().DeleteAsync(userId);
             await _unitOfWork.SaveAsync();
 
             return result;
