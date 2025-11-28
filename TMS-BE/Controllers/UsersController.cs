@@ -121,6 +121,7 @@ namespace TMS_BE.Controllers
 
 
         [HttpPost("Admin")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] CreateAdminRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
