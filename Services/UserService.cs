@@ -987,7 +987,7 @@ namespace Services
             user.IsDeleted = true;
             result = true;
 
-            await _unitOfWork.GetRepository<User>().DeleteAsync(user);
+            await _unitOfWork.GetRepository<User>().DeleteAsync(userId);
             await _unitOfWork.SaveAsync();
 
             return result;
