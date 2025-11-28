@@ -22,6 +22,8 @@ namespace Services
             }
             var classSchedule = new ClassSchedule
             {
+                ClassName = request.ClassName,
+                ClassDescription = request.ClassDescription,
                 TeacherProfileId = request.TeacherProfileId,
                 DayOfWeek = request.DayOfWeek,
                 StartTime = request.StartTime,
@@ -35,6 +37,8 @@ namespace Services
             var result = new ClassScheduleResponse
             {
                 Id = classSchedule.Id,
+                ClassName = classSchedule.ClassName,
+                ClassDescription = classSchedule.ClassDescription,
                 TeacherProfileId = classSchedule.TeacherProfileId,
                 DayOfWeek = classSchedule.DayOfWeek,
                 StartTime = classSchedule.StartTime,
@@ -97,6 +101,8 @@ namespace Services
                 .Select(a => new ClassScheduleResponse
                 {
                     Id = a.Id,
+                    ClassName = a.ClassName,
+                    ClassDescription = a.ClassDescription,
                     TeacherProfileId = a.TeacherProfileId,
                     DayOfWeek = a.DayOfWeek,
                     StartTime = a.StartTime,
@@ -118,6 +124,8 @@ namespace Services
             var result = new ClassScheduleResponse
             {
                 Id = classSchedule.Id,
+                ClassName = classSchedule.ClassName,
+                ClassDescription = classSchedule.ClassDescription,
                 TeacherProfileId = classSchedule.TeacherProfileId,
                 DayOfWeek = classSchedule.DayOfWeek,
                 StartTime = classSchedule.StartTime,
@@ -160,6 +168,14 @@ namespace Services
             {
                 classSchedule.RoomOrLink = request.RoomOrLink;
             }
+            if (request.ClassName != null)
+            {
+                classSchedule.ClassName = request.ClassName;
+            }
+            if (request.ClassDescription != null)
+            {
+                classSchedule.ClassDescription = request.ClassDescription;
+            }
             if (request.TeacherProfileId.HasValue)
             {
                 var checkTeacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
@@ -175,6 +191,8 @@ namespace Services
             var result = new ClassScheduleResponse
             {
                 Id = classSchedule.Id,
+                ClassName = classSchedule.ClassName,
+                ClassDescription = classSchedule.ClassDescription,
                 TeacherProfileId = classSchedule.TeacherProfileId,
                 DayOfWeek = classSchedule.DayOfWeek,
                 StartTime = classSchedule.StartTime,

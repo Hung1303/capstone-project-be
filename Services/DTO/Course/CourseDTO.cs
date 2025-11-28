@@ -52,6 +52,8 @@ namespace Services.DTO.Course
         public Guid id { get; set; }
         public Guid CourseId { get; set; }
         public Guid ClassScheduleId { get; set; }
+        public string ClassName { get; set; }
+        public string ClassDescription { get; set; }
         public Guid SubjectId { get; set; }
         public Guid TeacherProfileId { get; set; }
         public string status { get; set; }

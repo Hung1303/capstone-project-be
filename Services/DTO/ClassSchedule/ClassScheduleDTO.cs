@@ -4,6 +4,8 @@ namespace Services.DTO.ClassSchedule
 {
     public class CreateClassScheduleRequest : IValidatableObject
     {
+        public string ClassName { get; set; }
+        public string ClassDescription { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
@@ -35,6 +37,8 @@ namespace Services.DTO.ClassSchedule
     }
     public class UpdateClassScheduleRequest : IValidatableObject
     {
+        public string? ClassName { get; set; }
+        public string? ClassDescription { get; set; }
         public DayOfWeek? DayOfWeek { get; set; }
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
@@ -67,6 +71,8 @@ namespace Services.DTO.ClassSchedule
     public class ClassScheduleResponse
     {
         public Guid Id { get; set; }
+        public string ClassName { get; set; }
+        public string ClassDescription { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }

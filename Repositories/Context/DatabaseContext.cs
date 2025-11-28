@@ -918,6 +918,8 @@ namespace Repositories.Context
                 new ClassSchedule
                 {
                     Id = classSchedule1Id,
+                    ClassName = "ClassA",
+                    ClassDescription = "A",
                     CreatedAt = now,
                     LastUpdatedAt = now,
                     IsDeleted = false,
@@ -932,6 +934,8 @@ namespace Repositories.Context
                 new ClassSchedule
                 {
                     Id = classSchedule2Id,
+                    ClassName = "ClassA",
+                    ClassDescription = "A",
                     CreatedAt = now,
                     LastUpdatedAt = now,
                     IsDeleted = false,
@@ -946,6 +950,8 @@ namespace Repositories.Context
                 new ClassSchedule
                 {
                     Id = classSchedule3Id,
+                    ClassName = "ClassB",
+                    ClassDescription = "B",
                     CreatedAt = now,
                     LastUpdatedAt = now,
                     IsDeleted = false,
@@ -960,6 +966,8 @@ namespace Repositories.Context
                 new ClassSchedule
                 {
                     Id = classSchedule4Id,
+                    ClassName = "ClassB",
+                    ClassDescription = "B",
                     CreatedAt = now,
                     LastUpdatedAt = now,
                     IsDeleted = false,
@@ -974,6 +982,8 @@ namespace Repositories.Context
                 new ClassSchedule
                 {
                     Id = classSchedule5Id,
+                    ClassName = "ClassC",
+                    ClassDescription = "C",
                     CreatedAt = now,
                     LastUpdatedAt = now,
                     IsDeleted = false,
