@@ -121,6 +121,14 @@ namespace Services
             if (request.OtherDocumentsPath != null) ver.OtherDocumentsPath = request.OtherDocumentsPath;
             ver.Status = VerificationStatus.InProgress;
 
+            var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(t => t.Id == ver.TeacherProfileId && !t.IsDeleted);
+            if(teacher != null)
+            {
+                teacher.VerificationStatus = ver.Status;
+                teacher.LastUpdatedAt = DateTime.UtcNow;
+                await _unitOfWork.GetRepository<TeacherProfile>().UpdateAsync(teacher);
+            }
+
             await _unitOfWork.GetRepository<TeacherVerificationRequest>().UpdateAsync(ver);
             await _unitOfWork.SaveAsync();
             return Map(ver);
@@ -131,10 +139,20 @@ namespace Services
             var ver = await _unitOfWork.GetRepository<TeacherVerificationRequest>().Entities.FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted);
             if (ver == null) throw new Exception("Verification request not found");
 
+            var verifier = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(v => v.Id == request.VerifierId && !v.IsDeleted);
+
             ver.Status = request.Status;
             ver.Notes = request.Notes ?? ver.Notes;
-            ver.InspectorId = request.InspectorId;
-            ver.AdminId = request.AdminId;
+            if(verifier.Role == UserRole.Admin)
+            {
+                ver.AdminId = verifier.Id;
+                ver.InspectorId = null;
+            }else if(verifier.Role == UserRole.Inspector)
+            {
+                ver.InspectorId = verifier.Id;
+                ver.AdminId = null;
+            }
+
             if (request.Status == VerificationStatus.Completed || request.Status == VerificationStatus.Finalized)
             {
                 ver.CompletedAt = DateTime.UtcNow;

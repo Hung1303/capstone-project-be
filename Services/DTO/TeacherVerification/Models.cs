@@ -17,8 +17,7 @@ namespace Services.DTO.TeacherVerification
     public class SetTeacherVerificationStatusDto
     {
         public Core.Base.VerificationStatus Status { get; set; }
-        public Guid? InspectorId { get; set; }
-        public Guid? AdminId { get; set; }
+        public Guid VerifierId { get; set; }
         public string? Notes { get; set; }
     }
 
