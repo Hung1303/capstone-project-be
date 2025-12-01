@@ -431,7 +431,7 @@ namespace Services
             return request;
         }
 
-        public async Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null)
+        public async Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null, string? userRole = null)
         {
             IQueryable<User> query = _unitOfWork.GetRepository<User>().Entities;
 
@@ -439,6 +439,11 @@ namespace Services
             if (!string.IsNullOrWhiteSpace(fullName))
             {
                 query = query.Where(u => EF.Functions.Like(u.FullName, $"%{fullName}%"));
+            }
+
+            if (!string.IsNullOrEmpty(userRole))
+            {
+                query = query.Where(u => u.Role.ToString() == userRole);
             }
 
             int totalCount = await query.CountAsync();

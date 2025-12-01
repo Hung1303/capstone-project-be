@@ -21,9 +21,9 @@ namespace TMS_BE.Controllers
 
 
         [HttpGet("Users")]
-        public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null, [FromQuery] string? userRole = null)
         {
-            var (users, totalCount) = await _userService.GetAllUsersAsync(pageNumber, pageSize, fullName);
+            var (users, totalCount) = await _userService.GetAllUsersAsync(pageNumber, pageSize, fullName, userRole);
             return Ok(new { totalCount, users });
         }
 

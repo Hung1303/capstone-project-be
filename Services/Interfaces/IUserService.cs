@@ -22,7 +22,7 @@ namespace Services.Interfaces
         Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetAllTeachersAsync(int pageNumber, int pageSize, string? fullName = null);
         Task<(IEnumerable<ParentListResponse> Parents, int TotalCount)> GetAllParentsAsync(int pageNumber, int pageSize, string? fullName = null);
         Task<(IEnumerable<StudentListResponse> Students, int TotalCount)> GetAllStudentsAsync(int pageNumber, int pageSize, string? fullName = null);
-        Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null);
+        Task<(IEnumerable<UserSummaryDto> Users, int TotalCount)> GetAllUsersAsync(int pageNumber, int pageSize, string? fullName = null, string? userRole = null);
         Task<UserDetailResponse?> GetUserByIdAsync(Guid userId);
         Task<CenterDetailRespone?> GetCenterById(Guid userId);
         Task<(IEnumerable<TeacherListResponse> Teachers, int TotalCount)> GetTeachersByCenterIdAsync(
