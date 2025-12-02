@@ -5,6 +5,8 @@ namespace Services.Interfaces
     public interface ICourseService
     {
         Task<CourseResponse> CreateCourse(CreateCourseRequest request);
+        Task<CourseResponse> CenterCreateCourse(CenterCreateCourseRequest request);
+        Task<CourseResponse> AssignTeacher(Guid id, AssignTeacherRequest request);
         Task<CourseSubjectResponse> CreateSubjectForCourse(CreateSubjectForCourseRequest request);
         Task<CourseResponse> UpdateCourse(Guid id, UpdateCourseRequest request);
         Task<CourseSubjectResponse> UpdateCourseSubject(Guid id, UpdateCourseSubject request);

@@ -17,6 +17,172 @@ namespace Services
             _unitOfWork = unitOfWork;
             _subscriptionService = subscriptionService;
         }
+
+        public async Task<CourseResponse> AssignTeacher(Guid id, AssignTeacherRequest request)
+        {
+            var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+            if (course == null)
+            {
+                throw new Exception("Course Not Found");
+            }
+            var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId && !a.IsDeleted);
+            if (teacher == null)
+            {
+                throw new Exception("Teacher Not Found");
+            }
+
+            Guid? centerToUse = course.CenterProfileId;
+            if (centerToUse != null)
+            {
+                var center = await _unitOfWork
+                    .GetRepository<CenterProfile>()
+                    .Entities
+                    .FirstOrDefaultAsync(a => a.Id == centerToUse);
+                if (center == null)
+                {
+                    throw new Exception("CenterProfile Not Found");
+                }
+
+                if (teacher.CenterProfileId == null || teacher.CenterProfileId != centerToUse)
+                {
+                    throw new Exception("Teacher does not belong to the specified Center");
+                }
+            }
+            else
+            {
+                // Auto-assign center from teacher if any; remains null for independent teachers
+                centerToUse = teacher.CenterProfileId;
+            }
+
+            // Circular 29: require verified teacher before organizing extra classes
+            if (teacher.VerificationStatus != VerificationStatus.Completed && teacher.VerificationStatus != VerificationStatus.Finalized)
+            {
+                throw new Exception("Teacher must be verified per Circular 29 before creating courses");
+            }
+
+            // Circular 29: institution teachers must not conduct off-campus in-person extra classes
+            if (teacher.CenterProfileId != null)
+            {
+                if (centerToUse == null || centerToUse != teacher.CenterProfileId)
+                {
+                    throw new Exception("Institution teacher cannot create off-campus classes (Circular 29)");
+                }
+
+                // If in-person, ensure location is at the center address
+                var center = await _unitOfWork
+                    .GetRepository<CenterProfile>()
+                    .Entities
+                    .FirstOrDefaultAsync(a => a.Id == centerToUse);
+                if (center != null && course.TeachingMethod == TeachingMethod.InPerson)
+                {
+                    var addr = (center.Address ?? string.Empty).Trim().ToLower();
+                    var loc = (course.Location ?? string.Empty).Trim().ToLower();
+                    if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
+                    {
+                        throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
+                    }
+                }
+            }
+
+
+
+
+            course.TeacherProfileId = request.TeacherProfileId;
+            await _unitOfWork.GetRepository<Course>().UpdateAsync(course);
+            await _unitOfWork.SaveAsync();
+            var result = new CourseResponse
+            {
+                id = course.Id,
+                Title = course.Title,
+                Subject = course.Subject,
+                Description = course.Description,
+                Location = course.Location,
+                Semester = course.Semester,
+                StartDate = course.StartDate,
+                EndDate = course.EndDate,
+                TeachingMethod = course.TeachingMethod,
+                TuitionFee = course.TuitionFee,
+                Capacity = course.Capacity,
+                GradeLevel = course.GradeLevel,
+                Status = course.Status,
+                TeacherProfileId = course.TeacherProfileId,
+                CenterProfileId = course.CenterProfileId,
+            };
+            return result;
+        }
+
+        public async Task<CourseResponse> CenterCreateCourse(CenterCreateCourseRequest request)
+        {
+            Guid? centerToUse = request.CenterProfileId;
+
+            var center = await _unitOfWork
+                .GetRepository<CenterProfile>()
+                .Entities
+                .FirstOrDefaultAsync(a => a.Id == centerToUse);
+            if (center == null)
+            {
+                throw new Exception("CenterProfile Not Found");
+            }
+
+            // Check subscription limits for centers
+            if (centerToUse != null)
+            {
+                var canPost = await _subscriptionService.CanCenterPostCourseAsync(centerToUse.Value);
+                if (!canPost)
+                {
+                    var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
+                    var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
+
+                    if (max == 0)
+                    {
+                        throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");
+                    }
+                    else
+                    {
+                        throw new Exception($"Center has reached the course posting limit ({max} courses). Remaining: {remaining}. Please upgrade your subscription package to post more courses.");
+                    }
+                }
+            }
+
+            var course = new Course
+            {
+                Title = request.Title,
+                Subject = request.Subject,
+                Description = request.Description,
+                Location = request.Location,
+                Semester = request.Semester,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                TeachingMethod = request.TeachingMethod,
+                TuitionFee = request.TuitionFee,
+                Capacity = request.Capacity,
+                GradeLevel = request.GradeLevel,
+                Status = CourseStatus.Draft,
+                CenterProfileId = centerToUse,
+            };
+            await _unitOfWork.GetRepository<Course>().InsertAsync(course);
+            await _unitOfWork.SaveAsync();
+            var result = new CourseResponse
+            {
+                id = course.Id,
+                Title = course.Title,
+                Subject = course.Subject,
+                Description = course.Description,
+                Location = course.Location,
+                Semester = course.Semester,
+                StartDate = course.StartDate,
+                EndDate = course.EndDate,
+                TeachingMethod = course.TeachingMethod,
+                TuitionFee = course.TuitionFee,
+                Capacity = course.Capacity,
+                GradeLevel = course.GradeLevel,
+                Status = course.Status,
+                TeacherProfileId = course.TeacherProfileId,
+                CenterProfileId = course.CenterProfileId,
+            };
+            return result;
+        }
+
         public async Task<CourseResponse> CreateCourse(CreateCourseRequest request)
         {
             if (request.TeacherProfileId == null)

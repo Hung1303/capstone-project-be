@@ -29,6 +29,36 @@ namespace API.Controllers
 
         }
 
+        [HttpPost("CenterCreate/")]
+        public async Task<IActionResult> CenterCreateCourse(CenterCreateCourseRequest request)
+        {
+            try
+            {
+                var result = await _courseService.CenterCreateCourse(request);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpPut("/{id}/AsignTeacher")]
+        public async Task<IActionResult> AssignTeacher(Guid id, AssignTeacherRequest request)
+        {
+            try
+            {
+                var result = await _courseService.AssignTeacher(id, request);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAllCourse([FromQuery] string? searchTerm, [FromQuery] Guid? TeacherProfileId, [FromQuery] Guid? CenterProfileId,
             [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
