@@ -88,6 +88,35 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet("{CenterProfileId}/PublishedCourses")]
+        public async Task<IActionResult> GetPublishedCoursesByCenter(Guid CenterProfileId, [FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        {
+            try
+            {
+                var result = await _courseService.GetAllPublishedCoursesByCenter(CenterProfileId, searchTerm, pageNumber, pageSize);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("Published/Courses")]
+        public async Task<IActionResult> GetAllPublishedCourse([FromQuery] string? searchTerm, [FromQuery] Guid? TeacherProfileId, [FromQuery] Guid? CenterProfileId,
+            [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        {
+            try
+            {
+                var result = await _courseService.GetAllPublishedCourse(searchTerm, pageNumber, pageSize, TeacherProfileId, CenterProfileId);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCourseById(Guid id)
         {
@@ -116,6 +145,20 @@ namespace API.Controllers
             }
 
         }
+
+        [HttpPut("Publish/{courseId}")]
+        public async Task<IActionResult> CenterPublishCourse(Guid centerProfileId, Guid courseId)
+        {
+            try
+            {
+                var result = await _courseService.PublishCourseAsync(centerProfileId, courseId);
+                return Ok(new { success = true, data = "Course published." });
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourse(Guid id)
         {

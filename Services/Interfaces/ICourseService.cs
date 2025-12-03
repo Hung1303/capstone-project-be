@@ -19,5 +19,8 @@ namespace Services.Interfaces
         Task<CourseSubjectResponse> GetCourseSubjectById(Guid id);
         Task<bool> DeleteCourse(Guid id);
         Task<bool> DeleteCourseSubject(Guid id);
+        Task<bool> PublishCourseAsync(Guid centerProfileId, Guid courseId);
+        Task<IEnumerable<CourseResponse>> GetAllPublishedCoursesByCenter(Guid centerProfileId, string? searchTerm, int pageNumber, int pageSize);
+        Task<IEnumerable<CourseResponse>> GetAllPublishedCourse(string? searchTerm, int pageNumber, int pageSize, Guid? TeacherProfileId, Guid? CenterProfileId);
     }
 }

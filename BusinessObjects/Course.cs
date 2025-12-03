@@ -18,6 +18,8 @@ namespace BusinessObjects
         [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
         public int GradeLevel { get; set; }
         public CourseStatus Status { get; set; } = CourseStatus.Draft;
+        public bool IsPublished { get; set; } = false;
+        public DateTime? PublishedAt { get; set; } = null;
         public Guid? TeacherProfileId { get; set; }
         public virtual TeacherProfile TeacherProfile { get; set; }
         public Guid? CenterProfileId { get; set; }

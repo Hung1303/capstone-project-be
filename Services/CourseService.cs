@@ -124,25 +124,25 @@ namespace Services
                 throw new Exception("CenterProfile Not Found");
             }
 
-            // Check subscription limits for centers
-            if (centerToUse != null)
-            {
-                var canPost = await _subscriptionService.CanCenterPostCourseAsync(centerToUse.Value);
-                if (!canPost)
-                {
-                    var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
-                    var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
+            //// Check subscription limits for centers
+            //if (centerToUse != null)
+            //{
+            //    var canPost = await _subscriptionService.CanCenterPostCourseAsync(centerToUse.Value);
+            //    if (!canPost)
+            //    {
+            //        var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
+            //        var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
 
-                    if (max == 0)
-                    {
-                        throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");
-                    }
-                    else
-                    {
-                        throw new Exception($"Center has reached the course posting limit ({max} courses). Remaining: {remaining}. Please upgrade your subscription package to post more courses.");
-                    }
-                }
-            }
+            //        if (max == 0)
+            //        {
+            //            throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");
+            //        }
+            //        else
+            //        {
+            //            throw new Exception($"Center has reached the course posting limit ({max} courses). Remaining: {remaining}. Please upgrade your subscription package to post more courses.");
+            //        }
+            //    }
+            //}
 
             var course = new Course
             {
@@ -228,49 +228,49 @@ namespace Services
                 throw new Exception("Teacher must be verified per Circular 29 before creating courses");
             }
 
-            // Circular 29: institution teachers must not conduct off-campus in-person extra classes
-            if (teacher.CenterProfileId != null)
-            {
-                if (centerToUse == null || centerToUse != teacher.CenterProfileId)
-                {
-                    throw new Exception("Institution teacher cannot create off-campus classes (Circular 29)");
-                }
+            //// Circular 29: institution teachers must not conduct off-campus in-person extra classes
+            //if (teacher.CenterProfileId != null)
+            //{
+            //    if (centerToUse == null || centerToUse != teacher.CenterProfileId)
+            //    {
+            //        throw new Exception("Institution teacher cannot create off-campus classes (Circular 29)");
+            //    }
 
-                // If in-person, ensure location is at the center address
-                var center = await _unitOfWork
-                    .GetRepository<CenterProfile>()
-                    .Entities
-                    .FirstOrDefaultAsync(a => a.Id == centerToUse);
-                if (center != null && request.TeachingMethod == TeachingMethod.InPerson)
-                {
-                    var addr = (center.Address ?? string.Empty).Trim().ToLower();
-                    var loc = (request.Location ?? string.Empty).Trim().ToLower();
-                    if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
-                    {
-                        throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
-                    }
-                }
-            }
+            //    // If in-person, ensure location is at the center address
+            //    var center = await _unitOfWork
+            //        .GetRepository<CenterProfile>()
+            //        .Entities
+            //        .FirstOrDefaultAsync(a => a.Id == centerToUse);
+            //    if (center != null && request.TeachingMethod == TeachingMethod.InPerson)
+            //    {
+            //        var addr = (center.Address ?? string.Empty).Trim().ToLower();
+            //        var loc = (request.Location ?? string.Empty).Trim().ToLower();
+            //        if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
+            //        {
+            //            throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
+            //        }
+            //    }
+            //}
 
-            // Check subscription limits for centers
-            if (centerToUse != null)
-            {
-                var canPost = await _subscriptionService.CanCenterPostCourseAsync(centerToUse.Value);
-                if (!canPost)
-                {
-                    var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
-                    var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
+            //// Check subscription limits for centers
+            //if (centerToUse != null)
+            //{
+            //    var canPost = await _subscriptionService.CanCenterPostCourseAsync(centerToUse.Value);
+            //    if (!canPost)
+            //    {
+            //        var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
+            //        var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
 
-                    if (max == 0)
-                    {
-                        throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");
-                    }
-                    else
-                    {
-                        throw new Exception($"Center has reached the course posting limit ({max} courses). Remaining: {remaining}. Please upgrade your subscription package to post more courses.");
-                    }
-                }
-            }
+            //        if (max == 0)
+            //        {
+            //            throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");
+            //        }
+            //        else
+            //        {
+            //            throw new Exception($"Center has reached the course posting limit ({max} courses). Remaining: {remaining}. Please upgrade your subscription package to post more courses.");
+            //        }
+            //    }
+            //}
 
             var course = new Course
             {
@@ -449,6 +449,99 @@ namespace Services
             var skipAmount = (pageNumber - 1) * pageSize;
             var paginatedCourses = await courses
                 .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .Select(a => new CourseResponse
+                {
+                    id = a.Id,
+                    Title = a.Title,
+                    Subject = a.Subject,
+                    Description = a.Description,
+                    Location = a.Location,
+                    Semester = a.Semester,
+                    StartDate = a.StartDate,
+                    EndDate = a.EndDate,
+                    TeachingMethod = a.TeachingMethod,
+                    TuitionFee = a.TuitionFee,
+                    Capacity = a.Capacity,
+                    GradeLevel = a.GradeLevel,
+                    Status = a.Status,
+                    TeacherProfileId = a.TeacherProfileId,
+                    CenterProfileId = a.CenterProfileId,
+                }).ToListAsync();
+            return paginatedCourses;
+        }
+
+        public async Task<IEnumerable<CourseResponse>> GetAllPublishedCoursesByCenter(Guid centerProfileId, string? searchTerm, int pageNumber, int pageSize)
+        {
+            var courses = _unitOfWork.GetRepository<Course>().Entities.Where(a => !a.IsDeleted && a.CenterProfileId == centerProfileId && a.IsPublished);
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                courses = courses.Where(c =>
+                    (c.Title != null && c.Title.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Subject != null && c.Subject.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Description != null && c.Description.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Location != null && c.Location.ToLower().Contains(searchTerm.Trim().ToLower()))
+                );
+            }
+
+            var totalCount = await courses.CountAsync();
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+            var paginatedCourses = await courses
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .Select(a => new CourseResponse
+                {
+                    id = a.Id,
+                    Title = a.Title,
+                    Subject = a.Subject,
+                    Description = a.Description,
+                    Location = a.Location,
+                    Semester = a.Semester,
+                    StartDate = a.StartDate,
+                    EndDate = a.EndDate,
+                    TeachingMethod = a.TeachingMethod,
+                    TuitionFee = a.TuitionFee,
+                    Capacity = a.Capacity,
+                    GradeLevel = a.GradeLevel,
+                    Status = a.Status,
+                    TeacherProfileId = a.TeacherProfileId,
+                    CenterProfileId = a.CenterProfileId,
+                }).ToListAsync();
+            return paginatedCourses;
+        }
+
+        public async Task<IEnumerable<CourseResponse>> GetAllPublishedCourse(string? searchTerm, int pageNumber, int pageSize, Guid? TeacherProfileId, Guid? CenterProfileId)
+        {
+            var courses = _unitOfWork.GetRepository<Course>().Entities.Where(a => !a.IsDeleted && a.IsPublished);
+            if (TeacherProfileId.HasValue)
+            {
+                courses = courses.Where(a => a.TeacherProfileId == TeacherProfileId);
+            }
+            if (CenterProfileId.HasValue)
+
+            {
+                courses = courses.Where(a => a.CenterProfileId == CenterProfileId);
+            }
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                courses = courses.Where(c =>
+                    (c.Title != null && c.Title.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Subject != null && c.Subject.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Description != null && c.Description.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Location != null && c.Location.ToLower().Contains(searchTerm.Trim().ToLower()))
+                );
+            }
+
+            var totalCount = await courses.CountAsync();
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+            var paginatedCourses = await courses
+                .OrderByDescending(c => c.PublishedAt)
                 .Skip(skipAmount)
                 .Take(pageSize)
                 .Select(a => new CourseResponse
@@ -897,5 +990,31 @@ namespace Services
             };
             return result;
         }
+
+        public async Task<bool> PublishCourseAsync(Guid centerProfileId, Guid courseId)
+        {
+            var subscription = await _subscriptionService.GetActiveSubscriptionAsync(centerProfileId);
+            if (subscription == null || subscription.RemainingCoursePosts <= 0)
+                throw new Exception("No remaining course publish slots this month.");
+
+            var course = await _unitOfWork.GetRepository<Course>()
+                .Entities
+                .FirstOrDefaultAsync(c => c.Id == courseId && !c.IsDeleted && c.CenterProfileId == centerProfileId);
+
+            if (course == null)
+                throw new Exception("Course not found.");
+            if (course.Status != CourseStatus.Approved)
+                throw new Exception("Course is not approved.");
+            if (course.IsPublished)
+                throw new Exception("Course is already published.");
+
+            course.IsPublished = true;
+            course.PublishedAt = DateTime.UtcNow;
+            await _unitOfWork.GetRepository<Course>().UpdateAsync(course);
+            await _unitOfWork.SaveAsync();
+
+            return true;
+        }
+
     }
 }

@@ -462,19 +462,20 @@ namespace Services
             }
 
             // Calculate current course posts for this subscription period (monthly limit)
-            // Count all courses created within the subscription period (StartDate to EndDate)
+            // Count all courses posted within the subscription period (StartDate to EndDate)
             // This includes all statuses (Draft, PendingApproval, Approved, etc.)
             // because creating a course uses up a posting slot regardless of its status
-            var currentCoursePosts = await _unitOfWork.GetRepository<Course>()
+            var currentPublishedCoursePosts = await _unitOfWork.GetRepository<Course>()
                 .Entities
                 .CountAsync(c => c.CenterProfileId == subscription.CenterProfileId &&
-                                !c.IsDeleted &&
-                                c.CreatedAt >= subscription.StartDate &&
-                                c.CreatedAt <= subscription.EndDate);
+                     !c.IsDeleted &&
+                     c.IsPublished && // Only count published courses
+                     c.PublishedAt >= subscription.StartDate &&
+                     c.PublishedAt <= subscription.EndDate);
 
-            // Calculate remaining posts: Max allowed (from package) - currently posted (this month)
-            var remaining = subscription.SubscriptionPackage.MaxCoursePosts - currentCoursePosts;
-            if (remaining < 0) remaining = 0; // Ensure non-negative
+            var remaining = subscription.SubscriptionPackage.MaxCoursePosts - currentPublishedCoursePosts;
+            if (remaining < 0) remaining = 0;
+
 
             // Update subscription status if expired
             if (subscription.Status == SubscriptionStatus.Active && subscription.EndDate < DateTime.UtcNow)
@@ -501,7 +502,7 @@ namespace Services
                 AutoRenewalDate = subscription.AutoRenewalDate,
                 AutoRenewalEnabled = subscription.AutoRenewalEnabled,
                 MaxCoursePosts = subscription.SubscriptionPackage.MaxCoursePosts,
-                CurrentCoursePosts = currentCoursePosts,
+                CurrentCoursePosts = currentPublishedCoursePosts,
                 RemainingCoursePosts = remaining
             };
         }
