@@ -430,6 +430,48 @@ namespace Services
             return paginatedCourses;
         }
 
+        public async Task<IEnumerable<CourseResponse>> GetAllApprovedCoursesByTeacher(Guid TeacherProfileId, string? searchTerm, int pageNumber, int pageSize)
+        {
+            var courses = _unitOfWork.GetRepository<Course>().Entities.Where(a => !a.IsDeleted && a.TeacherProfileId == TeacherProfileId && a.Status==CourseStatus.Approved);
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                courses = courses.Where(c =>
+                    (c.Title != null && c.Title.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Subject != null && c.Subject.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Description != null && c.Description.ToLower().Contains(searchTerm.Trim().ToLower())) ||
+                    (c.Location != null && c.Location.ToLower().Contains(searchTerm.Trim().ToLower()))
+                );
+            }
+
+            var totalCount = await courses.CountAsync();
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+            var paginatedCourses = await courses
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .Select(a => new CourseResponse
+                {
+                    id = a.Id,
+                    Title = a.Title,
+                    Subject = a.Subject,
+                    Description = a.Description,
+                    Location = a.Location,
+                    Semester = a.Semester,
+                    StartDate = a.StartDate,
+                    EndDate = a.EndDate,
+                    TeachingMethod = a.TeachingMethod,
+                    TuitionFee = a.TuitionFee,
+                    Capacity = a.Capacity,
+                    GradeLevel = a.GradeLevel,
+                    Status = a.Status,
+                    TeacherProfileId = a.TeacherProfileId,
+                    CenterProfileId = a.CenterProfileId,
+                }).ToListAsync();
+            return paginatedCourses;
+        }
+
         public async Task<IEnumerable<CourseSubjectResponse>> GetAllCourseSubject(string? searchTerm, int pageNumber, int pageSize, Guid? CourseId, Guid? TeacherProfileId, string? status)
         {
             var subjectBuilder = _unitOfWork.GetRepository<SubjectBuilder>().Entities

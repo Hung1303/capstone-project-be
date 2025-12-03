@@ -72,8 +72,22 @@ namespace API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
         }
+
+        [HttpGet("{TeacherProfileId}/Courses")]
+        public async Task<IActionResult> GetApprovedCoursesByTeacher(Guid TeacherProfileId, [FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        {
+            try
+            {
+                var result = await _courseService.GetAllApprovedCoursesByTeacher(TeacherProfileId, searchTerm, pageNumber, pageSize);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCourseById(Guid id)
         {
