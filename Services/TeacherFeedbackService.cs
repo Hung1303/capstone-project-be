@@ -15,7 +15,8 @@ namespace Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<TeacherFeedbackResponse> CreateTeacherFeedback(Guid teacherProfileId, Guid reviewerId, CreateTeacherFeedbackRequest request)
+        public async Task<TeacherFeedbackResponse> CreateTeacherFeedback(
+    Guid teacherProfileId, Guid reviewerId, CreateTeacherFeedbackRequest request)
         {
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
                 .FirstOrDefaultAsync(t => t.Id == teacherProfileId);
@@ -23,23 +24,40 @@ namespace Services
             var reviewer = await _unitOfWork.GetRepository<User>().Entities
                 .Include(s => s.StudentProfile)
                 .Include(p => p.ParentProfile)
-                .FirstOrDefaultAsync(x => x.Id == reviewerId && !x.IsDeleted && x.Status == AccountStatus.Active);
+                .ThenInclude(pp => pp.StudentProfiles)
+                .FirstOrDefaultAsync(x => x.Id == reviewerId &&
+                                          !x.IsDeleted &&
+                                          x.Status == AccountStatus.Active);
 
-            if (teacher == null) return null;
-            if (reviewer != null && reviewer.Role == UserRole.Student)
+            if (teacher == null || reviewer == null)
+                return null;
+
+
+            if (reviewer.Role == UserRole.Student && reviewer.StudentProfile != null)
             {
+                var studentId = reviewer.StudentProfile.Id;
+
+                // Check the student enrolled in any course taught by this teacher
+                var isEnrolled = await _unitOfWork.GetRepository<Enrollment>().Entities
+                    .AnyAsync(e =>
+                        e.StudentProfileId == studentId &&
+                        e.Course.TeacherProfileId == teacherProfileId &&
+                        e.Status == EnrollmentStatus.Confirmed &&
+                        !e.IsDeleted
+                    );
+
+                if (!isEnrolled)
+                    throw new Exception("Only students enrolled in the teacher's course can leave feedback.");
+
                 var feedback = new TeacherFeedback
                 {
                     TeacherProfileId = teacher.Id,
-                    StudentProfileId = reviewer.StudentProfile.Id,
+                    StudentProfileId = studentId,
                     ParentProfileId = null,
                     Rating = request.Rating,
                     Comment = request.Comment,
                     SubmittedAt = DateTimeOffset.UtcNow,
-                    Status = ReviewStatus.PendingModeration,
-                    ModeratedByUserId = null,
-                    ModeratedAt = null,
-                    ModerationNotes = null
+                    Status = ReviewStatus.PendingModeration
                 };
 
                 await _unitOfWork.GetRepository<TeacherFeedback>().InsertAsync(feedback);
@@ -59,20 +77,33 @@ namespace Services
                     LastUpdatedAt = feedback.LastUpdatedAt
                 };
             }
-            else if (reviewer != null && reviewer.Role == UserRole.Teacher)
+
+
+            if (reviewer.Role == UserRole.Parent && reviewer.ParentProfile != null)
             {
+                var parent = reviewer.ParentProfile;
+
+                // Check if any child is enrolled in a course taught by this teacher
+                var isParentOfEnrolledStudent = await _unitOfWork.GetRepository<Enrollment>().Entities
+                    .AnyAsync(e =>
+                        e.Course.TeacherProfileId == teacherProfileId &&
+                        e.Status == EnrollmentStatus.Confirmed &&
+                        e.StudentProfile.ParentProfileId == parent.Id &&
+                        !e.IsDeleted
+                    );
+
+                if (!isParentOfEnrolledStudent)
+                    throw new Exception("Only parents of students enrolled in the teacher’s course can leave feedback.");
+
                 var feedback = new TeacherFeedback
                 {
                     TeacherProfileId = teacher.Id,
                     StudentProfileId = null,
-                    ParentProfileId = reviewer.ParentProfile.Id,
+                    ParentProfileId = parent.Id,
                     Rating = request.Rating,
                     Comment = request.Comment,
                     SubmittedAt = DateTimeOffset.UtcNow,
-                    Status = ReviewStatus.PendingModeration,
-                    ModeratedByUserId = null,
-                    ModeratedAt = null,
-                    ModerationNotes = null
+                    Status = ReviewStatus.PendingModeration
                 };
 
                 await _unitOfWork.GetRepository<TeacherFeedback>().InsertAsync(feedback);
@@ -93,8 +124,9 @@ namespace Services
                 };
             }
 
-            return null;
+            throw new Exception("Only enrolled students or their parents can leave teacher feedback.");
         }
+
 
         public async Task<TeacherFeedbackResponse> GetTeacherFeedbackById(Guid feedbackId)
         {

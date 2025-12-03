@@ -7,7 +7,7 @@ namespace BusinessObjects
     {
         public Guid UserId { get; set; }
         public string SchoolName { get; set; } = string.Empty;
-        public string SchoolYear { get; set; } = string.Empty; // Ví dụ: "2024-2025"        
+        public string SchoolYear { get; set; } = string.Empty; //Example: "2024-2025"        
         [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
         public int GradeLevel { get; set; }
         public string ClassName { get; set; }

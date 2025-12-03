@@ -99,7 +99,7 @@ namespace Services
                 throw new Exception("Subscription package not found");
             }
 
-            // Check if package has active subscriptions
+            
             var hasActiveSubscriptions = await _unitOfWork.GetRepository<CenterSubscription>()
                 .Entities
                 .AnyAsync(s => s.SubscriptionPackageId == id &&
@@ -194,7 +194,6 @@ namespace Services
                 throw new Exception("Subscription package not found or inactive");
             }
 
-            // Cancel existing active subscription if any
             var existingActiveSubscription = await _unitOfWork.GetRepository<CenterSubscription>()
                 .Entities
                 .FirstOrDefaultAsync(s => s.CenterProfileId == request.CenterProfileId &&
@@ -209,7 +208,7 @@ namespace Services
                 await _unitOfWork.GetRepository<CenterSubscription>().UpdateAsync(existingActiveSubscription);
             }
 
-            // Create new subscription
+           
             var now = DateTime.UtcNow;
             var endDate = now.AddMonths(1);
             var autoRenewalDate = request.AutoRenewalEnabled ? endDate : (DateTime?)null;
@@ -259,7 +258,7 @@ namespace Services
 
             if (currentSubscription == null)
             {
-                // No active subscription, create new one
+               
                 return await SubscribeCenterAsync(new SubscribeCenterRequest
                 {
                     CenterProfileId = request.CenterProfileId,
@@ -268,7 +267,7 @@ namespace Services
                 });
             }
 
-            // Check if upgrading to higher tier
+           
             var currentPackage = await _unitOfWork.GetRepository<SubscriptionPackage>()
                 .Entities
                 .FirstOrDefaultAsync(p => p.Id == currentSubscription.SubscriptionPackageId && !p.IsDeleted);
@@ -278,13 +277,13 @@ namespace Services
                 throw new Exception("Can only upgrade to a higher tier package");
             }
 
-            // Cancel current subscription
+           
             currentSubscription.Status = SubscriptionStatus.Cancelled;
             currentSubscription.CancelledAt = DateTime.UtcNow;
             currentSubscription.LastUpdatedAt = DateTime.UtcNow;
             await _unitOfWork.GetRepository<CenterSubscription>().UpdateAsync(currentSubscription);
 
-            // Create new subscription
+            
             var now = DateTime.UtcNow;
             var endDate = now.AddMonths(1);
             var autoRenewalDate = request.AutoRenewalEnabled ? endDate : (DateTime?)null;
@@ -444,10 +443,7 @@ namespace Services
             return activeSubscription.MaxCoursePosts;
         }
 
-        /// <summary>
-        /// Gets subscription details including calculated course posting limits.
-        /// Calculates remaining posts by: MaxCoursePosts (from package) - Courses created this month.
-        /// </summary>
+        
         private async Task<CenterSubscriptionResponse?> GetCenterSubscriptionResponseAsync(Guid subscriptionId)
         {
             var subscription = await _unitOfWork.GetRepository<CenterSubscription>()
@@ -461,15 +457,12 @@ namespace Services
                 return null;
             }
 
-            // Calculate current course posts for this subscription period (monthly limit)
-            // Count all courses posted within the subscription period (StartDate to EndDate)
-            // This includes all statuses (Draft, PendingApproval, Approved, etc.)
-            // because creating a course uses up a posting slot regardless of its status
+            //To calculate the remaining course posts
             var currentPublishedCoursePosts = await _unitOfWork.GetRepository<Course>()
                 .Entities
                 .CountAsync(c => c.CenterProfileId == subscription.CenterProfileId &&
                      !c.IsDeleted &&
-                     c.IsPublished && // Only count published courses
+                     c.IsPublished && 
                      c.PublishedAt >= subscription.StartDate &&
                      c.PublishedAt <= subscription.EndDate);
 

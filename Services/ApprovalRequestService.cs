@@ -16,9 +16,7 @@ namespace API.Services
             _unitOfWork = unitOfWork;
         }
 
-        /// <summary>
-        /// Tạo yêu cầu duyệt khóa học
-        /// </summary>
+        
         public async Task<bool> CreateApprovalRequestAsync(Guid courseId, Guid requestedByUserId, string? notes = null)
         {
             var courseRepo = _unitOfWork.GetRepository<Course>();
@@ -30,7 +28,7 @@ namespace API.Services
             if (course.Status != CourseStatus.Draft)
                 throw new Exception("Only courses in Draft status can be submitted for approval.");
 
-            // Tạo mới request
+            
             var request = new ApprovalRequest
             {
                 CourseId = course.Id,
@@ -38,7 +36,7 @@ namespace API.Services
                 Decision = ApprovalDecision.Pending
             };
 
-            // Đổi trạng thái khóa học thành PendingApproval
+            
             course.Status = CourseStatus.PendingApproval;
 
             await approvalRepo.InsertAsync(request);
@@ -48,9 +46,7 @@ namespace API.Services
             return true;
         }
 
-        /// <summary>
-        /// Duyệt hoặc từ chối yêu cầu (chỉ Admin / Inspector)
-        /// </summary>
+        
         public async Task<bool> ReviewApprovalRequestAsync(Guid approvalRequestId, Guid reviewerUserId, ApprovalDecision decision, string? notes = null)
         {
             var approvalRepo = _unitOfWork.GetRepository<ApprovalRequest>();
@@ -66,13 +62,12 @@ namespace API.Services
             if (reviewer == null)
                 throw new Exception("Only Admin or Inspector can approve/reject courses.");
 
-            // Cập nhật request
             request.Decision = decision;
             request.DecidedByUserId = reviewer.Id;
             request.DecidedAt = DateTimeOffset.UtcNow;
             request.Notes = notes ?? request.Notes;
 
-            // Cập nhật trạng thái khóa học
+            
             if (request.Course != null)
             {
                 request.Course.Status = decision switch
@@ -91,9 +86,7 @@ namespace API.Services
             return true;
         }
 
-        /// <summary>
-        /// Lấy danh sách yêu cầu duyệt
-        /// </summary>
+        
         public async Task<(IEnumerable<ApprovalRequestResponse> Records, int TotalCount)> GetApprovalRequestsAsync(int pageNumber, int pageSize, string? searchKeyword = null)
         {
             var approvalRepo = _unitOfWork.GetRepository<ApprovalRequest>().Entities;
@@ -135,9 +128,7 @@ namespace API.Services
             return (records, totalCount);
         }
 
-        /// <summary>
-        /// Lấy chi tiết yêu cầu duyệt
-        /// </summary>
+      
         public async Task<ApprovalRequestResponse> GetApprovalRequestByIdAsync(Guid id)
         {
             var request = await _unitOfWork.GetRepository<ApprovalRequest>().Entities
