@@ -60,29 +60,29 @@ namespace Services
                 throw new Exception("Teacher must be verified per Circular 29 before creating courses");
             }
 
-            // Circular 29: institution teachers must not conduct off-campus in-person extra classes
-            if (teacher.CenterProfileId != null)
-            {
-                if (centerToUse == null || centerToUse != teacher.CenterProfileId)
-                {
-                    throw new Exception("Institution teacher cannot create off-campus classes (Circular 29)");
-                }
+            //// Circular 29: institution teachers must not conduct off-campus in-person extra classes
+            //if (teacher.CenterProfileId != null)
+            //{
+            //    if (centerToUse == null || centerToUse != teacher.CenterProfileId)
+            //    {
+            //        throw new Exception("Institution teacher cannot create off-campus classes (Circular 29)");
+            //    }
 
-                // If in-person, ensure location is at the center address
-                var center = await _unitOfWork
-                    .GetRepository<CenterProfile>()
-                    .Entities
-                    .FirstOrDefaultAsync(a => a.Id == centerToUse);
-                if (center != null && course.TeachingMethod == TeachingMethod.InPerson)
-                {
-                    var addr = (center.Address ?? string.Empty).Trim().ToLower();
-                    var loc = (course.Location ?? string.Empty).Trim().ToLower();
-                    if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
-                    {
-                        throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
-                    }
-                }
-            }
+            //    // If in-person, ensure location is at the center address
+            //    var center = await _unitOfWork
+            //        .GetRepository<CenterProfile>()
+            //        .Entities
+            //        .FirstOrDefaultAsync(a => a.Id == centerToUse);
+            //    if (center != null && course.TeachingMethod == TeachingMethod.InPerson)
+            //    {
+            //        var addr = (center.Address ?? string.Empty).Trim().ToLower();
+            //        var loc = (course.Location ?? string.Empty).Trim().ToLower();
+            //        if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
+            //        {
+            //            throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
+            //        }
+            //    }
+            //}
 
 
 
