@@ -612,6 +612,9 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -619,6 +622,9 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Semester")
                         .HasColumnType("integer");

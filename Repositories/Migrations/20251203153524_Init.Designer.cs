@@ -12,8 +12,8 @@ using Repositories.Context;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251118145557_init")]
-    partial class init
+    [Migration("20251203153524_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -459,6 +459,14 @@ namespace Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ClassDescription")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClassName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -500,6 +508,8 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-1111-aaaa-bbbb-111111111111"),
+                            ClassDescription = "A",
+                            ClassName = "ClassA",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DayOfWeek = 1,
                             EndDate = new DateOnly(2025, 5, 31),
@@ -514,6 +524,8 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = new Guid("bbbbbbbb-2222-aaaa-bbbb-222222222222"),
+                            ClassDescription = "A",
+                            ClassName = "ClassA",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DayOfWeek = 3,
                             EndDate = new DateOnly(2025, 5, 31),
@@ -528,6 +540,8 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = new Guid("cccccccc-3333-aaaa-bbbb-333333333333"),
+                            ClassDescription = "B",
+                            ClassName = "ClassB",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DayOfWeek = 5,
                             EndDate = new DateOnly(2025, 5, 31),
@@ -542,6 +556,8 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = new Guid("dddddddd-4444-aaaa-bbbb-444444444444"),
+                            ClassDescription = "B",
+                            ClassName = "ClassB",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DayOfWeek = 2,
                             EndDate = new DateOnly(2025, 5, 31),
@@ -556,6 +572,8 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = new Guid("eeeeeeee-5555-aaaa-bbbb-555555555555"),
+                            ClassDescription = "C",
+                            ClassName = "ClassC",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DayOfWeek = 6,
                             EndDate = new DateOnly(2025, 5, 31),
@@ -597,6 +615,9 @@ namespace Repositories.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -604,6 +625,9 @@ namespace Repositories.Migrations
                         .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Semester")
                         .HasColumnType("integer");

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -388,6 +388,8 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassName = table.Column<string>(type: "text", nullable: false),
+                    ClassDescription = table.Column<string>(type: "text", nullable: false),
                     DayOfWeek = table.Column<int>(type: "integer", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
                     EndTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
@@ -427,6 +429,8 @@ namespace Repositories.Migrations
                     Capacity = table.Column<int>(type: "integer", nullable: false),
                     GradeLevel = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
+                    IsPublished = table.Column<bool>(type: "boolean", nullable: false),
+                    PublishedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     TeacherProfileId = table.Column<Guid>(type: "uuid", nullable: true),
                     CenterProfileId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -935,14 +939,14 @@ namespace Repositories.Migrations
 
             migrationBuilder.InsertData(
                 table: "ClassSchedules",
-                columns: new[] { "Id", "CreatedAt", "DayOfWeek", "EndDate", "EndTime", "IsDeleted", "LastUpdatedAt", "RoomOrLink", "StartDate", "StartTime", "TeacherProfileId" },
+                columns: new[] { "Id", "ClassDescription", "ClassName", "CreatedAt", "DayOfWeek", "EndDate", "EndTime", "IsDeleted", "LastUpdatedAt", "RoomOrLink", "StartDate", "StartTime", "TeacherProfileId" },
                 values: new object[,]
                 {
-                    { new Guid("aaaaaaaa-1111-aaaa-bbbb-111111111111"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, new DateOnly(2025, 5, 31), new TimeOnly(10, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Room 101, 123 Learning Ave, Cityville", new DateOnly(2025, 2, 1), new TimeOnly(9, 0, 0), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
-                    { new Guid("bbbbbbbb-2222-aaaa-bbbb-222222222222"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3, new DateOnly(2025, 5, 31), new TimeOnly(15, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Room 101, 123 Learning Ave, Cityville", new DateOnly(2025, 2, 1), new TimeOnly(14, 0, 0), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
-                    { new Guid("cccccccc-3333-aaaa-bbbb-333333333333"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 5, new DateOnly(2025, 5, 31), new TimeOnly(10, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Room 102, 123 Learning Ave, Cityville", new DateOnly(2025, 2, 1), new TimeOnly(9, 0, 0), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
-                    { new Guid("dddddddd-4444-aaaa-bbbb-444444444444"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, new DateOnly(2025, 5, 31), new TimeOnly(16, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Lab Room 1, 123 Learning Ave, Cityville", new DateOnly(2025, 2, 1), new TimeOnly(15, 0, 0), new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc") },
-                    { new Guid("eeeeeeee-5555-aaaa-bbbb-555555555555"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 6, new DateOnly(2025, 5, 31), new TimeOnly(11, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "https://zoom.us/j/1234567890", new DateOnly(2025, 2, 1), new TimeOnly(10, 0, 0), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") }
+                    { new Guid("aaaaaaaa-1111-aaaa-bbbb-111111111111"), "A", "ClassA", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, new DateOnly(2025, 5, 31), new TimeOnly(10, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Room 101, 123 Learning Ave, Cityville", new DateOnly(2025, 2, 1), new TimeOnly(9, 0, 0), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
+                    { new Guid("bbbbbbbb-2222-aaaa-bbbb-222222222222"), "A", "ClassA", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3, new DateOnly(2025, 5, 31), new TimeOnly(15, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Room 101, 123 Learning Ave, Cityville", new DateOnly(2025, 2, 1), new TimeOnly(14, 0, 0), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
+                    { new Guid("cccccccc-3333-aaaa-bbbb-333333333333"), "B", "ClassB", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 5, new DateOnly(2025, 5, 31), new TimeOnly(10, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Room 102, 123 Learning Ave, Cityville", new DateOnly(2025, 2, 1), new TimeOnly(9, 0, 0), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") },
+                    { new Guid("dddddddd-4444-aaaa-bbbb-444444444444"), "B", "ClassB", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, new DateOnly(2025, 5, 31), new TimeOnly(16, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Lab Room 1, 123 Learning Ave, Cityville", new DateOnly(2025, 2, 1), new TimeOnly(15, 0, 0), new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc") },
+                    { new Guid("eeeeeeee-5555-aaaa-bbbb-555555555555"), "C", "ClassC", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 6, new DateOnly(2025, 5, 31), new TimeOnly(11, 30, 0), false, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "https://zoom.us/j/1234567890", new DateOnly(2025, 2, 1), new TimeOnly(10, 0, 0), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") }
                 });
 
             migrationBuilder.InsertData(
