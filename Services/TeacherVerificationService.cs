@@ -21,13 +21,13 @@ namespace Services
                 .FirstOrDefaultAsync(t => t.Id == request.TeacherProfileId && !t.IsDeleted);
             if (teacher == null) throw new Exception("TeacherProfile not found");
 
-            // Guard: Already verified
+            
             if (teacher.VerificationStatus == VerificationStatus.Completed || teacher.VerificationStatus == VerificationStatus.Finalized)
             {
                 throw new Exception("Teacher is already verified");
             }
 
-            // Guard: User already active
+            
             var user = await _unitOfWork.GetRepository<User>().Entities
                 .FirstOrDefaultAsync(u => u.Id == teacher.UserId && !u.IsDeleted);
             if (user != null && user.Status == AccountStatus.Active)
@@ -35,7 +35,7 @@ namespace Services
                 throw new Exception("User account is already active; verification not required");
             }
 
-            // Guard: Existing pending verification request
+            
             var existingPending = await _unitOfWork.GetRepository<TeacherVerificationRequest>().Entities
                 .AnyAsync(v => v.TeacherProfileId == teacher.Id && !v.IsDeleted && v.Status == VerificationStatus.Pending);
             if (existingPending)
@@ -52,7 +52,7 @@ namespace Services
             };
             await _unitOfWork.GetRepository<TeacherVerificationRequest>().InsertAsync(ver);
 
-            // update teacher status timestamps
+            
             teacher.VerificationStatus = VerificationStatus.Pending;
             teacher.VerificationRequestedAt = DateTime.UtcNow;
             await _unitOfWork.GetRepository<TeacherProfile>().UpdateAsync(teacher);
@@ -160,7 +160,7 @@ namespace Services
 
             await _unitOfWork.GetRepository<TeacherVerificationRequest>().UpdateAsync(ver);
 
-            // reflect into teacher profile
+           
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(t => t.Id == ver.TeacherProfileId && !t.IsDeleted && t.VerificationStatus == VerificationStatus.InProgress);
             if (teacher != null)
             {
@@ -169,7 +169,7 @@ namespace Services
                 teacher.VerificationNotes = request.Notes ?? teacher.VerificationNotes;
                 await _unitOfWork.GetRepository<TeacherProfile>().UpdateAsync(teacher);
 
-                // If verification completed/finalized, activate the associated User account
+               
                 if (request.Status == VerificationStatus.Completed || request.Status == VerificationStatus.Finalized)
                 {
                     var user = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Id == teacher.UserId && !u.IsDeleted);

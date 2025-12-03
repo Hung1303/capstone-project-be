@@ -16,20 +16,39 @@ namespace Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<CourseFeedbackResponse> CreateCourseFeedback(Guid courseId, Guid reviewerId, CreateCourseFeedbackRequest request)
+        public async Task<CourseFeedbackResponse> CreateCourseFeedback(
+            Guid courseId, Guid reviewerId, CreateCourseFeedbackRequest request)
         {
             var course = await _unitOfWork.GetRepository<Course>().Entities
-                .FirstOrDefaultAsync(t => t.Id == courseId && t.Status == CourseStatus.Approved && !t.IsDeleted);
+                .FirstOrDefaultAsync(t => t.Id == courseId &&
+                                          t.Status == CourseStatus.Approved &&
+                                          !t.IsDeleted);
 
             var reviewer = await _unitOfWork.GetRepository<User>().Entities
                 .Include(s => s.StudentProfile)
                 .Include(p => p.ParentProfile)
-                .FirstOrDefaultAsync(x => x.Id == reviewerId && !x.IsDeleted && x.Status == AccountStatus.Active);
+                .ThenInclude(pp => pp.StudentProfiles)
+                .FirstOrDefaultAsync(x => x.Id == reviewerId &&
+                                          !x.IsDeleted &&
+                                          x.Status == AccountStatus.Active);
 
+            if (course == null || reviewer == null)
+                return null;
 
-            if (course == null) return null;
-            if (reviewer != null && reviewer.Role == UserRole.Student)
+            if (reviewer.Role == UserRole.Student && reviewer.StudentProfile != null)
             {
+                // Verify student enrollment
+                var isStudentEnrolled = await _unitOfWork.GetRepository<Enrollment>().Entities
+                    .AnyAsync(e =>
+                        e.CourseId == course.Id &&
+                        e.StudentProfileId == reviewer.StudentProfile.Id &&
+                        e.Status == EnrollmentStatus.Confirmed &&
+                        !e.IsDeleted
+                    );
+
+                if (!isStudentEnrolled)
+                    throw new Exception("Only enrolled students can leave feedback.");
+
                 var feedback = new CourseFeedback
                 {
                     CourseId = course.Id,
@@ -37,10 +56,7 @@ namespace Services
                     ParentProfileId = null,
                     Rating = request.Rating,
                     Comment = request.Comment,
-                    Status = ReviewStatus.PendingModeration,
-                    ModeratedByUserId = null,
-                    ModeratedAt = null,
-                    ModerationNotes = null
+                    Status = ReviewStatus.PendingModeration
                 };
 
                 await _unitOfWork.GetRepository<CourseFeedback>().InsertAsync(feedback);
@@ -59,8 +75,22 @@ namespace Services
                     LastUpdatedAt = feedback.LastUpdatedAt
                 };
             }
-            else if (reviewer != null && reviewer.Role == UserRole.Teacher)
+
+            
+            if (reviewer.Role == UserRole.Parent && reviewer.ParentProfile != null)
             {
+                // Verify any child is enrolled
+                var isParentOfEnrolledStudent = await _unitOfWork.GetRepository<Enrollment>().Entities
+                    .AnyAsync(e =>
+                        e.CourseId == course.Id &&
+                        e.StudentProfile.ParentProfileId == reviewer.ParentProfile.Id &&
+                        e.Status == EnrollmentStatus.Confirmed &&
+                        !e.IsDeleted
+                    );
+
+                if (!isParentOfEnrolledStudent)
+                    throw new Exception("Only parents of enrolled students can leave feedback.");
+
                 var feedback = new CourseFeedback
                 {
                     CourseId = course.Id,
@@ -68,10 +98,7 @@ namespace Services
                     ParentProfileId = reviewer.ParentProfile.Id,
                     Rating = request.Rating,
                     Comment = request.Comment,
-                    Status = ReviewStatus.PendingModeration,
-                    ModeratedByUserId = null,
-                    ModeratedAt = null,
-                    ModerationNotes = null
+                    Status = ReviewStatus.PendingModeration
                 };
 
                 await _unitOfWork.GetRepository<CourseFeedback>().InsertAsync(feedback);
@@ -91,7 +118,7 @@ namespace Services
                 };
             }
 
-            return null;
+            throw new Exception("Only enrolled students or their parents can leave feedback.");
         }
 
         public async Task<CourseFeedbackResponse> GetCourseFeedbackById(Guid courseFeedbackId)

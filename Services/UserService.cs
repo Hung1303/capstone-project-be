@@ -136,7 +136,7 @@ namespace Services
                 Status = CenterStatus.Pending
             };
 
-            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
+            
             try
             {
                 _unitOfWork.BeginTransaction();
@@ -194,7 +194,7 @@ namespace Services
                 PhoneSecondary = request.PhoneSecondary
             };
 
-            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
+           
             try
             {
                 _unitOfWork.BeginTransaction();
@@ -226,12 +226,12 @@ namespace Services
             if (parentProfile == null)
                 throw new Exception("Parent Profile not found.");
 
-            // ✅ Validate FullName format
+            
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
                 throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
 
-            // ✅ Validate SchoolYear format (e.g., "2024-2025")
+            
             var yearRangePattern = @"^(\d{4})-(\d{4})$";
             if (string.IsNullOrWhiteSpace(request.SchoolYear) || !Regex.IsMatch(request.SchoolYear.Trim(), yearRangePattern))
                 throw new Exception("School year must follow the format 'YYYY-YYYY' (e.g., 2024-2025).");
@@ -243,7 +243,7 @@ namespace Services
             if (endYear != startYear + 1)
                 throw new Exception("The second year in SchoolYear must be exactly one greater than the first (e.g., 2024-2025).");
 
-            // ✅ Check duplicates
+            
             var checkUser = await _unitOfWork.GetRepository<User>().Entities
                 .FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
 
@@ -257,7 +257,7 @@ namespace Services
                     throw new Exception("Duplicate phone number");
             }
 
-            // ✅ Create User
+            
             var user = new User
             {
                 Email = request.Email,
@@ -269,7 +269,7 @@ namespace Services
                 Status = AccountStatus.Pending
             };
 
-            // ✅ Create Student Profile
+            
             var student = new StudentProfile
             {
                 UserId = user.Id,
@@ -280,7 +280,7 @@ namespace Services
                 ParentProfileId = parentProfile.Id
             };
 
-            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
+            
             try
             {
                 _unitOfWork.BeginTransaction();
@@ -340,7 +340,6 @@ namespace Services
                 TeachAtClasses = request.TeachAtClasses
             };
 
-            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
             try
             {
                 _unitOfWork.BeginTransaction();
@@ -410,8 +409,7 @@ namespace Services
                 TeachAtClasses = request.TeachAtClasses,
                 CenterProfileId = center.Id
             };
-
-            // ✅ Use transaction to ensure atomicity - both entities must succeed or both fail
+           
             try
             {
                 _unitOfWork.BeginTransaction();
@@ -435,7 +433,6 @@ namespace Services
         {
             IQueryable<User> query = _unitOfWork.GetRepository<User>().Entities;
 
-            // Optional search by FullName
             if (!string.IsNullOrWhiteSpace(fullName))
             {
                 query = query.Where(u => EF.Functions.Like(u.FullName, $"%{fullName}%"));
@@ -448,7 +445,7 @@ namespace Services
 
             int totalCount = await query.CountAsync();
 
-            // Query with projection into DTO
+            
             var users = await query
                 .OrderByDescending(u => u.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
@@ -691,13 +688,13 @@ namespace Services
             var centerRepo = _unitOfWork.GetRepository<CenterProfile>().Entities;
             var userRepo = _unitOfWork.GetRepository<User>().Entities;
 
-            // Build base query with join to User
+            
             var query = from c in centerRepo
                         join u in userRepo on c.UserId equals u.Id
                         where !c.IsDeleted && !u.IsDeleted
                         select new { Center = c, User = u };
 
-            // Optional search by center name
+            
             if (!string.IsNullOrWhiteSpace(centerName))
             {
                 query = query.Where(x => EF.Functions.Like(x.Center.CenterName, $"%{centerName}%"));
@@ -705,7 +702,7 @@ namespace Services
 
             int totalCount = await query.CountAsync();
 
-            // Projection to DTO
+            
             var centers = await query
                 .OrderByDescending(x => x.Center.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
@@ -878,13 +875,12 @@ namespace Services
             var teacherRepo = _unitOfWork.GetRepository<TeacherProfile>().Entities;
             var userRepo = _unitOfWork.GetRepository<User>().Entities;
 
-            // Join teachers and users, filter by centerId
             var query = from t in teacherRepo
                         join u in userRepo on t.UserId equals u.Id
                         where !t.IsDeleted && !u.IsDeleted && t.CenterProfileId == centerId
                         select new { Teacher = t, User = u };
 
-            // Optional search by teacher full name
+            
             if (!string.IsNullOrWhiteSpace(fullName))
             {
                 query = query.Where(x => EF.Functions.Like(x.User.FullName, $"%{fullName}%"));
@@ -892,7 +888,7 @@ namespace Services
 
             int totalCount = await query.CountAsync();
 
-            // Paginate + project into DTO
+          
             var teachers = await query
                 .OrderByDescending(x => x.User.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
@@ -1124,7 +1120,7 @@ namespace Services
                  Include(s => s.StudentProfile)
                  .Where(u => u.StudentProfile.ParentProfileId == parentProfileId && !u.IsDeleted && u.Status == AccountStatus.Active);
 
-            // Optional search by teacher full name
+            
             if (!string.IsNullOrWhiteSpace(fullName))
             {
                 query = query.Where(x => EF.Functions.Like(x.FullName, $"%{fullName}%"));
@@ -1132,7 +1128,7 @@ namespace Services
 
             int totalCount = await query.CountAsync();
 
-            // Paginate + project into DTO
+          
             var students = await query
                 .OrderByDescending(x => x.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
