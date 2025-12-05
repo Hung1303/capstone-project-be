@@ -84,14 +84,14 @@ namespace Services
             query["vnp_Command"] = "pay";
             query["vnp_TmnCode"] = _configuration["Vnpay:TmnCode"];
             query["vnp_Amount"] = (payment.Amount*100).ToString();
-            query["vnp_CreateDate"] = DateTime.Now.ToString("yyyyMMddHHmmss");
+            query["vnp_CreateDate"] = DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss");
             query["vnp_CurrCode"] = "VND";
             query["vnp_IpAddr"] = IpAddress;
             query["vnp_Locale"] = "vn";
             query["vnp_OrderInfo"] = payment.Description;
             query["vnp_OrderType"] = "other";
             query["vnp_ReturnUrl"] = _configuration["Vnpay:ReturnUrl"];
-            query["vnp_ExpireDate"] = DateTime.Now.AddMinutes(5).ToString("yyyyMMddHHmmss");
+            query["vnp_ExpireDate"] = DateTime.UtcNow.AddHours(7).AddMinutes(5).ToString("yyyyMMddHHmmss");
             query["vnp_TxnRef"] = payment.Id.ToString();
 
             var hashData = new StringBuilder();

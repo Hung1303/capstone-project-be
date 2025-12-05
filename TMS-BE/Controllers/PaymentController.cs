@@ -102,14 +102,17 @@ namespace API.Controllers
         [HttpGet("Callback")]
         public async Task<IActionResult> Callback()
         {
+            var query = Request.Query;
+            var hashSecret = _configuration["Vnpay:HashSecret"];
+            var paymentSuccessUrl = _configuration["Vnpay:PaymentSuccessUrl"];
+            var paymentFailureUrl = _configuration["Vnpay:PaymentFailureUrl"];
             try
             {
-                var query = Request.Query;
-                var hashSecret = _configuration["Vnpay:HashSecret"];
+                
                 if (!query.TryGetValue("vnp_SecureHash", out var receivedHashValues) ||
                     string.IsNullOrEmpty(receivedHashValues[0]))
                 {
-                    return Ok(new { success = false, message = "Missing vnp_SecureHash" });
+                    return Redirect($"{paymentFailureUrl}");
                 }
                 string receivedHash = receivedHashValues[0];
 
@@ -137,7 +140,7 @@ namespace API.Controllers
 
                 if (!string.Equals(calculatedHash, receivedHash, StringComparison.Ordinal))
                 {
-                    return Ok(new { success = false, message = "Invalid signature" });
+                    return Redirect($"{paymentFailureUrl}");
                 }
 
                 var responseCode = query["vnp_ResponseCode"].ToString();
@@ -148,24 +151,20 @@ namespace API.Controllers
                     var txnRef = query["vnp_TxnRef"].ToString();
                     if (!Guid.TryParse(txnRef, out _))
                     {
-                        return Ok(new { success = false, message = "Invalid TxnRef" });
+                        return Redirect($"{paymentFailureUrl}");
                     }
 
                     var result = await _paymentService.UpdatePayment(Guid.Parse(txnRef));
-                    return Ok(new { success = true, data = result });
+                    return Redirect($"{paymentSuccessUrl}?paymentId={query["vnp_TxnRef"]}");
                 }
                 else
                 {
-                    return Ok(new
-                    {
-                        success = false,
-                        message = "Payment failed",
-                    });
+                    return Redirect($"{paymentFailureUrl}");
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return Redirect($"{paymentFailureUrl}");
             }
 
         }

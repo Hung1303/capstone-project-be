@@ -10,7 +10,7 @@ namespace BusinessObjects
 {
     public class Payment : BaseEntity
     {
-        [Range(10000.00, 1000000000, ErrorMessage = "Ammount must be at between 10.000 and 1.000.000.000")]
+        [Range(10000.00, 100000000, ErrorMessage = "Ammount must be at between 10.000 and 100.000.000")]
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public string status { get; set; }
