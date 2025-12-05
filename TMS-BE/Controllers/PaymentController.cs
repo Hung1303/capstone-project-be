@@ -5,6 +5,7 @@ using Services;
 using Services.DTO.LessonPlan;
 using Services.DTO.Payment;
 using Services.Interfaces;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -28,8 +29,21 @@ namespace API.Controllers
         {
             try
             {
-                var IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-                var result = await _paymentService.CreateVNPAYUrl(paymentId, IpAddress);
+                var ipAddress = HttpContext.Connection.RemoteIpAddress;
+                if (ipAddress != null)
+                {
+                    if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                    {
+                        ipAddress = ipAddress.MapToIPv4();
+                    }
+                }
+
+                var ipAddressString = ipAddress?.ToString();
+                if (string.IsNullOrEmpty(ipAddressString) || ipAddressString == "0.0.0.1" || ipAddressString == "::1")
+                {
+                    ipAddressString = "127.0.0.1";
+                }
+                var result = await _paymentService.CreateVNPAYUrl(paymentId, ipAddressString);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -108,27 +122,29 @@ namespace API.Controllers
             var paymentFailureUrl = _configuration["Vnpay:PaymentFailureUrl"];
             try
             {
-                
-                if (!query.TryGetValue("vnp_SecureHash", out var receivedHashValues) ||
-                    string.IsNullOrEmpty(receivedHashValues[0]))
-                {
-                    return Redirect($"{paymentFailureUrl}");
-                }
-                string receivedHash = receivedHashValues[0];
 
-                var hashData = new StringBuilder();
-                var sortedKeys = query.Keys
+                if (!query.TryGetValue("vnp_SecureHash", out var receivedHashValues))
+                {
+                    return Redirect(paymentFailureUrl);
+                }
+                string receivedHash = receivedHashValues.ToString();
+
+                var sortedParams = query.Keys
                     .Where(k => !string.IsNullOrEmpty(k) &&
-                                !k.Equals("vnp_SecureHash", StringComparison.Ordinal))
-                    .OrderBy(k => k, StringComparer.Ordinal)
+                                !k.StartsWith("vnp_SecureHash")) 
+                    .OrderBy(k => k, StringComparer.InvariantCultureIgnoreCase) 
                     .ToList();
 
-                foreach (var key in sortedKeys)
+                var hashData = new StringBuilder();
+                foreach (var key in sortedParams)
                 {
-                    var rawValue = query[key].ToString(); 
-                    var encodedValue = Uri.EscapeDataString(rawValue);
-                    if (hashData.Length > 0) hashData.Append('&');
-                    hashData.Append($"{key}={encodedValue}");
+                    string value = query[key];
+
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        if (hashData.Length > 0) hashData.Append('&');
+                        hashData.Append($"{key}={WebUtility.UrlEncode(value)}");
+                    }
                 }
 
                 string calculatedHash;
@@ -138,24 +154,26 @@ namespace API.Controllers
                     calculatedHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
                 }
 
-                if (!string.Equals(calculatedHash, receivedHash, StringComparison.Ordinal))
+                if (!calculatedHash.Equals(receivedHash, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return Redirect($"{paymentFailureUrl}");
+                    return Redirect(paymentFailureUrl);
                 }
 
                 var responseCode = query["vnp_ResponseCode"].ToString();
                 var txnStatus = query["vnp_TransactionStatus"].ToString();
+                var txnRef = query["vnp_TxnRef"].ToString();
+                var vnpAmount = Convert.ToInt64(query["vnp_Amount"]) / 100; // VNPAY amount is *100
 
                 if (responseCode == "00" && txnStatus == "00")
                 {
-                    var txnRef = query["vnp_TxnRef"].ToString();
-                    if (!Guid.TryParse(txnRef, out _))
+                    if (!Guid.TryParse(txnRef, out Guid paymentId))
                     {
-                        return Redirect($"{paymentFailureUrl}");
+                        return Redirect(paymentFailureUrl);
                     }
 
-                    var result = await _paymentService.UpdatePayment(Guid.Parse(txnRef));
-                    return Redirect($"{paymentSuccessUrl}?paymentId={query["vnp_TxnRef"]}");
+                    var result = await _paymentService.UpdatePayment(paymentId);
+
+                    return Redirect($"{paymentSuccessUrl}?paymentId={paymentId}");
                 }
                 else
                 {

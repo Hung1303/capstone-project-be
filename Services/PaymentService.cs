@@ -9,7 +9,9 @@ using Services.DTO.Payment;
 using Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,7 +58,7 @@ namespace Services
             return result;
         }
 
-        public async Task<string> CreateVNPAYUrl( Guid paymentId, string IpAddress)
+        public async Task<string> CreateVNPAYUrl(Guid paymentId, string IpAddress)
         {
             var payment = await _unitOfWork.GetRepository<Payment>().Entities.FirstOrDefaultAsync(a => a.Id == paymentId && !a.IsDeleted);
             if (payment == null)
@@ -78,44 +80,70 @@ namespace Services
                 throw new Exception("IpAddress not found.");
             }
 
-            var uriBuilder = new UriBuilder(_configuration["Vnpay:BaseUrl"]);
-            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-            query["vnp_Version"] = "2.1.0";
-            query["vnp_Command"] = "pay";
-            query["vnp_TmnCode"] = _configuration["Vnpay:TmnCode"];
-            query["vnp_Amount"] = (payment.Amount*100).ToString();
-            query["vnp_CreateDate"] = DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss");
-            query["vnp_CurrCode"] = "VND";
-            query["vnp_IpAddr"] = IpAddress;
-            query["vnp_Locale"] = "vn";
-            query["vnp_OrderInfo"] = payment.Description;
-            query["vnp_OrderType"] = "other";
-            query["vnp_ReturnUrl"] = _configuration["Vnpay:ReturnUrl"];
-            query["vnp_ExpireDate"] = DateTime.UtcNow.AddHours(7).AddMinutes(5).ToString("yyyyMMddHHmmss");
-            query["vnp_TxnRef"] = payment.Id.ToString();
+            var vnp_Params = new SortedList<string, string>(new VnpayCompare());
 
-            var hashData = new StringBuilder();
-            var hashKeys = query.AllKeys
-                .Where(k => k != "vnp_SecureHash")
-                .OrderBy(k => k, StringComparer.Ordinal);
+            vnp_Params.Add("vnp_Version", "2.1.0");
+            vnp_Params.Add("vnp_Command", "pay");
+            vnp_Params.Add("vnp_TmnCode", _configuration["Vnpay:TmnCode"]);
+            vnp_Params.Add("vnp_Amount", (payment.Amount * 100).ToString());
+            vnp_Params.Add("vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss"));
+            vnp_Params.Add("vnp_CurrCode", "VND");
+            vnp_Params.Add("vnp_IpAddr", IpAddress); // Ensure this is IPv4 from Controller
+            vnp_Params.Add("vnp_Locale", "vn");
+            vnp_Params.Add("vnp_OrderInfo", payment.Description);
+            vnp_Params.Add("vnp_OrderType", "other");
+            vnp_Params.Add("vnp_ReturnUrl", _configuration["Vnpay:ReturnUrl"]);
+            vnp_Params.Add("vnp_ExpireDate", DateTime.UtcNow.AddHours(7).AddMinutes(15).ToString("yyyyMMddHHmmss"));
+            vnp_Params.Add("vnp_TxnRef", payment.Id.ToString());
 
-            foreach (var key in hashKeys)
+            var data = new StringBuilder();
+
+            foreach (KeyValuePair<string, string> kv in vnp_Params)
             {
-                var value = query[key];
-                if (hashData.Length > 0) hashData.Append('&');
-                hashData.Append($"{key}={Uri.EscapeDataString(value)}");
+                if (!string.IsNullOrEmpty(kv.Value))
+                {
+                    data.Append(WebUtility.UrlEncode(kv.Key) + "=" + WebUtility.UrlEncode(kv.Value) + "&");
+                }
             }
 
-            string hashSecret = _configuration["Vnpay:HashSecret"];
-            using (var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(hashSecret)))
+            string queryString = data.ToString();
+            if (queryString.Length > 0)
             {
-                var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(hashData.ToString()));
-                query["vnp_SecureHash"] = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                queryString = queryString.Remove(queryString.Length - 1, 1);
             }
 
-            uriBuilder.Query = query.ToString();
+            string vnp_SecureHash = HmacSHA512(_configuration["Vnpay:HashSecret"], queryString);
 
-            return uriBuilder.ToString();
+            string baseUrl = _configuration["Vnpay:BaseUrl"];
+            return $"{baseUrl}?{queryString}&vnp_SecureHash={vnp_SecureHash}";
+        }
+
+        public class VnpayCompare : IComparer<string>
+        {
+            public int Compare(string x, string y)
+            {
+                if (x == y) return 0;
+                if (x == null) return -1;
+                if (y == null) return 1;
+                var vnpCompare = CompareInfo.GetCompareInfo("en-US");
+                return vnpCompare.Compare(x, y, CompareOptions.Ordinal);
+            }
+        }
+
+        private string HmacSHA512(string key, string inputData)
+        {
+            var hash = new StringBuilder();
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+            byte[] inputBytes = Encoding.UTF8.GetBytes(inputData);
+            using (var hmac = new HMACSHA512(keyBytes))
+            {
+                byte[] hashValue = hmac.ComputeHash(inputBytes);
+                foreach (var theByte in hashValue)
+                {
+                    hash.Append(theByte.ToString("x2"));
+                }
+            }
+            return hash.ToString();
         }
 
         public async Task<bool> DeletePayment(Guid id)
@@ -184,10 +212,10 @@ namespace Services
             {
                 throw new Exception("Payment Not Found");
             }
-            
+
             payment.status = "DONE";
             payment.PaymentDate = DateTime.UtcNow;
-            
+
             await _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
             await _unitOfWork.SaveAsync();
 
