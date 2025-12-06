@@ -94,6 +94,7 @@ namespace Services.DTO.Course
         public Guid ClassScheduleId { get; set; }
         public string ClassName { get; set; }
         public string ClassDescription { get; set; }
+        public string TeacherName { get; set; }
         public Guid SubjectId { get; set; }
         public Guid TeacherProfileId { get; set; }
         public string status { get; set; }
@@ -151,6 +152,8 @@ namespace Services.DTO.Course
         public int Capacity { get; set; }
         public int GradeLevel { get; set; }
         public CourseStatus Status { get; set; }
+        public string TeacherName { get; set; }
+        public string CenterName { get; set; }
         public Guid? TeacherProfileId { get; set; }
         public Guid? CenterProfileId { get; set; }
     }
