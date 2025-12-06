@@ -1,6 +1,7 @@
 ﻿using BusinessObjects;
 using Core.Base;
 using Core.Security;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Repository.Interfaces;
@@ -355,6 +356,82 @@ namespace API.Controllers
         }
         #endregion
 
+        #region Parent Login
+
+        [HttpPost]
+        [Route("parent-login")]
+        public IActionResult ParentLogin([FromBody] LoginRequest request)
+        {
+            var user = _userService.GetUserByEmailAsync(request.Email).Result;
+
+            // Kiểm tra tồn tại user
+            if (user == null)
+            {
+                return BadRequest(new ResultDTO
+                {
+                    IsSuccess = false,
+                    Message = "Sai email hoặc mật khẩu",
+                    Data = null
+                });
+            }
+
+            // Kiểm tra trạng thái tài khoản
+            if (user.IsDeleted)
+            {
+                return BadRequest(new ResultDTO
+                {
+                    IsSuccess = false,
+                    Message = "Tài khoản đã bị xóa",
+                    Data = null
+                });
+            }
+
+            if (user.Status != AccountStatus.Active)
+            {
+                return BadRequest(new ResultDTO
+                {
+                    IsSuccess = false,
+                    Message = "Tài khoản chưa được kích hoạt",
+                    Data = null
+                });
+            }
+
+            // ✅ Kiểm tra mật khẩu (dùng PasswordHasher.VerifyPassword)
+            bool isPasswordValid = PasswordHasher.VerifyPassword(request.Password, user.PasswordHash);
+
+            if (isPasswordValid)
+            {
+                // Convert userId to string using .ToString()
+                var claims = new List<Claim>
+{
+    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+    new Claim(ClaimTypes.Name, user.Email)
+};
+
+                // Reset refresh token (nếu có)
+                _tokenService.ResetRefreshToken();
+
+                // Sinh JWT token
+                var token = GenerateToken(user, null);
+
+                // ✅ Trả về kết quả thành công
+                return Ok(new ResultDTO
+                {
+                    IsSuccess = true,
+                    Message = "Đăng nhập thành công.",
+                    Data = token
+                });
+            }
+
+            // ❌ Mật khẩu sai
+            return BadRequest(new ResultDTO
+            {
+                IsSuccess = false,
+                Message = "Sai email hoặc mật khẩu",
+                Data = null
+            });
+        }
+        #endregion
 
 
     }
