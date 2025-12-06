@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Core.Base;
+using Microsoft.AspNetCore.Mvc;
 using Services.DTO.EnrollmentDTO;
 using Services.Interfaces;
 
@@ -23,6 +24,32 @@ namespace API.Controllers
             [FromQuery] string? searchTerm = null)
         {
             var enrollments = await _enrollmentService.GetAllEnrollments(searchTerm, pageNumber, pageSize);
+
+            if (enrollments == null || !enrollments.Any())
+                return NotFound(new { message = "No enrollments found." });
+
+            return Ok(new
+            {
+                message = "Successfully retrieved enrollments.",
+                data = enrollments,
+                pagination = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalItems = enrollments.Count(),
+                    // Nếu bạn có totalCount từ service, có thể thêm TotalPages = ...
+                }
+            });
+        }
+
+        [HttpGet("Center/{centerProfileId}/Enrollments")]
+        public async Task<IActionResult> GetAllEnrollmentsByCenter(Guid centerProfileId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? searchTerm = null,
+            EnrollmentStatus? status = null)
+        {
+            var enrollments = await _enrollmentService.GetAllEnrollmentsByCenter(centerProfileId,searchTerm, status, pageNumber, pageSize);
 
             if (enrollments == null || !enrollments.Any())
                 return NotFound(new { message = "No enrollments found." });
