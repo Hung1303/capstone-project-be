@@ -14,7 +14,7 @@ namespace Services.Interfaces
     {
         Task<PaymentResponse> CreatePayment(CreatePaymentRequest request);
         Task<PaymentResponse> UpdatePayment(Guid id);
-        Task<IEnumerable<PaymentResponse>> GetAllPayments(int pageNumber, int pageSize, Guid? userId);
+        Task<IEnumerable<PaymentResponse>> GetAllPayments(int pageNumber, int pageSize, Guid? userId, Guid? CenterSubscriptionId, Guid? EnrollmentId, string? status);
         Task<PaymentResponse> GetPaymentById(Guid id);
         Task<bool> DeletePayment(Guid id);
         Task<string> CreateVNPAYUrl( Guid paymentId, string IpAddress);

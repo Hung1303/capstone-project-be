@@ -16,6 +16,10 @@ namespace BusinessObjects
         public string status { get; set; }
         public DateTime PaymentDate {  get; set; } = DateTime.UtcNow;
         public Guid UserId { get; set; }
+        public Guid? CenterSubscriptionId { get; set; }
+        public Guid? EnrollmentId { get; set; }
         public virtual User User { get; set; }
+        public virtual CenterSubscription CenterSubscription { get; set; }
+        public virtual Enrollment Enrollment { get; set; }
     }
 }

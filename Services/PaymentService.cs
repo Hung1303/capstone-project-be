@@ -37,11 +37,33 @@ namespace Services
             {
                 throw new Exception("User Not Found");
             }
+            if (request.CenterSubscriptionId.HasValue)
+            {
+                var centersub = await _unitOfWork.GetRepository<CenterSubscription>().Entities.FirstOrDefaultAsync(a => a.Id == request.CenterSubscriptionId && !a.IsDeleted);
+                if (centersub == null)
+                {
+                    throw new Exception("Center Not Found");
+                }
+            }
+            if (request.EnrollmentId.HasValue)
+            {
+                var enrollment = await _unitOfWork.GetRepository<Enrollment>().Entities.FirstOrDefaultAsync(a => a.Id == request.EnrollmentId && !a.IsDeleted);
+                if (enrollment == null)
+                {
+                    throw new Exception("Enrollment Not Found");
+                }
+            }
+            if (request.CenterSubscriptionId.HasValue && request.EnrollmentId.HasValue)
+            {
+                throw new Exception("Only CenterSubscriptionId or EnrollmentId allowed not both");
+            }
             var payment = new Payment
             {
                 Amount = request.Amount,
                 Description = request.Description,
                 status = "PENDING",
+                CenterSubscriptionId = request.CenterSubscriptionId,
+                EnrollmentId = request.EnrollmentId,
                 UserId = request.UserId,
             };
             await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
@@ -54,6 +76,8 @@ namespace Services
                 status = payment.status,
                 PaymentDate = payment.PaymentDate,
                 UserId = payment.UserId,
+                CenterSubscriptionId = payment.CenterSubscriptionId,
+                EnrollmentId = payment.EnrollmentId,
             };
             return result;
         }
@@ -159,12 +183,24 @@ namespace Services
             return true;
         }
 
-        public async Task<IEnumerable<PaymentResponse>> GetAllPayments(int pageNumber, int pageSize, Guid? userId)
+        public async Task<IEnumerable<PaymentResponse>> GetAllPayments(int pageNumber, int pageSize, Guid? userId ,Guid? CenterSubscriptionId, Guid? EnrollmentId, string? status)
         {
             var payment = _unitOfWork.GetRepository<Payment>().Entities.Where(a => !a.IsDeleted);
             if (userId.HasValue)
             {
                 payment = payment.Where(a => a.UserId == userId);
+            }
+            if (CenterSubscriptionId.HasValue)
+            {
+                payment = payment.Where(a => a.CenterSubscriptionId == CenterSubscriptionId);
+            }
+            if (CenterSubscriptionId.HasValue)
+            {
+                payment = payment.Where(a => a.EnrollmentId == EnrollmentId);
+            }
+            if (status != null)
+            {
+                payment = payment.Where(a => a.status == status);
             }
             var totalCount = await payment.CountAsync();
             pageNumber = Math.Max(1, pageNumber);
@@ -182,6 +218,8 @@ namespace Services
                     status = a.status,
                     PaymentDate = a.PaymentDate,
                     UserId = a.UserId,
+                    CenterSubscriptionId = a.CenterSubscriptionId,
+                    EnrollmentId = a.EnrollmentId,
                 }).ToListAsync();
             return paginatedPayments;
         }
@@ -201,13 +239,18 @@ namespace Services
                 status = payment.status,
                 PaymentDate = payment.PaymentDate,
                 UserId = payment.UserId,
+                CenterSubscriptionId = payment.CenterSubscriptionId,
+                EnrollmentId = payment.EnrollmentId,
             };
             return result;
         }
 
         public async Task<PaymentResponse> UpdatePayment(Guid id)
         {
-            var payment = await _unitOfWork.GetRepository<Payment>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+            var payment = await _unitOfWork.GetRepository<Payment>().Entities
+                .Include(c => c.CenterSubscription)
+                .Include(c => c.Enrollment)
+                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (payment == null)
             {
                 throw new Exception("Payment Not Found");
@@ -215,6 +258,17 @@ namespace Services
 
             payment.status = "DONE";
             payment.PaymentDate = DateTime.UtcNow;
+
+            if (payment.Enrollment != null && payment.CenterSubscription == null)
+            {
+                payment.Enrollment.Status = EnrollmentStatus.Paid;
+                await _unitOfWork.GetRepository<Enrollment>().UpdateAsync(payment.Enrollment);
+            }
+            if (payment.CenterSubscription != null && payment.Enrollment == null)
+            {
+                payment.CenterSubscription.Status = SubscriptionStatus.Paid;
+                await _unitOfWork.GetRepository<CenterSubscription>().UpdateAsync(payment.CenterSubscription);
+            }
 
             await _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
             await _unitOfWork.SaveAsync();
@@ -227,6 +281,8 @@ namespace Services
                 status = payment.status,
                 PaymentDate = payment.PaymentDate,
                 UserId = payment.UserId,
+                CenterSubscriptionId = payment.CenterSubscriptionId,
+                EnrollmentId = payment.EnrollmentId,
             };
             return result;
         }

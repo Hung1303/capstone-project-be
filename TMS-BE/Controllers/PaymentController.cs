@@ -70,11 +70,11 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPayments([FromQuery] Guid? UserId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        public async Task<IActionResult> GetAllPayments([FromQuery] Guid? UserId, [FromQuery] Guid? CenterSubscriptionId, [FromQuery] Guid? EnrollmentId, [FromQuery] string? status, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
-                var result = await _paymentService.GetAllPayments( pageNumber, pageSize, UserId);
+                var result = await _paymentService.GetAllPayments( pageNumber, pageSize, UserId, CenterSubscriptionId, EnrollmentId, status);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
