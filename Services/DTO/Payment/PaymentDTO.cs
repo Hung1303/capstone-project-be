@@ -13,6 +13,8 @@ namespace Services.DTO.Payment
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public Guid UserId { get; set; }
+        public Guid? CenterSubscriptionId { get; set; }
+        public Guid? EnrollmentId { get; set; }
     }
     public class PaymentResponse
     {
@@ -22,5 +24,7 @@ namespace Services.DTO.Payment
         public string status { get; set; }
         public DateTime PaymentDate;
         public Guid UserId { get; set; }
+        public Guid? CenterSubscriptionId { get; set; }
+        public Guid? EnrollmentId { get; set; }
     }
 }

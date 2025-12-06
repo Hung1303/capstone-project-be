@@ -40,7 +40,8 @@ namespace Core.Base
         Pending = 0,
         Confirmed = 1,
         Cancelled = 2,
-        Completed = 3
+        Completed = 3,
+        Paid = 4,
     }
 
     public enum ReviewStatus
@@ -129,7 +130,8 @@ namespace Core.Base
         Inactive = 0,
         Active = 1,
         Expired = 2,
-        Cancelled = 3
+        Cancelled = 3,
+        Paid = 4
     }
 }
 
