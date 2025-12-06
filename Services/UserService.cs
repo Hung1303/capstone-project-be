@@ -1150,5 +1150,60 @@ namespace Services
 
             return (students, totalCount);
         }
+
+        public async Task<(IEnumerable<StudentEnrollInCourseResponse> Students, int TotalCount)> GetStudentsByCourse(
+    Guid courseId, int pageNumber, int pageSize, string? fullName = null)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            var enrollmentQ = _unitOfWork.GetRepository<Enrollment>().Entities.AsQueryable();
+            var studentQ = _unitOfWork.GetRepository<StudentProfile>().Entities.AsQueryable();
+            var userQ = _unitOfWork.GetRepository<User>().Entities.AsQueryable();
+
+            // base joined query: enroll -> student -> user
+            var joined = from e in enrollmentQ
+                         join s in studentQ on e.StudentProfileId equals s.Id
+                         join u in userQ on s.UserId equals u.Id
+                         where e.CourseId == courseId && e.Status == EnrollmentStatus.Confirmed
+                         select new
+                         {
+                             Enrollment = e,
+                             Student = s,
+                             User = u
+                         };
+
+            // optional filter by student's full name
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                var normalized = fullName.Trim().ToLower();
+                joined = joined.Where(x => EF.Functions.Like(x.User.FullName.ToLower(), $"%{normalized}%"));
+                // alternatively: .Where(x => x.User.FullName.ToLower().Contains(normalized))
+            }
+
+            // total count before paging
+            var totalCount = await joined.CountAsync();
+
+            // apply ordering + paging
+            var page = await joined
+                .OrderBy(x => x.User.FullName) // change ordering if you prefer
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new StudentEnrollInCourseResponse
+                {
+                    UserId = x.User.Id,
+                    StudentProfileId = x.Student.Id,
+                    EnrollmentId = x.Enrollment.Id,
+                    CourseId = x.Enrollment.CourseId,
+                    StudentName = x.User.FullName,
+                    SchoolName = x.Student.SchoolName,
+                    SchoolYear = x.Student.SchoolYear,
+                    GradeLevel = x.Student.GradeLevel,
+                    ClassName = x.Student.ClassName
+                })
+                .ToListAsync();
+
+            return (page, totalCount);
+        }
     }
 }

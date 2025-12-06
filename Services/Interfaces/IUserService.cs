@@ -37,5 +37,7 @@ namespace Services.Interfaces
         Task<bool> UpdateCenterStatusAsync(Guid centerId, CenterStatus status, string? reason = null);
         Task<(IEnumerable<StudentListResponse> Students, int TotalCount)> GetStudentsByParentIdAsync(
            Guid parentProfileId, int pageNumber, int pageSize, string? fullName = null);
+        Task<(IEnumerable<StudentEnrollInCourseResponse> Students, int TotalCount)> GetStudentsByCourse(
+            Guid courseId, int pageNumber, int pageSize, string? fullName = null);
     }
 }
