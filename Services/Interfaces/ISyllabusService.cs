@@ -9,6 +9,6 @@ namespace Services.Interfaces
         Task<IEnumerable<SyllabusResponse>> GetAllSyllabus(string? searchTerm, int pageNumber, int pageSize, Guid? subjectId, Guid? TeacherProfileId);
         Task<SyllabusResponse> GetSyllabusById(Guid id);
         Task<bool> DeleteSyllabus(Guid id);
-        Task<SyllabusResponse2> GetSyllabusBySubjectOfCenter(Guid subjectId, Guid centerProfileId);
+        Task<SyllabusResponse> GetSyllabusBySubjectOfCenter(Guid subjectId, Guid centerProfileId);
     }
 }
