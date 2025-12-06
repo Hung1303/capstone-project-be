@@ -57,6 +57,23 @@ namespace API.Controllers
             }
 
         }
+
+        [HttpGet("{subjectId}/{centerProfileId}")]
+        public async Task<IActionResult> GetSyllabusBySubjectOfCenter(Guid subjectId, Guid centerProfileId)
+        {
+            try
+            {
+                var result = await _syllabusService.GetSyllabusBySubjectOfCenter(subjectId, centerProfileId);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSyllabus(Guid id, UpdateSyllabusRequest request)
         {

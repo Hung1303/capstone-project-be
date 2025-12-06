@@ -60,33 +60,6 @@ namespace Services
                 throw new Exception("Teacher must be verified per Circular 29 before creating courses");
             }
 
-            //// Circular 29: institution teachers must not conduct off-campus in-person extra classes
-            //if (teacher.CenterProfileId != null)
-            //{
-            //    if (centerToUse == null || centerToUse != teacher.CenterProfileId)
-            //    {
-            //        throw new Exception("Institution teacher cannot create off-campus classes (Circular 29)");
-            //    }
-
-            //    // If in-person, ensure location is at the center address
-            //    var center = await _unitOfWork
-            //        .GetRepository<CenterProfile>()
-            //        .Entities
-            //        .FirstOrDefaultAsync(a => a.Id == centerToUse);
-            //    if (center != null && course.TeachingMethod == TeachingMethod.InPerson)
-            //    {
-            //        var addr = (center.Address ?? string.Empty).Trim().ToLower();
-            //        var loc = (course.Location ?? string.Empty).Trim().ToLower();
-            //        if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
-            //        {
-            //            throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
-            //        }
-            //    }
-            //}
-
-
-
-
             course.TeacherProfileId = request.TeacherProfileId;
             await _unitOfWork.GetRepository<Course>().UpdateAsync(course);
             await _unitOfWork.SaveAsync();
@@ -123,26 +96,6 @@ namespace Services
             {
                 throw new Exception("CenterProfile Not Found");
             }
-
-            //// Check subscription limits for centers
-            //if (centerToUse != null)
-            //{
-            //    var canPost = await _subscriptionService.CanCenterPostCourseAsync(centerToUse.Value);
-            //    if (!canPost)
-            //    {
-            //        var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
-            //        var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
-
-            //        if (max == 0)
-            //        {
-            //            throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");
-            //        }
-            //        else
-            //        {
-            //            throw new Exception($"Center has reached the course posting limit ({max} courses). Remaining: {remaining}. Please upgrade your subscription package to post more courses.");
-            //        }
-            //    }
-            //}
 
             var course = new Course
             {
@@ -227,50 +180,6 @@ namespace Services
             {
                 throw new Exception("Teacher must be verified per Circular 29 before creating courses");
             }
-
-            //// Circular 29: institution teachers must not conduct off-campus in-person extra classes
-            //if (teacher.CenterProfileId != null)
-            //{
-            //    if (centerToUse == null || centerToUse != teacher.CenterProfileId)
-            //    {
-            //        throw new Exception("Institution teacher cannot create off-campus classes (Circular 29)");
-            //    }
-
-            //    // If in-person, ensure location is at the center address
-            //    var center = await _unitOfWork
-            //        .GetRepository<CenterProfile>()
-            //        .Entities
-            //        .FirstOrDefaultAsync(a => a.Id == centerToUse);
-            //    if (center != null && request.TeachingMethod == TeachingMethod.InPerson)
-            //    {
-            //        var addr = (center.Address ?? string.Empty).Trim().ToLower();
-            //        var loc = (request.Location ?? string.Empty).Trim().ToLower();
-            //        if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
-            //        {
-            //            throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
-            //        }
-            //    }
-            //}
-
-            //// Check subscription limits for centers
-            //if (centerToUse != null)
-            //{
-            //    var canPost = await _subscriptionService.CanCenterPostCourseAsync(centerToUse.Value);
-            //    if (!canPost)
-            //    {
-            //        var remaining = await _subscriptionService.GetRemainingCoursePostsAsync(centerToUse.Value);
-            //        var max = await _subscriptionService.GetMaxCoursePostsAsync(centerToUse.Value);
-
-            //        if (max == 0)
-            //        {
-            //            throw new Exception("Center does not have an active subscription package. Please subscribe to a package to post courses.");
-            //        }
-            //        else
-            //        {
-            //            throw new Exception($"Center has reached the course posting limit ({max} courses). Remaining: {remaining}. Please upgrade your subscription package to post more courses.");
-            //        }
-            //    }
-            //}
 
             var course = new Course
             {
@@ -379,32 +288,40 @@ namespace Services
             return true;
         }
 
-        public async Task<IEnumerable<CourseResponse>> GetAllCourse(string? searchTerm, int pageNumber, int pageSize, Guid? TeacherProfileId, Guid? CenterProfileId)
+        public async Task<IEnumerable<CourseResponse>> GetAllCourse(
+            string? searchTerm,
+            int pageNumber,
+            int pageSize,
+            Guid? TeacherProfileId,
+            Guid? CenterProfileId)
         {
-            var courses = _unitOfWork.GetRepository<Course>().Entities.Where(a => !a.IsDeleted);
-            if (TeacherProfileId.HasValue)
-            {
-                courses = courses.Where(a => a.TeacherProfileId == TeacherProfileId);
-            }
-            if (CenterProfileId.HasValue)
+            var courses = _unitOfWork.GetRepository<Course>().Entities
+                .Where(a => !a.IsDeleted)
+                .AsNoTracking(); // read-only
 
-            {
+            if (TeacherProfileId.HasValue)
+                courses = courses.Where(a => a.TeacherProfileId == TeacherProfileId);
+
+            if (CenterProfileId.HasValue)
                 courses = courses.Where(a => a.CenterProfileId == CenterProfileId);
-            }
+
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
+                var lowered = searchTerm.Trim().ToLower();
                 courses = courses.Where(c =>
-                    (c.Title != null && c.Title.ToLower().Contains(searchTerm.Trim().ToLower())) ||
-                    (c.Subject != null && c.Subject.ToLower().Contains(searchTerm.Trim().ToLower())) ||
-                    (c.Description != null && c.Description.ToLower().Contains(searchTerm.Trim().ToLower())) ||
-                    (c.Location != null && c.Location.ToLower().Contains(searchTerm.Trim().ToLower()))
+                    (c.Title != null && c.Title.ToLower().Contains(lowered)) ||
+                    (c.Subject != null && c.Subject.ToLower().Contains(lowered)) ||
+                    (c.Description != null && c.Description.ToLower().Contains(lowered)) ||
+                    (c.Location != null && c.Location.ToLower().Contains(lowered))
                 );
             }
 
             var totalCount = await courses.CountAsync();
+
             pageNumber = Math.Max(1, pageNumber);
             pageSize = Math.Max(1, pageSize);
             var skipAmount = (pageNumber - 1) * pageSize;
+
             var paginatedCourses = await courses
                 .OrderByDescending(c => c.CreatedAt)
                 .Skip(skipAmount)
@@ -426,13 +343,24 @@ namespace Services
                     Status = a.Status,
                     TeacherProfileId = a.TeacherProfileId,
                     CenterProfileId = a.CenterProfileId,
-                }).ToListAsync();
+
+                    TeacherName = _unitOfWork.GetRepository<User>().Entities
+                    .Where(u => u.TeacherProfile != null && u.TeacherProfile.Id == a.TeacherProfileId)
+                        .Select(u => u.FullName)
+                        .FirstOrDefault(),
+
+                    CenterName = a.CenterProfile.CenterName
+                })
+                .ToListAsync();
+
             return paginatedCourses;
         }
 
         public async Task<IEnumerable<CourseResponse>> GetAllApprovedCoursesByTeacher(Guid TeacherProfileId, string? searchTerm, int pageNumber, int pageSize)
         {
-            var courses = _unitOfWork.GetRepository<Course>().Entities.Where(a => !a.IsDeleted && a.TeacherProfileId == TeacherProfileId && a.Status==CourseStatus.Approved);
+            var courses = _unitOfWork.GetRepository<Course>().Entities
+                
+                .Where(a => !a.IsDeleted && a.TeacherProfileId == TeacherProfileId && a.Status==CourseStatus.Approved);
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 courses = courses.Where(c =>
@@ -466,6 +394,11 @@ namespace Services
                     Capacity = a.Capacity,
                     GradeLevel = a.GradeLevel,
                     Status = a.Status,
+                    TeacherName = _unitOfWork.GetRepository<User>().Entities
+                        .Where(u => u.TeacherProfile != null && u.TeacherProfile.Id == a.TeacherProfileId)
+                        .Select(u => u.FullName)
+                        .FirstOrDefault(),
+                    CenterName = a.CenterProfile.CenterName,
                     TeacherProfileId = a.TeacherProfileId,
                     CenterProfileId = a.CenterProfileId,
                 }).ToListAsync();
@@ -508,6 +441,11 @@ namespace Services
                     Capacity = a.Capacity,
                     GradeLevel = a.GradeLevel,
                     Status = a.Status,
+                    TeacherName = _unitOfWork.GetRepository<User>().Entities
+                        .Where(u => u.TeacherProfile != null && u.TeacherProfile.Id == a.TeacherProfileId)
+                        .Select(u => u.FullName)
+                        .FirstOrDefault(),
+                    CenterName = a.CenterProfile.CenterName,
                     TeacherProfileId = a.TeacherProfileId,
                     CenterProfileId = a.CenterProfileId,
                 }).ToListAsync();
@@ -559,6 +497,11 @@ namespace Services
                     Capacity = a.Capacity,
                     GradeLevel = a.GradeLevel,
                     Status = a.Status,
+                    TeacherName = _unitOfWork.GetRepository<User>().Entities
+                        .Where(u => u.TeacherProfile != null && u.TeacherProfile.Id == a.TeacherProfileId)
+                        .Select(u => u.FullName)
+                        .FirstOrDefault(),
+                    CenterName = a.CenterProfile.CenterName,
                     TeacherProfileId = a.TeacherProfileId,
                     CenterProfileId = a.CenterProfileId,
                 }).ToListAsync();
@@ -617,6 +560,11 @@ namespace Services
                     StartTime = a.ClassSchedule.EndTime,
                     RoomOrLink = a.ClassSchedule.RoomOrLink,
                     TeacherProfileId = a.ClassSchedule.TeacherProfileId,
+
+                    TeacherName = _unitOfWork.GetRepository<User>().Entities
+                        .Where(u => u.TeacherProfile != null && u.TeacherProfile.Id == a.ClassSchedule.TeacherProfileId)
+                        .Select(u => u.FullName)
+                        .FirstOrDefault()
                 }).ToListAsync();
             return paginatedCourseSubjct;
         }
@@ -673,6 +621,10 @@ namespace Services
                     StartTime = a.ClassSchedule.EndTime,
                     RoomOrLink = a.ClassSchedule.RoomOrLink,
                     TeacherProfileId = a.ClassSchedule.TeacherProfileId,
+                    TeacherName = _unitOfWork.GetRepository<User>().Entities
+                        .Where(u => u.TeacherProfile != null && u.TeacherProfile.Id == a.ClassSchedule.TeacherProfileId)
+                        .Select(u => u.FullName)
+                        .FirstOrDefault(),
                 }).ToListAsync();
             return paginatedStuddentSchedules;
         }
@@ -732,13 +684,19 @@ namespace Services
                     StartTime = a.ClassSchedule.EndTime,
                     RoomOrLink = a.ClassSchedule.RoomOrLink,
                     TeacherProfileId = a.ClassSchedule.TeacherProfileId,
+                    TeacherName = _unitOfWork.GetRepository<User>().Entities
+                        .Where(u => u.TeacherProfile != null && u.TeacherProfile.Id == a.ClassSchedule.TeacherProfileId)
+                        .Select(u => u.FullName)
+                        .FirstOrDefault()
                 }).ToListAsync();
             return paginatedStuddentSchedules;
         }
 
         public async Task<CourseResponse> GetCourseById(Guid id)
         {
-            var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+            var course = await _unitOfWork.GetRepository<Course>().Entities
+                .Include(c => c.CenterProfile)
+                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (course == null)
             {
                 throw new Exception("Course Not Found");
@@ -758,6 +716,8 @@ namespace Services
                 Capacity = course.Capacity,
                 GradeLevel = course.GradeLevel,
                 Status = course.Status,
+                TeacherName = _unitOfWork.GetRepository<User>().Entities.Where(u => u.TeacherProfile.Id == course.TeacherProfileId).Select(u => u.FullName).FirstOrDefault(),
+                CenterName = course.CenterProfile.CenterName,
                 TeacherProfileId = course.TeacherProfileId,
                 CenterProfileId = course.CenterProfileId,
             };
@@ -795,6 +755,10 @@ namespace Services
                 StartTime = classSchedule.EndTime,
                 RoomOrLink = classSchedule.RoomOrLink,
                 TeacherProfileId = classSchedule.TeacherProfileId,
+                TeacherName = _unitOfWork.GetRepository<User>().Entities
+                        .Where(u => u.TeacherProfile != null && u.TeacherProfile.Id == classSchedule.TeacherProfileId)
+                        .Select(u => u.FullName)
+                        .FirstOrDefault()
             };
             return result;
         }

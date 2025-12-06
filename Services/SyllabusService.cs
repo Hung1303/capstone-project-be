@@ -134,6 +134,37 @@ namespace Services
             return result;
         }
 
+        public async Task<SyllabusResponse2> GetSyllabusBySubjectOfCenter(Guid subjectId, Guid centerProfileId)
+        {
+            var syllabus = await _unitOfWork.GetRepository<Syllabus>().Entities
+                .Include(s => s.Subject)
+                .Include(t => t.TeacherProfile)
+                .FirstOrDefaultAsync(a => !a.IsDeleted && a.SubjectId == subjectId && a.TeacherProfile.CenterProfileId == centerProfileId);
+
+            var teacher = await _unitOfWork.GetRepository<User>().Entities
+                .Include(t => t.TeacherProfile)
+                .FirstOrDefaultAsync(t => !t.IsDeleted && t.TeacherProfile.Id == syllabus.TeacherProfileId && t.TeacherProfile.CenterProfileId == centerProfileId);
+            if (syllabus == null)
+            {
+                throw new Exception("Syllabus Not Found");
+            }
+            var result = new SyllabusResponse2
+            {
+                Id = syllabus.Id,
+                SyllabusName = syllabus.SyllabusName,
+                SubjectName = syllabus.Subject.SubjectName,
+                TeacherName = teacher.FullName,
+                Description = syllabus.Description,
+                GradeLevel = syllabus.GradeLevel,
+                //Subject = syllabus.Subject,
+                AssessmentMethod = syllabus.AssessmentMethod,
+                CourseMaterial = syllabus.CourseMaterial,
+                SubjectId = syllabus.SubjectId,
+                TeacherProfileId = syllabus.TeacherProfileId,
+            };
+            return result;
+        }
+
         public async Task<SyllabusResponse> UpdateSyllabus(Guid id, UpdateSyllabusRequest request)
         {
             var syllabus = await _unitOfWork.GetRepository<Syllabus>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
