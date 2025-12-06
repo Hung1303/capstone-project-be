@@ -68,6 +68,32 @@ namespace API.Controllers
             });
         }
 
+        [HttpGet("Student/{studentProfileId}/Enrollments")]
+        public async Task<IActionResult> GetAllEnrollmentsByStudent(Guid studentProfileId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? searchTerm = null,
+            EnrollmentStatus? status = null)
+        {
+            var enrollments = await _enrollmentService.GetAllEnrollmentsByStudent(studentProfileId, searchTerm, status, pageNumber, pageSize);
+
+            if (enrollments == null || !enrollments.Any())
+                return NotFound(new { message = "No enrollments found." });
+
+            return Ok(new
+            {
+                message = "Successfully retrieved enrollments.",
+                data = enrollments,
+                pagination = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalItems = enrollments.Count(),
+                    // Nếu bạn có totalCount từ service, có thể thêm TotalPages = ...
+                }
+            });
+        }
+
         // ✅ GET: api/Enrollments/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEnrollmentById(Guid id)
