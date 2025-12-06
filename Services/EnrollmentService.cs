@@ -176,6 +176,61 @@ namespace Services
             return pagedEnrollments;
         }
 
+        public async Task<IEnumerable<EnrollmentResponse>> GetAllEnrollmentsByCenter(Guid centerProfileId, string? searchTerm, EnrollmentStatus? status, int pageNumber, int pageSize)
+        {
+            
+            var enrollmentsQuery = _unitOfWork.GetRepository<Enrollment>().Entities
+                .Include(c => c.Course)
+                .ThenInclude(d => d.CenterProfile)
+                .Where(e => !e.IsDeleted && e.Course.CenterProfile.Id == centerProfileId)
+                .Include(e => e.StudentProfile)
+                    .ThenInclude(s => s.ParentProfile)
+                .Include(e => e.Course)
+                .AsQueryable(); 
+
+            
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.Trim().ToLower();
+
+                enrollmentsQuery = enrollmentsQuery.Where(e =>
+                    (e.CancelReason != null && e.CancelReason.ToLower().Contains(searchTerm)) ||
+                    (e.StudentProfile.SchoolName != null && e.StudentProfile.SchoolName.ToLower().Contains(searchTerm)) ||
+                    (e.Course.Title != null && e.Course.Title.ToLower().Contains(searchTerm)) ||
+                    (e.Course.Subject != null && e.Course.Subject.ToLower().Contains(searchTerm))
+                );
+            }
+
+            if (status.HasValue)
+            {
+                enrollmentsQuery = enrollmentsQuery.Where(e => e.Status == status.Value);
+            }
+            
+            var totalCount = await enrollmentsQuery.CountAsync();
+
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+
+            var pagedEnrollments = await enrollmentsQuery
+                .OrderByDescending(e => e.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .Select(e => new EnrollmentResponse
+                {
+                    Id = e.Id,
+                    CourseId = e.CourseId,
+                    StudentProfileId = e.StudentProfileId,
+                    Status = e.Status,
+                    ConfirmedAt = e.ConfirmedAt,
+                    CancelledAt = e.CancelledAt,
+                    CancelReason = e.CancelReason
+                })
+                .ToListAsync();
+
+            return pagedEnrollments;
+        }
+
 
 
         // ✅ UPDATE
