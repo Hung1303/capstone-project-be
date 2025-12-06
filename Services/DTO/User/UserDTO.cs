@@ -319,5 +319,16 @@ namespace Services.DTO.User
         public string? Reason { get; set; }
     }
 
-
+    public class StudentEnrollInCourseResponse
+    {
+        public Guid UserId { get; set; }
+        public Guid StudentProfileId { get; set; }
+        public Guid EnrollmentId { get; set; }
+        public Guid CourseId { get; set; }
+        public string StudentName { get; set; }
+        public string SchoolName { get; set; }
+        public string SchoolYear { get; set; }
+        public int GradeLevel { get; set; }
+        public string ClassName { get; set; }
+    }
 }

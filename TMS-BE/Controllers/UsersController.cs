@@ -119,6 +119,13 @@ namespace TMS_BE.Controllers
             return Ok(new { totalCount, students });
         }
 
+        [HttpGet("Course/{courseId}/Students")]
+        public async Task<IActionResult> GetStudentsByCourse(Guid courseId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5, [FromQuery] string? fullName = null)
+        {
+            var (students, totalCount) = await _userService.GetStudentsByCourse(courseId, pageNumber, pageSize, fullName);
+            return Ok(new { totalCount, students });
+        }
+
 
         [HttpPost("Admin")]
         [Authorize(Policy = "Admin")]
