@@ -47,14 +47,14 @@ namespace Services
             return teacherClasses.Any(tc => string.Equals(tc, studentClassName, StringComparison.OrdinalIgnoreCase));
         }
 
-        // ✅ CREATE
+        // ✅ CREATE: Tạo Enrollment ở trạng thái Pending (chờ thanh toán)
         public async Task<EnrollmentResponse> CreateEnrollment(CreateEnrollmentRequest request)
         {
             var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(c => c.Id == request.CourseId && !c.IsDeleted);
-            if (course == null)
-                throw new Exception("Course not found");
+            if (course == null) throw new Exception("Course not found");
 
-            // ✅ Block new enrollments if course is full (count only confirmed enrollments)
+            // Check capacity logic:
+            // Lưu ý: Có thể bạn vẫn muốn check capacity ngay lúc đăng ký để tránh việc nhận tiền nhưng hết chỗ.
             var confirmedCount = await _unitOfWork.GetRepository<Enrollment>().Entities
                 .CountAsync(e => e.CourseId == request.CourseId && e.Status == EnrollmentStatus.Confirmed && !e.IsDeleted);
 
@@ -62,14 +62,11 @@ namespace Services
                 throw new Exception("Course capacity reached");
 
             var student = await _unitOfWork.GetRepository<StudentProfile>().Entities.FirstOrDefaultAsync(s => s.Id == request.StudentProfileId && !s.IsDeleted);
-            if (student == null)
-                throw new Exception("Student profile not found");
+            if (student == null) throw new Exception("Student profile not found");
 
-            // ✅ Validate grade level match
             if (student.GradeLevel != course.GradeLevel)
-                throw new Exception($"Student grade level ({student.GradeLevel}) does not match course grade level ({course.GradeLevel}). Only students with grade {course.GradeLevel} can enroll in this course.");
+                throw new Exception($"Student grade level ({student.GradeLevel}) does not match course grade level ({course.GradeLevel}).");
 
-            // ✅ Validate that teacher is not teaching their own student
             if (course.TeacherProfileId.HasValue)
             {
                 var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
@@ -77,15 +74,25 @@ namespace Services
 
                 if (teacher != null && IsTeacherTeachingOwnStudent(teacher, student))
                 {
-                    throw new Exception($"Cannot enroll: The teacher teaches at the same school ({student.SchoolName}) and class ({student.ClassName}) as this student. Teachers cannot teach their own students.");
+                    throw new Exception($"Cannot enroll: Teacher teaches at the same school and class as student.");
                 }
+            }
+
+            // Kiểm tra xem đã đăng ký chưa
+            var existingEnrollment = await _unitOfWork.GetRepository<Enrollment>().Entities
+                .FirstOrDefaultAsync(e => e.CourseId == request.CourseId && e.StudentProfileId == request.StudentProfileId && !e.IsDeleted);
+            if (existingEnrollment != null)
+            {
+                // Nếu đã có nhưng Cancelled thì cho tạo lại, còn Pending/Paid/Confirmed thì chặn
+                if (existingEnrollment.Status != EnrollmentStatus.Cancelled)
+                    throw new Exception("Student is already enrolled or pending payment for this course.");
             }
 
             var enrollment = new Enrollment
             {
                 CourseId = request.CourseId,
                 StudentProfileId = request.StudentProfileId,
-                Status = EnrollmentStatus.Pending,
+                Status = EnrollmentStatus.Pending, // ✅ Bắt đầu là Pending (0)
             };
 
             await _unitOfWork.GetRepository<Enrollment>().InsertAsync(enrollment);
@@ -97,9 +104,7 @@ namespace Services
                 CourseId = enrollment.CourseId,
                 StudentProfileId = enrollment.StudentProfileId,
                 Status = enrollment.Status,
-                ConfirmedAt = enrollment.ConfirmedAt,
-                CancelledAt = enrollment.CancelledAt,
-                CancelReason = enrollment.CancelReason
+                // Chưa có ConfirmedAt
             };
         }
 
@@ -410,56 +415,53 @@ namespace Services
             };
         }
 
-        // ✅ APPROVE
+        // ✅ APPROVE: Chỉ được approve khi đã Paid (4) -> Chuyển sang Confirmed (1)
         public async Task<EnrollmentResponse> ApproveEnrollment(Guid enrollmentId, Guid approverProfileId)
         {
             var enrollment = await _unitOfWork.GetRepository<Enrollment>().Entities
                 .Include(e => e.Course)
                 .FirstOrDefaultAsync(e => e.Id == enrollmentId && !e.IsDeleted);
 
-            if (enrollment == null)
-                throw new Exception("Enrollment not found");
+            if (enrollment == null) throw new Exception("Enrollment not found");
+
+            // ✅ Check Logic: Phải thanh toán rồi mới được duyệt
+            if (enrollment.Status != EnrollmentStatus.Paid)
+            {
+                throw new Exception($"Cannot approve enrollment. Current status is {enrollment.Status}. Enrollment must be PAID (Status 4) before approval.");
+            }
 
             var course = enrollment.Course;
 
-            // ✅ Load student profile to validate grade level
+            // Validation Teacher/Student relationship (Double check)
             var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
                 .FirstOrDefaultAsync(s => s.Id == enrollment.StudentProfileId && !s.IsDeleted);
 
-            if (student == null)
-                throw new Exception("Student profile not found");
+            if (student == null) throw new Exception("Student profile not found");
 
-            // ✅ Validate grade level match before approving
-            if (student.GradeLevel != course.GradeLevel)
-                throw new Exception($"Student grade level ({student.GradeLevel}) does not match course grade level ({course.GradeLevel}). Only students with grade {course.GradeLevel} can enroll in this course.");
-
-            // ✅ Validate that teacher is not teaching their own student
+            // (Giữ nguyên logic check Teacher dạy học sinh ruột tại đây...)
             if (course.TeacherProfileId.HasValue)
             {
                 var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
                     .FirstOrDefaultAsync(t => t.Id == course.TeacherProfileId.Value && !t.IsDeleted);
-
                 if (teacher != null && IsTeacherTeachingOwnStudent(teacher, student))
-                {
-                    throw new Exception($"Cannot approve enrollment: The teacher teaches at the same school ({student.SchoolName}) and class ({student.ClassName}) as this student. Teachers cannot teach their own students.");
-                }
+                    throw new Exception("Conflict: Teacher teaches this student at school.");
             }
 
-            // ✅ Kiểm tra quyền duyệt
+            // Kiểm tra quyền duyệt
             bool isAuthorized = (course.TeacherProfileId == approverProfileId) ||
                                 (course.CenterProfileId == approverProfileId);
 
             if (!isAuthorized)
                 throw new Exception("You do not have permission to approve this enrollment");
 
-            // ✅ Ensure course capacity is not exceeded before confirming
+            // ✅ Kiểm tra Capacity một lần nữa trước khi chốt đơn (đề phòng lúc payment thì còn slot nhưng giờ hết)
             var confirmedCount = await _unitOfWork.GetRepository<Enrollment>().Entities
                 .CountAsync(e => e.CourseId == course.Id && e.Status == EnrollmentStatus.Confirmed && !e.IsDeleted);
 
             if (confirmedCount >= course.Capacity)
-                throw new Exception("Course capacity reached");
+                throw new Exception("Course capacity reached. Cannot approve more students.");
 
-            // ✅ Cập nhật trạng thái
+            // ✅ Cập nhật trạng thái sang Confirmed (1)
             enrollment.Status = EnrollmentStatus.Confirmed;
             enrollment.ConfirmedAt = DateTimeOffset.UtcNow;
             enrollment.CancelledAt = null;
@@ -478,26 +480,24 @@ namespace Services
             };
         }
 
-        // ✅ REJECT
+        // ✅ REJECT: Nếu từ chối sau khi đã thanh toán, có thể cần logic hoàn tiền (Ở đây chỉ xử lý status)
         public async Task<EnrollmentResponse> RejectEnrollment(Guid enrollmentId, Guid approverProfileId, string reason)
         {
             var enrollment = await _unitOfWork.GetRepository<Enrollment>().Entities
                 .Include(e => e.Course)
                 .FirstOrDefaultAsync(e => e.Id == enrollmentId && !e.IsDeleted);
 
-            if (enrollment == null)
-                throw new Exception("Enrollment not found");
+            if (enrollment == null) throw new Exception("Enrollment not found");
 
             var course = enrollment.Course;
 
-            // ✅ Kiểm tra quyền duyệt
             bool isAuthorized = (course.TeacherProfileId == approverProfileId) ||
                                 (course.CenterProfileId == approverProfileId);
 
             if (!isAuthorized)
                 throw new Exception("You do not have permission to reject this enrollment");
 
-            // ✅ Cập nhật trạng thái
+            // ✅ Update Status
             enrollment.Status = EnrollmentStatus.Cancelled;
             enrollment.CancelledAt = DateTimeOffset.UtcNow;
             enrollment.CancelReason = reason;
