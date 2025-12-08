@@ -132,7 +132,7 @@ namespace Services
                 LicenseIssuedBy = request.LicenseIssuedBy,
                 Address = request.Address,
                 ContactEmail = request.Email,
-                ContactPhone = request.PhoneNumber,
+                ContactPhone = request.ContactPhone,
                 Status = CenterStatus.Pending
             };
 
