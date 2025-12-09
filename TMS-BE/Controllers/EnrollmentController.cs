@@ -199,23 +199,16 @@ namespace API.Controllers
 
 
 
-        // ✅ DELETE: api/Enrollments/{id}
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEnrollment(Guid id)
         {
-            try
-            {
-                var result = await _enrollmentService.DeleteEnrollment(id);
+            var result = await _enrollmentService.DeleteEnrollment(id);
 
-                if (!result)
-                    return NotFound(new { message = "Enrollment not found or already deleted." });
+            if (!result)
 
-                return Ok(new { message = "Enrollment deleted successfully." });
-            }
-            catch (Exception ex)
-            {
-                // Bắt lỗi nếu có lỗi trong service
-                return BadRequest(new { message = ex.Message });
-            }
+                return NotFound(new { message = "Enrollment not found or already deleted." });
+
+            return Ok(new { message = "Enrollment deleted successfully." });
         }
     }
 }
