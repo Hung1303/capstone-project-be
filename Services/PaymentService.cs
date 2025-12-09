@@ -342,6 +342,7 @@ namespace Services
                 response.EnsureSuccessStatusCode();
 
                 var result = await response.Content.ReadFromJsonAsync<VnPayRefundResponse>();
+                Console.WriteLine($"Response: {result.ResponseCode}");
                 //var ResponseData = new VnPayRefundResponse
                 //{
                 //    ResponseId = result.ResponseId,
