@@ -71,20 +71,32 @@ namespace API.Controllers
         [Authorize(Policy = "InspectionAccess")]
         public async Task<IActionResult> ApproveTeacherFeedback(Guid feedbackId, Guid moderatorId, [FromBody] TeacherFeedbackModerationRequest request)
         {
-            var result = await _teacherFeedbackService.ApproveTeacherFeedback(feedbackId, moderatorId, request);
+            try
+            {
+                var result = await _teacherFeedbackService.ApproveTeacherFeedback(feedbackId, moderatorId, request);
 
-            if (result == null) return NotFound("Feedback not found.");
-            return Ok(result);
+                if (result == null) return NotFound("Feedback not found.");
+                return Ok(result);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPut("{feedbackId}")]
         [Authorize(Policy = "ParentStudent")]
         public async Task<IActionResult> UpdateTeacherFeedback(Guid feedbackId, [FromBody] UpdateTeacherFeedbackRequest request)
         {
-            var result = await _teacherFeedbackService.UpdateTeacherFeedback(feedbackId, request);
-            if (result == null) return NotFound("Feedback not found.");
+            try
+            {
+                var result = await _teacherFeedbackService.UpdateTeacherFeedback(feedbackId, request);
+                if (result == null) return NotFound("Feedback not found.");
 
-            return Ok(result);
+                return Ok(result);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpDelete("{id}")]

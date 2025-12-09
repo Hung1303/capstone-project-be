@@ -32,6 +32,8 @@ namespace Services.DTO.User
         [Phone(ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
         public string CenterName { get; set; }
+        [Phone(ErrorMessage = "Invalid phone number.")]
+        public string ContactPhone { get; set; } //số điện thoại bàn
         public string LicenseNumber { get; set; }
         public DateOnly IssueDate { get; set; }
         public string LicenseIssuedBy { get; set; }

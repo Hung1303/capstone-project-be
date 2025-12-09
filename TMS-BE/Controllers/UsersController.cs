@@ -1,4 +1,5 @@
-﻿using Core.Base;
+﻿using BusinessObjects;
+using Core.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTO.User;
@@ -131,35 +132,58 @@ namespace TMS_BE.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] CreateAdminRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var user = await _userService.CreateAdminRequest(request);
-            return Ok(user);
+            try
+            {
+                var user = await _userService.CreateAdminRequest(request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("Inspector")]
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateInspectorAccount([FromBody] CreateAdminRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var user = await _userService.CreateInspectorRequest(request);
-            return Ok(user);
+            try
+            {
+                var user = await _userService.CreateInspectorRequest(request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         //Center register at the platform
         [HttpPost("Center")]
         public async Task<IActionResult> CreateCenterAccount([FromBody] CreateCenterRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var user = await _userService.CreateCenterRequest(request);
-            return Ok(user);
+            try
+            {
+                var user = await _userService.CreateCenterRequest(request);
+                return Ok(user);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("Teacher")]
         public async Task<IActionResult> CreateTeacherAccount([FromBody] CreateTeacherRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var user = await _userService.CreateTeacherRequest(request);
-            return Ok(user);
+            try
+            {
+                var user = await _userService.CreateTeacherRequest(request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         //Centers create new account for Teacher
@@ -167,17 +191,29 @@ namespace TMS_BE.Controllers
         [Authorize(Policy = "Center")]
         public async Task<IActionResult> CenterAddTeacher(Guid centerOwnerId, [FromBody] CreateTeacherRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var user = await _userService.CenterAddTeacherRequest(centerOwnerId, request);
-            return Ok(user);
+            try
+            {
+                var user = await _userService.CenterAddTeacherRequest(centerOwnerId, request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("Parent")]
         public async Task<IActionResult> CreateParentAccount([FromBody] CreateParentRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var user = await _userService.CreateParentRequest(request);
-            return Ok(user);
+            try
+            {
+                var user = await _userService.CreateParentRequest(request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         //Parents create new account for their children
@@ -185,9 +221,15 @@ namespace TMS_BE.Controllers
         [Authorize(Policy = "Parent")]
         public async Task<IActionResult> CreateStudentAccount(Guid parentId, [FromBody] CreateStudentRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var user = await _userService.CreateStudentRequest(parentId, request);
-            return Ok(user);
+            try
+            {
+                var user = await _userService.CreateStudentRequest(parentId, request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
 
@@ -195,17 +237,29 @@ namespace TMS_BE.Controllers
         [Authorize(Policy = "Center")]
         public async Task<IActionResult> UpdateCenter(Guid userId, [FromBody] CenterUpdateRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _userService.UpdateCenterAsync(userId, request);
-            return result != null ? Ok(result) : NotFound();
+            try
+            {
+                var user = await _userService.UpdateCenterAsync(userId, request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPut("Teacher/{userId}")]
         public async Task<IActionResult> UpdateTeacher(Guid userId, [FromBody] TeacherUpdateRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _userService.UpdateTeacherAsynce(userId, request);
-            return result != null ? Ok(result) : NotFound();
+            try
+            {
+                var user = await _userService.UpdateTeacherAsynce(userId, request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         //Parents update their profile
@@ -213,9 +267,15 @@ namespace TMS_BE.Controllers
         [Authorize(Policy = "Parent")]
         public async Task<IActionResult> UpdateParent(Guid userId, [FromBody] ParentUpdateRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _userService.UpdateParentAsynce(userId, request);
-            return result != null ? Ok(result) : NotFound();
+            try
+            {
+                var user = await _userService.UpdateParentAsynce(userId, request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         //Parents update their children profile
@@ -223,9 +283,15 @@ namespace TMS_BE.Controllers
         [Authorize(Policy = "Parent")]
         public async Task<IActionResult> UpdateStudent(Guid parentProfileId, [FromQuery] Guid studentId, [FromBody] StudentUpdateRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _userService.UpdateStudentAsync(parentProfileId ,studentId, request);
-            return result != null ? Ok(result) : NotFound();
+            try
+            {
+                var user = await _userService.UpdateStudentAsync(parentProfileId, studentId, request);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         //Update user status for Admin
@@ -233,15 +299,29 @@ namespace TMS_BE.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> UpdateUserStatus(Guid userId, int status)
         {
-            var result = await _userService.UpdateUserStatus(userId, status);
-            return result ? Ok(new { message = "User Staus Changed." }) : NotFound();
+            try
+            {
+                var user = await _userService.UpdateUserStatus(userId, status);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPut("ChangePassword/{userId}")]
         public async Task<IActionResult> ChangePassword(Guid userId, string currentPassword, string newPassword)
         {
-            var result = await _userService.ChangePassword(userId, currentPassword, newPassword);
-            return result ? Ok(new { message = "Password Changed." }) : BadRequest();
+            try
+            {
+                var user = await _userService.ChangePassword(userId, currentPassword, newPassword);
+                return Ok(new { message = "Password changed!!!"});
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpGet("Centers/Status/{status}")]

@@ -98,8 +98,14 @@ namespace API.Controllers
         [Authorize(Policy = "InspectionAccess")]
         public async Task<IActionResult> GetVerificationRequestsByInspector(Guid inspectorId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var result = await _verificationService.GetVerificationRequestsByInspectorAsync(inspectorId, pageNumber, pageSize);
-            return Ok(result);
+            try
+            {
+                var result = await _verificationService.GetVerificationRequestsByInspectorAsync(inspectorId, pageNumber, pageSize);
+                return Ok(result);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         /// <summary>
@@ -109,8 +115,14 @@ namespace API.Controllers
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetPendingVerificationRequests([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var result = await _verificationService.GetPendingVerificationRequestsAsync(pageNumber, pageSize);
-            return Ok(result);
+            try
+            {
+                var result = await _verificationService.GetPendingVerificationRequestsAsync(pageNumber, pageSize);
+                return Ok(result);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         /// <summary>
@@ -120,8 +132,14 @@ namespace API.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> GetCentersPendingVerification([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var result = await _verificationService.GetCentersPendingVerificationAsync(pageNumber, pageSize);
-            return Ok(result);
+            try
+            {
+                var result = await _verificationService.GetCentersPendingVerificationAsync(pageNumber, pageSize);
+                return Ok(result);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         /// <summary>
@@ -131,8 +149,14 @@ namespace API.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> GetCentersByStatus(CenterStatus status, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var result = await _verificationService.GetCentersByStatusAsync(status, pageNumber, pageSize);
-            return Ok(result);
+            try
+            {
+                var result = await _verificationService.GetCentersByStatusAsync(status, pageNumber, pageSize);
+                return Ok(result);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         /// <summary>
@@ -142,18 +166,12 @@ namespace API.Controllers
         [Authorize(Policy = "Inspector")]
         public async Task<IActionResult> CompleteVerification(Guid verificationId)
         {
-            try
-            {
                 var result = await _verificationService.CompleteVerificationAsync(verificationId);
                 if (result)
                     return Ok(new { message = "Verification completed successfully" });
                 else
                     return BadRequest(new { message = "Failed to complete verification" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            
         }
 
         /// <summary>
@@ -165,18 +183,12 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            try
-            {
                 var result = await _verificationService.SuspendCenterAsync(centerId, request.Reason, request.AdminId);
                 if (result)
                     return Ok(new { message = "Center suspended successfully" });
                 else
                     return BadRequest(new { message = "Failed to suspend center" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            
         }
 
         /// <summary>
@@ -188,18 +200,12 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            try
-            {
-                var result = await _verificationService.RestoreCenterAsync(centerId, request.Reason, request.AdminId);
-                if (result)
-                    return Ok(new { message = "Center restored successfully" });
-                else
-                    return BadRequest(new { message = "Failed to restore center" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _verificationService.RestoreCenterAsync(centerId, request.Reason, request.AdminId);
+            if (result)
+                return Ok(new { message = "Center restored successfully" });
+            else
+                return BadRequest(new { message = "Failed to restore center" });
+            
         }
     }
 }
