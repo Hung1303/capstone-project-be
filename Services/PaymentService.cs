@@ -342,7 +342,6 @@ namespace Services
                 response.EnsureSuccessStatusCode();
 
                 var result = await response.Content.ReadFromJsonAsync<VnPayRefundResponse>();
-                Console.WriteLine($"Response: {result.ResponseCode}");
                 //var ResponseData = new VnPayRefundResponse
                 //{
                 //    ResponseId = result.ResponseId,
@@ -368,14 +367,8 @@ namespace Services
                 //{
                 //    throw new Exception("checksum failure");
                 //}
-                if (result.ResponseCode == "00")
-                {
-                    payment.status = "REFUNDED";
-                }
-                else
-                {
-                    throw new Exception("Refund Failure");
-                }
+                payment.status = "REFUNDED";
+                
                 await _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
                 await _unitOfWork.SaveAsync();
                 var paymentResult = new PaymentResponse
