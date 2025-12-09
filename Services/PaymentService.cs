@@ -3,6 +3,7 @@ using BusinessObjects;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Org.BouncyCastle.Asn1.X9;
 using Repository.Interfaces;
 using Services.DTO.LessonPlan;
 using Services.DTO.Payment;
@@ -12,10 +13,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Web;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Services
 {
@@ -23,11 +30,13 @@ namespace Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
+        private readonly HttpClient _httpClient;
 
-        public PaymentService(IUnitOfWork unitOfWork, IConfiguration configuration)
+        public PaymentService(IUnitOfWork unitOfWork, IConfiguration configuration, HttpClient httpClient)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;
+            _httpClient = httpClient;
         }
 
         public async Task<PaymentResponse> CreatePayment(CreatePaymentRequest request)
@@ -245,7 +254,7 @@ namespace Services
             return result;
         }
 
-        public async Task<PaymentResponse> UpdatePayment(Guid id)
+        public async Task<PaymentResponse> UpdatePayment(Guid id, DateTime payDate)
         {
             var payment = await _unitOfWork.GetRepository<Payment>().Entities
                 .Include(c => c.CenterSubscription)
@@ -257,7 +266,8 @@ namespace Services
             }
 
             payment.status = "DONE";
-            payment.PaymentDate = DateTime.UtcNow;
+            payDate = DateTime.SpecifyKind(payDate, DateTimeKind.Utc);
+            payment.PaymentDate = payDate;
 
             if (payment.Enrollment != null && payment.CenterSubscription == null)
             {
@@ -285,6 +295,106 @@ namespace Services
                 EnrollmentId = payment.EnrollmentId,
             };
             return result;
+        }
+
+        public async Task<PaymentResponse> RefundVnpay(Guid paymentId)
+        {
+            var payment = await _unitOfWork.GetRepository<Payment>().Entities
+                .Include(c => c.CenterSubscription)
+                .Include(c => c.Enrollment)
+                .FirstOrDefaultAsync(a => a.Id == paymentId && !a.IsDeleted && a.status == "DONE");
+            if (payment == null)
+            {
+                throw new Exception("Payment Not Found");
+            }
+            string vnp_TmnCode = _configuration["Vnpay:TmnCode"];
+            string vnp_HashSecret = _configuration["Vnpay:HashSecret"];
+            string vnp_ApiUrl = _configuration["Vnpay:PaymendRefundUrl"];
+
+            var requestData = new VnPayRefundRequest
+            {
+                RequestId = Guid.NewGuid().ToString().Replace("-", ""),
+                Version = "2.1.0",
+                Command = "refund",
+                TmnCode = vnp_TmnCode,
+                TransactionType = "02", 
+                TxnRef = payment.Id.ToString(),
+                Amount = payment.Amount * 100, 
+                TransactionNo = "", 
+                TransactionDate = payment.PaymentDate.ToString(), 
+                CreateBy = payment.UserId.ToString(),
+                CreateDate = DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss"),
+                IpAddr = "127.0.0.1",
+                OrderInfo = "Hoan tien giao dich " + payment.Id.ToString(),
+            };
+
+            var signData = $"{requestData.RequestId}|{requestData.Version}|{requestData.Command}|{requestData.TmnCode}|" +
+                           $"{requestData.TransactionType}|{requestData.TxnRef}|{requestData.Amount}|{requestData.TransactionNo}|" +
+                           $"{requestData.TransactionDate}|{requestData.CreateBy}|{requestData.CreateDate}|{requestData.IpAddr}|" +
+                           $"{requestData.OrderInfo}";
+
+            requestData.SecureHash = HmacSHA512(vnp_HashSecret, signData);
+            Console.WriteLine("request hash:" + requestData.SecureHash);
+
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync(vnp_ApiUrl, requestData);
+                response.EnsureSuccessStatusCode();
+
+                var result = await response.Content.ReadFromJsonAsync<VnPayRefundResponse>();
+                //var ResponseData = new VnPayRefundResponse
+                //{
+                //    ResponseId = result.ResponseId,
+                //    Command = result.Command,
+                //    ResponseCode = result.ResponseCode,
+                //    Message = result.Message,
+                //    TmnCode = result.TmnCode,
+                //    TxnRef = result.TxnRef,
+                //    Amount = result.Amount,
+                //    BankCode = result.BankCode,
+                //    PayDate = result.PayDate,
+                //    TransactionNo = result.TransactionNo,
+                //    TransactionType = result.TransactionType,
+                //    TransactionStatus = result.TransactionStatus,
+                //    OrderInfo = result.OrderInfo,
+                //};
+                //string ResponseSignData = $"{ResponseData.ResponseId}|{ResponseData.Command}|{ResponseData.ResponseCode}|{ResponseData.Message}|{ResponseData.TmnCode}|" +
+                //     $"{ResponseData.TxnRef}|{ResponseData.Amount}|{ResponseData.BankCode}|{ResponseData.PayDate}|{ResponseData.TransactionNo}|" +
+                //     $"{ResponseData.TransactionType}|{ResponseData.TransactionStatus}|{ResponseData.OrderInfo}";
+                //string myChecksum = HmacSHA512(vnp_HashSecret, ResponseSignData);
+                //Console.WriteLine("response hash:" + myChecksum);
+                //if (!myChecksum.Equals(result.SecureHash))
+                //{
+                //    throw new Exception("checksum failure");
+                //}
+                if (result.ResponseCode == "00")
+                {
+                    payment.status = "REFUNDED";
+                }
+                else
+                {
+                    throw new Exception("Refund Failure");
+                }
+                await _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
+                await _unitOfWork.SaveAsync();
+                var paymentResult = new PaymentResponse
+                {
+                    Id = payment.Id,
+                    Amount = payment.Amount,
+                    Description = payment.Description,
+                    status = payment.status,
+                    PaymentDate = payment.PaymentDate,
+                    UserId = payment.UserId,
+                    CenterSubscriptionId = payment.CenterSubscriptionId,
+                    EnrollmentId = payment.EnrollmentId,
+                };
+                return paymentResult;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw new Exception( ex.Message);
+            }
         }
     }
 }

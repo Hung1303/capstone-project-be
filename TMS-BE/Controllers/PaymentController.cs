@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using Services.DTO.LessonPlan;
 using Services.DTO.Payment;
 using Services.Interfaces;
+using System.Globalization;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -52,7 +54,26 @@ namespace API.Controllers
             }
 
         }
-        
+
+        [HttpPost("VNPAY/Refund")]
+        public async Task<IActionResult> VNPAYRefund([FromBody] Guid paymentId)
+        {
+            try
+            {
+                
+                var result = await _paymentService.RefundVnpay(paymentId);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+
+
 
         [HttpPost]
         public async Task<IActionResult> CreatePayment(CreatePaymentRequest request)
@@ -125,6 +146,7 @@ namespace API.Controllers
 
                 if (!query.TryGetValue("vnp_SecureHash", out var receivedHashValues))
                 {
+                    Console.WriteLine("securehash not found");
                     return Redirect(paymentFailureUrl);
                 }
                 string receivedHash = receivedHashValues.ToString();
@@ -156,32 +178,41 @@ namespace API.Controllers
 
                 if (!calculatedHash.Equals(receivedHash, StringComparison.InvariantCultureIgnoreCase))
                 {
+                    Console.WriteLine("securehash check fail");
                     return Redirect(paymentFailureUrl);
                 }
 
                 var responseCode = query["vnp_ResponseCode"].ToString();
                 var txnStatus = query["vnp_TransactionStatus"].ToString();
                 var txnRef = query["vnp_TxnRef"].ToString();
+                var paymentDate = query["vnp_PayDate"].ToString();
                 var vnpAmount = Convert.ToInt64(query["vnp_Amount"]) / 100; // VNPAY amount is *100
 
                 if (responseCode == "00" && txnStatus == "00")
                 {
                     if (!Guid.TryParse(txnRef, out Guid paymentId))
                     {
+                        Console.WriteLine("txn ref parse fail");
                         return Redirect(paymentFailureUrl);
                     }
-
-                    var result = await _paymentService.UpdatePayment(paymentId);
+                    if (!DateTime.TryParseExact(paymentDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None,out DateTime payDate))
+                    {
+                        Console.WriteLine("paymentDate parse fail");
+                        return Redirect(paymentFailureUrl);
+                    }
+                    var result = await _paymentService.UpdatePayment(paymentId, payDate);
 
                     return Redirect($"{paymentSuccessUrl}?paymentId={paymentId}");
                 }
                 else
                 {
+                    Console.WriteLine("response code and txn status fail");
                     return Redirect($"{paymentFailureUrl}");
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Payment fail");
                 return Redirect($"{paymentFailureUrl}");
             }
 
