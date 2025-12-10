@@ -116,12 +116,22 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _enrollmentService.CreateEnrollment(request);
-            return Ok(new
+            try
             {
-                message = "Enrollment created successfully.",
-                data = result
-            });
+                // Lỗi "Duplicate email" xảy ra ở đây (trong service) và cần được catch
+                var result = await _enrollmentService.CreateEnrollment(request);
+                return Ok(new
+                {
+                    message = "Enrollment created successfully.",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                // Bắt các lỗi khác và trả về Internal Server Error (500) hoặc Bad Request tùy ngữ cảnh
+                // Trong trường hợp này, ta trả về Bad Request cho các lỗi có thông báo rõ ràng
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // ✅ PUT: api/Enrollments/{id}
@@ -131,12 +141,20 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _enrollmentService.UpdateEnrollment(id, request);
-            return Ok(new
+            try
             {
-                message = "Enrollment updated successfully.",
-                data = result
-            });
+                var result = await _enrollmentService.UpdateEnrollment(id, request);
+                return Ok(new
+                {
+                    message = "Enrollment updated successfully.",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                // Bắt các lỗi khác
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // ✅ NEW 1: APPROVE ENROLLMENT
@@ -181,13 +199,13 @@ namespace API.Controllers
 
 
 
-        // ✅ DELETE: api/Enrollments/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEnrollment(Guid id)
         {
             var result = await _enrollmentService.DeleteEnrollment(id);
 
             if (!result)
+
                 return NotFound(new { message = "Enrollment not found or already deleted." });
 
             return Ok(new { message = "Enrollment deleted successfully." });

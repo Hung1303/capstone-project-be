@@ -46,6 +46,7 @@ namespace API.Extensions
             services.AddScoped<ISubscriptionService, SubscriptionService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddHttpClient<IPaymentService,PaymentService>();
 
             return services;
         }
