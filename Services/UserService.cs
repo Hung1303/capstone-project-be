@@ -26,17 +26,17 @@ namespace Services
         {
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
-                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+                throw new Exception("Tên phải bắt đầu bằng chữ in hoa và chỉ chứa chữ cái.");
 
             var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
             if (checkUser != null)
             {
                 if (checkUser.Email == request.Email)
-                    throw new Exception("Duplicate email");
+                    throw new Exception("Email bị trùng");
                 else if (checkUser.UserName == request.UserName)
-                    throw new Exception("Duplicate Username");
+                    throw new Exception("Tên người dùng bị trùng");
                 else
-                    throw new Exception("Duplicate Phonenumber");
+                    throw new Exception("Số điện thoại bị trùng");
             }
 
             var user = new User
@@ -60,17 +60,17 @@ namespace Services
         {
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
-                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+                throw new Exception("Tên phải bắt đầu bằng chữ in hoa và chỉ chứa mỗi kí tự.");
 
             var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
             if (checkUser != null)
             {
                 if (checkUser.Email == request.Email)
-                    throw new Exception("Duplicate email");
+                    throw new Exception("Email bị trùng");
                 else if (checkUser.UserName == request.UserName)
-                    throw new Exception("Duplicate Username");
+                    throw new Exception("Tên người dùng bị trùng");
                 else
-                    throw new Exception("Duplicate Phonenumber");
+                    throw new Exception("Số điện thoại bị trùng");
             }
 
             var user = new User
@@ -94,21 +94,21 @@ namespace Services
         {
             var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
             if (!Regex.IsMatch(request.Email, emailPattern))
-                throw new Exception("Invalid Email.");
+                throw new Exception("Email không hợp lệ");
 
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
-                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+                throw new Exception("Tên phải bắt đầu bằng chữ in hoa và chỉ chứa chữ cái.");
 
             var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
             if (checkUser != null)
             {
                 if (checkUser.Email == request.Email)
-                    throw new Exception("Duplicate email");
+                    throw new Exception("Email bị trùng");
                 else if (checkUser.UserName == request.UserName)
-                    throw new Exception("Duplicate Username");
+                    throw new Exception("Tên người dùng bị trùng");
                 else
-                    throw new Exception("Duplicate Phonenumber");
+                    throw new Exception("Số điện thoại bị trùng");
             }
 
             var user = new User
@@ -160,21 +160,21 @@ namespace Services
         {
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
-                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+                throw new Exception("Tên phải bắt đầu bằng chữ in hoa và chỉ chứa chữ cái.");
 
             var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
             if (checkUser != null)
             {
                 if (checkUser.Email == request.Email)
-                    throw new Exception("Duplicate email");
+                    throw new Exception("Email bị trùng");
                 else if (checkUser.UserName == request.UserName)
-                    throw new Exception("Duplicate Username");
+                    throw new Exception("Tên người dùng bị trùng");
                 else
-                    throw new Exception("Duplicate Phonenumber");
+                    throw new Exception("Số điện thoại bị trùng");
             }
 
             if (request.PhoneSecondary == request.PhoneNumber)
-                throw new InvalidOperationException("Cannot use main phone number as secondary.");
+                throw new InvalidOperationException("Số điện thoại phụ không được trùng với số điện thoại chính");
 
             var user = new User
             {
@@ -219,29 +219,29 @@ namespace Services
             var parent = await _unitOfWork.GetRepository<User>().Entities
                 .FirstOrDefaultAsync(o => o.Id == parentId && o.Role == UserRole.Parent && o.Status == AccountStatus.Active);
             if (parent == null)
-                throw new Exception("Parent not found");
+                throw new Exception("Không tìm thấy phụ huynh");
 
             var parentProfile = await _unitOfWork.GetRepository<ParentProfile>().Entities
                 .FirstOrDefaultAsync(c => c.UserId == parentId);
             if (parentProfile == null)
-                throw new Exception("Parent Profile not found.");
+                throw new Exception("Không tìm thấy hồ sơ phụ huynh");
 
             
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
-                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+                throw new Exception("Tên phải bắt đầu bằng chữ in hoa và chỉ chứa chữ cái.");
 
             
             var yearRangePattern = @"^(\d{4})-(\d{4})$";
             if (string.IsNullOrWhiteSpace(request.SchoolYear) || !Regex.IsMatch(request.SchoolYear.Trim(), yearRangePattern))
-                throw new Exception("School year must follow the format 'YYYY-YYYY' (e.g., 2024-2025).");
+                throw new Exception("Năm học phải theo đúng mẫu xxxx-xxxx (ví dụ: 2024-2025)");
 
             var match = Regex.Match(request.SchoolYear.Trim(), yearRangePattern);
             int startYear = int.Parse(match.Groups[1].Value);
             int endYear = int.Parse(match.Groups[2].Value);
 
             if (endYear != startYear + 1)
-                throw new Exception("The second year in SchoolYear must be exactly one greater than the first (e.g., 2024-2025).");
+                throw new Exception("Năm thứ hai trong năm học phải lớn hơn năm thứ nhất đúng 1 năm.");
 
             
             var checkUser = await _unitOfWork.GetRepository<User>().Entities
@@ -250,9 +250,9 @@ namespace Services
             if (checkUser != null)
             {
                 if (checkUser.Email == request.Email)
-                    throw new Exception("Duplicate email");
+                    throw new Exception("Email bị trùng");
                 else if (checkUser.UserName == request.UserName)
-                    throw new Exception("Duplicate username");
+                    throw new Exception("Tên người dùng bị trùng");
                 else
                     throw new Exception("Duplicate phone number");
             }
@@ -304,17 +304,17 @@ namespace Services
         {
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
-                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+                throw new Exception("Tên phải bắt đầu bằng chữ in hoa và chỉ chứa chữ cái.");
 
             var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
             if (checkUser != null)
             {
                 if (checkUser.Email == request.Email)
-                    throw new Exception("Duplicate email");
+                    throw new Exception("Email bị trùng");
                 else if (checkUser.UserName == request.UserName)
-                    throw new Exception("Duplicate Username");
+                    throw new Exception("Tên người dùng bị trùng");
                 else
-                    throw new Exception("Duplicate Phonenumber");
+                    throw new Exception("Số điện thoại bị trùng");
             }
 
             var user = new User
@@ -363,27 +363,27 @@ namespace Services
         {
             var owner = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(o => o.Id == centerOwnerId && o.Role == UserRole.Center && o.Status == AccountStatus.Active);
             if (owner == null)
-                throw new Exception("Center not available");
+                throw new Exception("Trung tâm không tồn tại.");
 
             var center = await _unitOfWork.GetRepository<CenterProfile>().Entities.FirstOrDefaultAsync(c => c.UserId == centerOwnerId);
             if (center == null)
             {
-                throw new Exception("Center not found.");
+                throw new Exception("Không tìm thấy hồ sơ trung tâm.");
             }
 
             var namePattern = @"^([A-ZÀ-Ỹ][a-zà-ỹ]+)(\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*$";
             if (string.IsNullOrWhiteSpace(request.FullName) || !Regex.IsMatch(request.FullName.Trim(), namePattern))
-                throw new Exception("Each word in the full name must start with an uppercase letter and contain only letters.");
+                throw new Exception("Tên phải bắt đầu bằng chữ in hoa và chỉ chứa chữ cái.");
 
             var checkUser = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(u => u.Email == request.Email || u.UserName == request.UserName || u.PhoneNumber == request.PhoneNumber);
             if (checkUser != null)
             {
                 if (checkUser.Email == request.Email)
-                    throw new Exception("Duplicate email");
+                    throw new Exception("Email bị trùng");
                 else if (checkUser.UserName == request.UserName)
-                    throw new Exception("Duplicate Username");
+                    throw new Exception("Tên người dùng bị trùng");
                 else
-                    throw new Exception("Duplicate Phonenumber");
+                    throw new Exception("Số điện thoại bị trùng");
             }
 
             var user = new User
@@ -519,12 +519,12 @@ namespace Services
             bool emailExists = await _unitOfWork.GetRepository<User>().Entities
                 .AnyAsync(u => u.Email == request.Email && u.Id != userId && !u.IsDeleted);
             if (emailExists)
-                throw new InvalidOperationException("Email is already in use by another user.");
+                throw new InvalidOperationException("Email đã được dùng bởi tài khoản khác.");
 
             bool phoneExists = await _unitOfWork.GetRepository<User>().Entities
                 .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != userId && !u.IsDeleted);
             if (phoneExists)
-                throw new InvalidOperationException("Phone number is already in use by another user.");
+                throw new InvalidOperationException("Số điện thoại đã được dùng bởi tài khoản khác.");
 
             owner.Email = request.Email;
             owner.PhoneNumber = request.PhoneNumber;
@@ -563,12 +563,12 @@ namespace Services
             bool emailExists = await _unitOfWork.GetRepository<User>().Entities
                 .AnyAsync(u => u.Email == request.Email && u.Id != userId && !u.IsDeleted);
             if (emailExists)
-                throw new InvalidOperationException("Email is already in use by another user.");
+                throw new InvalidOperationException("Email đã được dùng bởi tài khoản khác.");
 
             bool phoneExists = await _unitOfWork.GetRepository<User>().Entities
                 .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != userId && !u.IsDeleted);
             if (phoneExists)
-                throw new InvalidOperationException("Phone number is already in use by another user.");
+                throw new InvalidOperationException("Số điện thoại được dùng bởi tài khoản khác.");
 
             user.Email = request.Email;
             user.PhoneNumber = request.PhoneNumber;
@@ -606,15 +606,15 @@ namespace Services
             bool emailExists = await _unitOfWork.GetRepository<User>().Entities
                 .AnyAsync(u => u.Email == request.Email && u.Id != userId && !u.IsDeleted);
             if (emailExists)
-                throw new InvalidOperationException("Email is already in use by another user.");
+                throw new InvalidOperationException("Email đã được dùng bởi tài khoản khác.");
 
             bool phoneExists = await _unitOfWork.GetRepository<User>().Entities
                 .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != userId && !u.IsDeleted);
             if (phoneExists)
-                throw new InvalidOperationException("Phone number is already in use by another user.");
+                throw new InvalidOperationException("Số điện thoại đã được dùng bởi tài khoản khác.");
 
             if (request.PhoneSecondary == user.PhoneNumber)
-                throw new InvalidOperationException("Cannot use main phone number as secondary.");
+                throw new InvalidOperationException("Không thể dùng số điện thoại chính cho số điện thoại phụ.");
 
             user.Email = request.Email;
             user.PhoneNumber = request.PhoneNumber;
@@ -661,12 +661,12 @@ namespace Services
             bool emailExists = await _unitOfWork.GetRepository<User>().Entities
                 .AnyAsync(u => u.Email == request.Email && u.Id != studentId && !u.IsDeleted);
             if (emailExists)
-                throw new InvalidOperationException("Email is already in use by another user.");
+                throw new InvalidOperationException("Email đã được dùng bởi tài khoản khác.");
 
             bool phoneExists = await _unitOfWork.GetRepository<User>().Entities
                 .AnyAsync(u => u.PhoneNumber == request.PhoneNumber && u.Id != studentId && !u.IsDeleted);
             if (phoneExists)
-                throw new InvalidOperationException("Phone number is already in use by another user.");
+                throw new InvalidOperationException("Số điện thoại đã được dùng bởi tài khoản khác.");
 
             user.Email = request.Email;
             user.PhoneNumber = request.PhoneNumber;
@@ -983,7 +983,7 @@ namespace Services
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
-                throw new Exception("User not found");
+                throw new Exception("Không tìm thấy tài khoản.");
 
             user.IsDeleted = true;
             result = true;
@@ -1001,9 +1001,9 @@ namespace Services
             var user = await _unitOfWork.GetRepository<User>().Entities
                 .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
 
-            if (user == null) throw new Exception("User not found.");
+            if (user == null) throw new Exception("Không tìm thấy tài khoản.");
 
-            if (status < 1 || status > 3) throw new Exception("Must between 1 and 3");
+            if (status < 1 || status > 3) throw new Exception("Giá trị phải từ 1 đến 3.");
 
             switch (status)
             {
@@ -1032,16 +1032,16 @@ namespace Services
             var user = await _unitOfWork.GetRepository<User>().Entities
                 .FirstOrDefaultAsync(u => u.Id == userId && !u.IsDeleted);
 
-            if (user == null) throw new Exception("User not found");
+            if (user == null) throw new Exception("Không tìm thấy tài khoản.");
 
             if (!PasswordHasher.VerifyPassword(currentPassword, user.PasswordHash))
-                throw new Exception("Current password is incorrect.");
+                throw new Exception("Mật khẩu hiện tại không chính xác.");
 
             if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
-                throw new Exception("New password must be at least 6 characters long.");
+                throw new Exception("Mật khẩu mới phải dùng ít nhất 6 kí tự.");
 
             if (PasswordHasher.VerifyPassword(newPassword, user.PasswordHash))
-                throw new Exception("New password cannot be the same as the current password.");
+                throw new Exception("Mật khẩu mới không được trùng với mật khẩu cũ.");
 
             user.PasswordHash = PasswordHasher.HashPassword(newPassword);
             user.LastUpdatedAt = DateTime.UtcNow;

@@ -108,8 +108,8 @@ namespace Services
                 .Select(x => new UserSuspensionRecordResponse
                 {
                     Id = x.s.Id,
-                    BannedUserFullName = x.bannedUser != null ? x.bannedUser.FullName : "(Unknown User)",
-                    AdminFullName = x.admin != null ? x.admin.FullName : "(Unknown Admin)",
+                    BannedUserFullName = x.bannedUser != null ? x.bannedUser.FullName : "(Người dùng không xác định.)",
+                    AdminFullName = x.admin != null ? x.admin.FullName : "(Quản trị viên không xác định.)",
                     Reason = x.s.Reason,
                     SuspendedFrom = x.s.SuspendedFrom,
                     SuspendedTo = x.s.SuspendedTo,
@@ -145,8 +145,8 @@ namespace Services
                                   SuspensionId = s.Id,
                                   CourseTitle = c.Title,
                                   Subject = c.Subject,
-                                  TeacherName = tu != null ? tu.FullName : "(Unknown Teacher)",
-                                  AdminName = admin != null ? admin.FullName : "(Unknown Admin)",
+                                  TeacherName = tu != null ? tu.FullName : "(Giáo viên không xác định)",
+                                  AdminName = admin != null ? admin.FullName : "(Quản trị viên không xác định.)",
                                   Reason = s.Reason,
                                   CreatedAt = s.CreatedAt,
                                   LastUpdatedAt = (DateTime)s.LastUpdatedAt
@@ -188,7 +188,7 @@ namespace Services
                 .Include(a => a.ActionByUser)
                 .FirstOrDefaultAsync(r => r.Id == Id && !r.IsDeleted);
 
-            if (record == null) throw new Exception("Record not found.");
+            if (record == null) throw new Exception("Không tìm thấy báo cáo.");
 
             if (record != null && record.UserId != null)
             {

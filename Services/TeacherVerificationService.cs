@@ -1,4 +1,4 @@
-using BusinessObjects;
+﻿using BusinessObjects;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
@@ -19,12 +19,12 @@ namespace Services
         {
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
                 .FirstOrDefaultAsync(t => t.Id == request.TeacherProfileId && !t.IsDeleted);
-            if (teacher == null) throw new Exception("TeacherProfile not found");
+            if (teacher == null) throw new Exception("Không tìm thấy giáo viên.");
 
             
             if (teacher.VerificationStatus == VerificationStatus.Completed || teacher.VerificationStatus == VerificationStatus.Finalized)
             {
-                throw new Exception("Teacher is already verified");
+                throw new Exception("Giáo viên này đã được xác minh.");
             }
 
             
@@ -32,7 +32,7 @@ namespace Services
                 .FirstOrDefaultAsync(u => u.Id == teacher.UserId && !u.IsDeleted);
             if (user != null && user.Status == AccountStatus.Active)
             {
-                throw new Exception("User account is already active; verification not required");
+                throw new Exception("Tài khoản đã được kích hoạt. Không cần phải xác minh.");
             }
 
             
@@ -40,7 +40,7 @@ namespace Services
                 .AnyAsync(v => v.TeacherProfileId == teacher.Id && !v.IsDeleted && v.Status == VerificationStatus.Pending);
             if (existingPending)
             {
-                throw new Exception("A pending verification request already exists");
+                throw new Exception("Đã có yêu cầu xác minh đang chờ duyệt.");
             }
 
             var ver = new TeacherVerificationRequest
@@ -65,7 +65,7 @@ namespace Services
         {
             var ver = await _unitOfWork.GetRepository<TeacherVerificationRequest>().Entities
                 .FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted);
-            if (ver == null) throw new Exception("Verification request not found");
+            if (ver == null) throw new Exception("Không tìm thấy yêu cầu xác minh.");
             return Map(ver);
         }
 
@@ -113,7 +113,7 @@ namespace Services
         public async Task<TeacherVerificationResponse> UpdateDocuments(Guid id, TeacherVerificationDocumentsDto request)
         {
             var ver = await _unitOfWork.GetRepository<TeacherVerificationRequest>().Entities.FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted);
-            if (ver == null) throw new Exception("Verification request not found");
+            if (ver == null) throw new Exception("Yêu cầu xác minh không tồn tại.");
 
             if (request.QualificationCertificatePath != null) ver.QualificationCertificatePath = request.QualificationCertificatePath;
             if (request.EmploymentContractPath != null) ver.EmploymentContractPath = request.EmploymentContractPath;
@@ -137,7 +137,7 @@ namespace Services
         public async Task<TeacherVerificationResponse> SetStatus(Guid id, SetTeacherVerificationStatusDto request)
         {
             var ver = await _unitOfWork.GetRepository<TeacherVerificationRequest>().Entities.FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted);
-            if (ver == null) throw new Exception("Verification request not found");
+            if (ver == null) throw new Exception("Yêu cầu xác minh không tồn tại.");
 
             var verifier = await _unitOfWork.GetRepository<User>().Entities.FirstOrDefaultAsync(v => v.Id == request.VerifierId && !v.IsDeleted);
 

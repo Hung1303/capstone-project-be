@@ -47,7 +47,7 @@ namespace Services
                     );
 
                 if (!isEnrolled)
-                    throw new Exception("Only students enrolled in the teacher's course can leave feedback.");
+                    throw new Exception("Chỉ học sinh đăng kí khóa học này mới được quyền đánh giá.");
 
                 var feedback = new TeacherFeedback
                 {
@@ -93,7 +93,7 @@ namespace Services
                     );
 
                 if (!isParentOfEnrolledStudent)
-                    throw new Exception("Only parents of students enrolled in the teacher’s course can leave feedback.");
+                    throw new Exception("Chỉ phụ huynh của học sinh đăng kí khóa học này mới được đánh giá.");
 
                 var feedback = new TeacherFeedback
                 {
@@ -124,7 +124,7 @@ namespace Services
                 };
             }
 
-            throw new Exception("Only enrolled students or their parents can leave teacher feedback.");
+            throw new Exception("Chỉ học sinh hoặc phụ huynh của học sinh đấy mới được quyền đánh giá.");
         }
 
 

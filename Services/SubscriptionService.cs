@@ -1,4 +1,4 @@
-using BusinessObjects;
+﻿using BusinessObjects;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
@@ -53,7 +53,7 @@ namespace Services
 
             if (package == null)
             {
-                throw new Exception("Subscription package not found");
+                throw new Exception("Không tìm thấy gói dịch vụ.");
             }
 
             if (request.PackageName != null)
@@ -96,7 +96,7 @@ namespace Services
 
             if (package == null)
             {
-                throw new Exception("Subscription package not found");
+                throw new Exception("Không tìm thấy gói dịch vụ.");
             }
 
             
@@ -108,7 +108,7 @@ namespace Services
 
             if (hasActiveSubscriptions)
             {
-                throw new Exception("Cannot delete subscription package with active subscriptions");
+                throw new Exception("Không thể xóa gói dịch vụ đang có người đăng ký.");
             }
 
             package.IsDeleted = true;
@@ -168,7 +168,7 @@ namespace Services
 
             if (package == null)
             {
-                throw new Exception("Subscription package not found");
+                throw new Exception("Không tìm thấy gói dịch vụ.");
             }
 
             return package;
@@ -182,7 +182,7 @@ namespace Services
 
             if (center == null)
             {
-                throw new Exception("Center profile not found");
+                throw new Exception("Không tìm thấy trung tâm.");
             }
 
             var package = await _unitOfWork.GetRepository<SubscriptionPackage>()
@@ -191,7 +191,7 @@ namespace Services
 
             if (package == null)
             {
-                throw new Exception("Subscription package not found or inactive");
+                throw new Exception("Không tìm thấy gói dịch vụ hoặc gói dịch vụ chưa kích hoạt.");
             }
 
             var existingActiveSubscription = await _unitOfWork.GetRepository<CenterSubscription>()
@@ -238,7 +238,7 @@ namespace Services
 
             if (center == null)
             {
-                throw new Exception("Center profile not found");
+                throw new Exception("Không tìm thấy trung tâm.");
             }
 
             var newPackage = await _unitOfWork.GetRepository<SubscriptionPackage>()
@@ -247,7 +247,7 @@ namespace Services
 
             if (newPackage == null)
             {
-                throw new Exception("New subscription package not found or inactive");
+                throw new Exception("Gói dịch vụ mới không tìm thấy hoặc chưa kích hoạt.");
             }
 
             var currentSubscription = await _unitOfWork.GetRepository<CenterSubscription>()
@@ -274,7 +274,7 @@ namespace Services
 
             if (currentPackage != null && newPackage.Tier <= currentPackage.Tier)
             {
-                throw new Exception("Can only upgrade to a higher tier package");
+                throw new Exception("Chỉ có thể nâng cấp lên gói bậc cao hơn.");
             }
 
            
@@ -313,12 +313,12 @@ namespace Services
 
             if (subscription == null)
             {
-                throw new Exception("Subscription not found");
+                throw new Exception("Không tìm thấy gói dịch vụ.");
             }
 
             if (subscription.Status != SubscriptionStatus.Active)
             {
-                throw new Exception("Only active subscriptions can be cancelled");
+                throw new Exception("Chỉ gói dịch vụ đang kích hoạt mới có thể bị hủy.");
             }
 
             subscription.Status = SubscriptionStatus.Cancelled;

@@ -1,4 +1,4 @@
-using BusinessObjects;
+﻿using BusinessObjects;
 using Core.Base;
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
@@ -26,17 +26,17 @@ namespace Services
                 .FirstOrDefaultAsync(c => c.Id == request.CenterProfileId);
 
             if (center == null)
-                throw new Exception("Center not found");
+                throw new Exception("Không tìm thấy trung tâm.");
 
             if (center.Status != CenterStatus.Pending)
-                throw new Exception("Center is not in pending status for verification");
+                throw new Exception("Trung tâm không ở trạng thái chờ duyệt.");
 
             // Check if there's already a pending verification request
             var existingRequest = center.VerificationRequests
                 .FirstOrDefault(vr => vr.Status == VerificationStatus.Pending || vr.Status == VerificationStatus.InProgress);
 
             if (existingRequest != null)
-                throw new Exception("There is already a pending or in-progress verification request for this center");
+                throw new Exception("Hiện đã có yêu cầu xác minh đang chờ xử lý hoặc đang được tiến hành đối với trung tâm này.");
 
             // Create verification request
             var verificationRequest = new CenterVerificationRequest
@@ -65,10 +65,10 @@ namespace Services
                 .FirstOrDefaultAsync(vr => vr.Id == verificationId);
 
             if (verificationRequest == null)
-                throw new Exception("Verification request not found");
+                throw new Exception("Không tìm thấy yêu cầu xác minh.");
 
             if (verificationRequest.Status != VerificationStatus.Pending && verificationRequest.Status != VerificationStatus.InProgress)
-                throw new Exception("Verification request is not in a state that can be updated");
+                throw new Exception("Yêu cầu xác minh không ở trạng thái có thể cập nhật.");
 
             // Update verification request
             verificationRequest.Status = VerificationStatus.InProgress;
@@ -93,10 +93,10 @@ namespace Services
                 .FirstOrDefaultAsync(vr => vr.Id == verificationId);
 
             if (verificationRequest == null)
-                throw new Exception("Verification request not found");
+                throw new Exception("Không tìm thấy yêu cầu xác minh.");
 
             if (verificationRequest.Status != VerificationStatus.InProgress && verificationRequest.Status != VerificationStatus.Completed)
-                throw new Exception("Verification request is not ready for admin decision");
+                throw new Exception("Yêu cầu xác minh chưa sẵn sàng cho quyết định của quản trị viên.");
 
             // Update verification request with admin decision
             verificationRequest.AdminId = decision.AdminId;

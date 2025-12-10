@@ -47,7 +47,7 @@ namespace Services
                     );
 
                 if (!isStudentEnrolled)
-                    throw new Exception("Only enrolled students can leave feedback.");
+                    throw new Exception("Chỉ học sinh đăng kí khóa học mới được đánh giá.");
 
                 var feedback = new CourseFeedback
                 {
@@ -89,7 +89,7 @@ namespace Services
                     );
 
                 if (!isParentOfEnrolledStudent)
-                    throw new Exception("Only parents of enrolled students can leave feedback.");
+                    throw new Exception("Chỉ phụ huynh của học sinh đăng kí khóa học mới được đánh giá.");
 
                 var feedback = new CourseFeedback
                 {
@@ -118,7 +118,7 @@ namespace Services
                 };
             }
 
-            throw new Exception("Only enrolled students or their parents can leave feedback.");
+            throw new Exception("Chỉ học sinh đăng kí khóa học và phụ huynh của học sinh đấy được quyền đánh giá.");
         }
 
         public async Task<CourseFeedbackResponse> GetCourseFeedbackById(Guid courseFeedbackId)
@@ -161,7 +161,7 @@ namespace Services
             await _unitOfWork.GetRepository<CourseFeedback>().UpdateAsync(feedback);
             await _unitOfWork.SaveAsync();
 
-            return "Feedback approved.";
+            return "Đánh giá được chấp thuận.";
         }
 
         public async Task<CourseFeedbackResponse> UpdateCourseFeedback(Guid feedbackId, UpdateCourseFeedbackRequest request)
