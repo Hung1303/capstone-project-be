@@ -325,7 +325,6 @@ namespace TMS_BE.Controllers
         }
 
         [HttpGet("Centers/Status/{status}")]
-        [Authorize(Policy = "InspectionAccess")]
         public async Task<IActionResult> GetCentersByStatus(CenterStatus status, int pageNumber = 1, int pageSize = 5, string? centerName = null)
         {
             var (centers, totalCount) = await _userService.GetCentersByStatusAsync(status, pageNumber, pageSize, centerName);
