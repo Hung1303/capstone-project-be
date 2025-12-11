@@ -21,7 +21,7 @@ namespace Services.DTO.ClassSchedule
                 if (EndDate.Value < StartDate.Value)
                 {
                     yield return new ValidationResult(
-                        "The EndDate must be lower than the StartDate.",
+                        "Ngày kết thúc phải lớn hơn ngày bắt đầu.",
                         new[] { nameof(EndDate), nameof(StartDate) }
                     );
                 }
@@ -29,7 +29,7 @@ namespace Services.DTO.ClassSchedule
             if (EndTime <= StartTime)
             {
                 yield return new ValidationResult(
-                    "The EndTime must be strictly greater than the StartTime.",
+                    "Giờ kết thúc phải lớn hơn giờ bắt đầu.",
                     new[] { nameof(EndDate), nameof(StartDate) }
                 );
             }
@@ -54,7 +54,7 @@ namespace Services.DTO.ClassSchedule
                 if (EndDate.Value < StartDate.Value)
                 {
                     yield return new ValidationResult(
-                        "The EndDate must not be lower than the StartDate.",
+                        "Ngày kết thúc phải lớn hơn ngày bắt đầu.",
                         new[] { nameof(EndDate), nameof(StartDate) }
                     );
                 }
@@ -62,7 +62,7 @@ namespace Services.DTO.ClassSchedule
             if (EndTime <= StartTime)
             {
                 yield return new ValidationResult(
-                    "The EndTime must be strictly greater than the StartTime.",
+                   "Giờ kết thúc phải lớn hơn giờ bắt đầu.",
                     new[] { nameof(EndDate), nameof(StartDate) }
                 );
             }

@@ -10,7 +10,7 @@ namespace Services.DTO.Payment
 {
     public class CreatePaymentRequest
     {
-        [Range(10000.00, 100000000, ErrorMessage = "Ammount must be at between 10.000 and 100.000.000")]
+        [Range(10000.00, 100000000, ErrorMessage = "Số lượng phải giữa 10.000 và 100.000.000")]
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public Guid UserId { get; set; }

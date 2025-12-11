@@ -68,6 +68,32 @@ namespace API.Controllers
             });
         }
 
+        [HttpGet("Course/{courseId}/Enrollments")]
+        public async Task<IActionResult> GetAllEnrollmentsByCourse(Guid courseId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? searchTerm = null,
+            EnrollmentStatus? status = null)
+        {
+            var enrollments = await _enrollmentService.GetAllEnrollmentsByCourse(courseId, searchTerm, status, pageNumber, pageSize);
+
+            if (enrollments == null || !enrollments.Any())
+                return NotFound(new { message = "Không tìm thấy đăng kí khóa học." });
+
+            return Ok(new
+            {
+                message = "Thành công lấy được danh sách đăng kí khóa học.",
+                data = enrollments,
+                pagination = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalItems = enrollments.Count(),
+                    // Nếu bạn có totalCount từ service, có thể thêm TotalPages = ...
+                }
+            });
+        }
+
         [HttpGet("Student/{studentProfileId}/Enrollments")]
         public async Task<IActionResult> GetAllEnrollmentsByStudent(Guid studentProfileId,
             [FromQuery] int pageNumber = 1,

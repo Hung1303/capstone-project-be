@@ -21,8 +21,8 @@ namespace API.Controllers
         {
             var result = await _approvalService.CreateApprovalRequestAsync(courseId, requestedByUserId, notes);
             return result
-                ? Ok(new { message = "Approval request created successfully. Course is now Pending Approval." })
-                : BadRequest(new { message = "Failed to create approval request." });
+                ? Ok(new { message = "Yêu cầu duyệt được tạo thành công. Khóa học đang được chờ duyệt." })
+                : BadRequest(new { message = "Tạo yêu cầu duyệt thất bại." });
         }
 
         // PUT: api/ApprovalRequests/{approvalRequestId}
@@ -31,8 +31,8 @@ namespace API.Controllers
         {
             var result = await _approvalService.ReviewApprovalRequestAsync(approvalRequestId, reviewerUserId, decision, notes);
             return result
-                ? Ok(new { message = $"Approval request {decision.ToString()} successfully." })
-                : BadRequest(new { message = "Failed to review approval request." });
+                ? Ok(new { message = $"Thành công {decision.ToString()} yêu cầu duyệt." })
+                : BadRequest(new { message = "Xem yêu cầu duyệt thất bại." });
         }
 
         // GET: api/ApprovalRequests
@@ -56,8 +56,8 @@ namespace API.Controllers
         {
             var result = await _approvalService.DeleteApprovalRequestAsync(approvalRequestId);
             return result
-                ? Ok(new { message = "Approval request deleted successfully." })
-                : BadRequest(new { message = "Failed to delete approval request." });
+                ? Ok(new { message = "Đã xóa yêu cầu duyệt thành công." })
+                : BadRequest(new { message = "Xóa yêu cầu duyệt thất bại." });
         }
     }
 }

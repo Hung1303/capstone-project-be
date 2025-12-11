@@ -10,7 +10,7 @@ namespace BusinessObjects
         public Guid TeacherProfileId { get; set; }
         public string SyllabusName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 tới lớp 12.")]
         public int GradeLevel { get; set; }
         //public string Subject { get; set; } = string.Empty;
 

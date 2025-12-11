@@ -4,7 +4,7 @@ namespace Services.DTO.CourseResult
 {
     public class CreateCourseResultRequest
     {
-        [Range(0.00, 10.00, ErrorMessage = "Mark must be 0 - 10")]
+        [Range(0.00, 10.00, ErrorMessage = "Điểm phải từ 0 đến 10")]
         public float Mark { get; set; }
         public string Comment { get; set; }
         public Guid StudentId { get; set; }
@@ -22,7 +22,7 @@ namespace Services.DTO.CourseResult
     }
     public class UpdateCourseResultRequest
     {
-        [Range(0.00, 10.00, ErrorMessage = "Mark must be 0 - 10")]
+        [Range(0.00, 10.00, ErrorMessage = "Điểm phải từ 0 đến 10")]
         public float? Mark { get; set; }
         public string? Comment { get; set; }
         public Guid? StudentId { get; set; }
