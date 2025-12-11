@@ -13,11 +13,11 @@ namespace Services.DTO.Course
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public TeachingMethod TeachingMethod { get; set; }
-        [Range(1000.00, (double)decimal.MaxValue, ErrorMessage = "Tuition Fee must be at least 1000")]
+        [Range(1000.00, (double)decimal.MaxValue, ErrorMessage = "Học phí phải có giá trị ít là 1000")]
         public decimal TuitionFee { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1")]
+        [Range(1, int.MaxValue, ErrorMessage = "Số lượng ít nhất phải là 1")]
         public int Capacity { get; set; }
-        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
         public int GradeLevel { get; set; }
         //public CourseStatus Status { get; set; }
         [Required]
@@ -29,7 +29,7 @@ namespace Services.DTO.Course
             if (StartDate > EndDate)
             {
                 yield return new ValidationResult(
-                    "The StartDate must be lower than the EndDate.",
+                    "Ngày kết thúc phải lớn hơn ngày bắt đầu.",
                     new[] { nameof(EndDate), nameof(StartDate) }
                 );
             }
@@ -47,11 +47,11 @@ namespace Services.DTO.Course
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public TeachingMethod TeachingMethod { get; set; }
-        [Range(1000.00, (double)decimal.MaxValue, ErrorMessage = "Tuition Fee must be at least 1000")]
+        [Range(1000.00, (double)decimal.MaxValue, ErrorMessage = "Học phí phải có giá trị ít là 1000")]
         public decimal TuitionFee { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1")]
+        [Range(1, int.MaxValue, ErrorMessage = "Số lượng ít nhất phải là 1")]
         public int Capacity { get; set; }
-        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
         public int GradeLevel { get; set; }
         //public CourseStatus Status { get; set; }
         [Required]
@@ -62,7 +62,7 @@ namespace Services.DTO.Course
             if (StartDate > EndDate)
             {
                 yield return new ValidationResult(
-                    "The StartDate must be lower than the EndDate.",
+                    "Ngày kết thúc phải lớn hơn ngày bắt đầu.",
                     new[] { nameof(EndDate), nameof(StartDate) }
                 );
             }
@@ -117,11 +117,11 @@ namespace Services.DTO.Course
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
         public TeachingMethod? TeachingMethod { get; set; }
-        [Range(1000.00, (double)decimal.MaxValue, ErrorMessage = "Tuition Fee must be at least 1000")]
+        [Range(1000.00, (double)decimal.MaxValue, ErrorMessage = "Học phí phải có giá trị ít là 1000")]
         public decimal? TuitionFee { get; set; }
-        [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1")]
+        [Range(1, int.MaxValue, ErrorMessage = "Số lượng ít nhất phải là 1")]
         public int? Capacity { get; set; }
-        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
         public int? GradeLevel { get; set; }
         public CourseStatus? Status { get; set; }
         public Guid? TeacherProfileId { get; set; }
@@ -131,7 +131,7 @@ namespace Services.DTO.Course
             if (StartDate > EndDate)
             {
                 yield return new ValidationResult(
-                    "The StartDate must be lower than the EndDate.",
+                    "Ngày kết thúc phải lớn hơn ngày bắt đầu.",
                     new[] { nameof(EndDate), nameof(StartDate) }
                 );
             }

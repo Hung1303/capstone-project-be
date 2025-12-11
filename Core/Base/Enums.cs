@@ -32,7 +32,9 @@ namespace Core.Base
         Approved = 2,
         Rejected = 3,
         Suspended = 4,
-        Archived = 5
+        Archived = 5,
+        Cancelled = 6,
+        UnassignedTeacher = 7
     }
 
     public enum EnrollmentStatus

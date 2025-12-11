@@ -6,33 +6,33 @@ namespace Services.DTO.User
     public class CreateAdminRequest
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Tên người dùng phải có ít nhất 6 kí tự")]
         public string UserName { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Mật khẩu phải dài ít nhất 6 kí tự")]
         public string Password { get; set; }
-        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
+        [Required, MinLength(2, ErrorMessage = "Họ và tên phải dài ít nhất 2 kí tự")]
         public string FullName { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
     }
 
     public class CreateCenterRequest
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Tên người dùng phải có ít nhất 6 kí tự")]
         public string UserName { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Mật khẩu phải dài ít nhất 6 kí tự")]
         public string Password { get; set; }
-        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
+        [Required, MinLength(2, ErrorMessage = "Họ và tên phải dài ít nhất 2 kí tự")]
         public string FullName { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
         public string CenterName { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string ContactPhone { get; set; } //số điện thoại bàn
         public string LicenseNumber { get; set; }
         public DateOnly IssueDate { get; set; }
@@ -44,17 +44,17 @@ namespace Services.DTO.User
     public class CreateTeacherRequest
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Tên người dùng phải có ít nhất 6 kí tự")]
         public string UserName { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Mật khẩu phải dài ít nhất 6 kí tự")]
         public string Password { get; set; }
-        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
+        [Required, MinLength(2, ErrorMessage = "Họ và tên phải dài ít nhất 2 kí tự")]
         public string FullName { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
-        [Range(0, 50, ErrorMessage = "Years of experience must be between 0 and 50.")]
+        [Range(0, 50, ErrorMessage = "Năm kinh nghiệm phải từ 0 đến 50")]
         public int YearOfExperience { get; set; } = 0;
         public string Qualifications { get; set; }
         public string LicenseNumber { get; set; }
@@ -68,18 +68,18 @@ namespace Services.DTO.User
     {
 
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Tên người dùng phải có ít nhất 6 kí tự")]
         public string UserName { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Mật khẩu phải dài ít nhất 6 kí tự")]
         public string Password { get; set; }
-        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
+        [Required, MinLength(2, ErrorMessage = "Họ và tên phải dài ít nhất 2 kí tự")]
         public string FullName { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string? PhoneSecondary { get; set; }
     }
 
@@ -87,19 +87,19 @@ namespace Services.DTO.User
     {
 
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Username must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Tên người dùng phải có ít nhất 6 kí tự")]
         public string UserName { get; set; }
-        [Required, MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
+        [Required, MinLength(6, ErrorMessage = "Mật khẩu phải dài ít nhất 6 kí tự")]
         public string Password { get; set; }
-        [Required, MinLength(2, ErrorMessage = "Fullname must be at least 2 characters long")]
+        [Required, MinLength(2, ErrorMessage = "Họ và tên phải dài ít nhất 2 kí tự")]
         public string FullName { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
         public string SchoolName { get; set; }
         public string SchoolYear { get; set; }
-        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
         public int GradeLevel { get; set; }
         public string ClassName { get; set; }
     }
@@ -120,9 +120,9 @@ namespace Services.DTO.User
     public class CenterUpdateRequest
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
     }
@@ -130,9 +130,9 @@ namespace Services.DTO.User
     public class TeacherUpdateRequest
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
         public string Subjects { get; set; }
         public string Bio { get; set; }
@@ -141,25 +141,25 @@ namespace Services.DTO.User
     public class ParentUpdateRequest
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string? PhoneSecondary { get; set; }
     }
 
     public class StudentUpdateRequest
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
         public string SchoolName { get; set; }
         public string SchoolYear { get; set; }
-        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
         public int GradeLevel { get; set; }
         public string ClassName { get; set; }
 
@@ -168,9 +168,9 @@ namespace Services.DTO.User
     public class UserUpdateRequest
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [EmailAddress(ErrorMessage = "Sai cú pháp email")]
         public string Email { get; set; }
-        [Phone(ErrorMessage = "Invalid phone number.")]
+        [Phone(ErrorMessage = "Sai số điện thoại.")]
         public string PhoneNumber { get; set; }
     }
 
@@ -226,7 +226,7 @@ namespace Services.DTO.User
         public string PhoneNumber { get; set; }
         public string SchoolName { get; set; }
         public string SchoolYear { get; set; }
-        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
         public int GradeLevel { get; set; }
         public string ClassName { get; set; }
         public string Status { get; set; }
@@ -309,7 +309,7 @@ namespace Services.DTO.User
 
         public string SchoolName { get; set; }
         public string SchoolYear { get; set; }
-        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
+        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
         public int GradeLevel { get; set; }
         public string ClassName { get; set; }
     }

@@ -58,6 +58,8 @@ namespace Services
             var supervisor = await _unitOfWork.GetRepository<User>().Entities
                 .FirstOrDefaultAsync(u => u.Id == supervisorId && u.Role == UserRole.Admin && !u.IsDeleted);
 
+            var enrollments = _unitOfWork.GetRepository<Enrollment>().Entities.Where(e => e.CourseId == courseId);
+
             if (course == null || supervisor == null) return false;
 
             var ban = new SuspensionRecord
@@ -70,6 +72,20 @@ namespace Services
             };
 
             course.Status = CourseStatus.Suspended;
+
+            foreach (var a in enrollments)
+            {
+                try
+                {
+                    a.Status = EnrollmentStatus.Cancelled;
+                    a.CancelReason = $"{record.Reason}";
+                    a.CancelledAt = DateTimeOffset.UtcNow;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+            }
 
             await _unitOfWork.GetRepository<Course>().UpdateAsync(course);
             await _unitOfWork.GetRepository<SuspensionRecord>().InsertAsync(ban);
