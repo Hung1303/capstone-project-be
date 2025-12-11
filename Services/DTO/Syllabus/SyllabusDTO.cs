@@ -6,7 +6,7 @@ namespace Services.DTO.Syllabus
     {
         public string SyllabusName { get; set; }
         public string Description { get; set; }
-        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
         public int GradeLevel { get; set; }
         public string AssessmentMethod { get; set; }
         public string CourseMaterial { get; set; }
@@ -18,7 +18,7 @@ namespace Services.DTO.Syllabus
     {
         public string? SyllabusName { get; set; }
         public string? Description { get; set; }
-        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
         public int? GradeLevel { get; set; }
         public string? AssessmentMethod { get; set; }
         public string? CourseMaterial { get; set; }
@@ -32,7 +32,7 @@ namespace Services.DTO.Syllabus
         public string SubjectName { get; set; }
         public string TeacherName { get; set; }
         public string Description { get; set; }
-        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 đến lớp 12.")]
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
         public int GradeLevel { get; set; }
         public string AssessmentMethod { get; set; }
         public string CourseMaterial { get; set; }

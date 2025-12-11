@@ -14,7 +14,7 @@ namespace Services.Interfaces
         Task<bool> DeleteEnrollment(Guid id);
         Task<EnrollmentResponse> ApproveEnrollment(Guid enrollmentId, Guid approverProfileId);
         Task<EnrollmentResponse> RejectEnrollment(Guid enrollmentId, Guid approverProfileId, string reason);
-        Task<IEnumerable<EnrollmentResponse>> GetAllEnrollmentsByCourse(Guid courseId, string? searchTerm, EnrollmentStatus? status, int pageNumber, int pageSize);
+
     }
 
 }

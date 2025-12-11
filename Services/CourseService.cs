@@ -980,58 +980,5 @@ namespace Services
             return true;
         }
 
-        public async Task<bool> CancelCourse(Guid courseId, string reason)
-        {
-            var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(c => c.Id == courseId && !c.IsDeleted);
-            if(course == null) { throw new Exception("Không tìm thấy khóa học."); }
-
-            course.Status = CourseStatus.Cancelled;
-
-            var enrollments = _unitOfWork.GetRepository<Enrollment>().Entities.Where(e => e.CourseId == courseId);
-
-            foreach (var a in enrollments)
-            {
-                try
-                {
-                    a.Status = EnrollmentStatus.Cancelled;
-                    a.CancelReason = $"{reason}";
-                    a.CancelledAt = DateTimeOffset.UtcNow;
-                }catch(Exception e)
-                {
-                    throw new Exception(e.Message);
-                }
-            }
-
-            await _unitOfWork.SaveAsync();
-            return true;
-        }
-
-        public async Task<bool> TeacherWithdrawFromCourse(Guid courseId, string reason)
-        {
-            var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(c => c.Id == courseId && !c.IsDeleted);
-            if (course == null) { throw new Exception("Không tìm thấy khóa học."); }
-
-            course.Status = CourseStatus.UnassignedTeacher;
-            course.TeacherProfileId = null;
-
-            var enrollments = _unitOfWork.GetRepository<Enrollment>().Entities.Where(e => e.CourseId == courseId);
-
-            foreach (var a in enrollments)
-            {
-                try
-                {
-                    a.Status = EnrollmentStatus.Cancelled;
-                    a.CancelReason = $"{reason}";
-                    a.CancelledAt = DateTimeOffset.UtcNow;
-                }
-                catch (Exception e)
-                {
-                    throw new Exception(e.Message);
-                }
-            }
-
-            await _unitOfWork.SaveAsync();
-            return true;
-        }
     }
 }

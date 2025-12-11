@@ -1,14 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Services.DTO.Email
 {
     public class SendEmailToCentersRequest
     {
-        [Required(ErrorMessage = "Cần tiêu đề")]
-        [StringLength(200, ErrorMessage = "Tiêu đề không vượt quá 200 kí tự.")]
+        [Required(ErrorMessage = "Subject is required")]
+        [StringLength(200, ErrorMessage = "Subject cannot exceed 200 characters")]
         public string Subject { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Cần nội dung.")]
+        [Required(ErrorMessage = "Body is required")]
         public string Body { get; set; } = string.Empty;
 
         public List<Guid>? CenterIds { get; set; } // Optional: send to specific centers. If null, send to all centers

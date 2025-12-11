@@ -531,68 +531,6 @@ namespace Services
 
             return true;
         }
-
-        public async Task<IEnumerable<EnrollmentResponse>> GetAllEnrollmentsByCourse(Guid courseId, string? searchTerm, EnrollmentStatus? status, int pageNumber, int pageSize)
-        {
-
-            var enrollmentsQuery = _unitOfWork.GetRepository<Enrollment>().Entities
-                .Include(c => c.Course)
-                .ThenInclude(d => d.CenterProfile)
-                .Where(e => !e.IsDeleted && e.CourseId == courseId)
-                .Include(e => e.StudentProfile)
-                    .ThenInclude(s => s.ParentProfile)
-                .Include(e => e.Course)
-                .AsQueryable();
-
-
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                searchTerm = searchTerm.Trim().ToLower();
-
-                enrollmentsQuery = enrollmentsQuery.Where(e =>
-                    (e.CancelReason != null && e.CancelReason.ToLower().Contains(searchTerm)) ||
-                    (e.StudentProfile.SchoolName != null && e.StudentProfile.SchoolName.ToLower().Contains(searchTerm)) ||
-                    (e.Course.Title != null && e.Course.Title.ToLower().Contains(searchTerm)) ||
-                    (e.Course.Subject != null && e.Course.Subject.ToLower().Contains(searchTerm))
-                );
-            }
-
-            if (status.HasValue)
-            {
-                enrollmentsQuery = enrollmentsQuery.Where(e => e.Status == status.Value);
-            }
-
-            var totalCount = await enrollmentsQuery.CountAsync();
-
-            pageNumber = Math.Max(1, pageNumber);
-            pageSize = Math.Max(1, pageSize);
-            var skipAmount = (pageNumber - 1) * pageSize;
-
-            var pagedEnrollments = await enrollmentsQuery
-                .OrderByDescending(e => e.CreatedAt)
-                .Skip(skipAmount)
-                .Take(pageSize)
-                .Select(e => new EnrollmentResponse
-                {
-                    Id = e.Id,
-                    CourseId = e.CourseId,
-                    StudentProfileId = e.StudentProfileId,
-                    StudentName = _unitOfWork.GetRepository<User>().Entities.Where(u => u.StudentProfile.Id == e.StudentProfileId).Select(u => u.FullName).FirstOrDefault(),
-                    ParentName = _unitOfWork.GetRepository<User>().Entities.Where(u => u.ParentProfile.Id == e.StudentProfile.ParentProfileId).Select(u => u.FullName).FirstOrDefault(),
-                    SchoolName = e.StudentProfile.SchoolName,
-                    Gradelevel = e.StudentProfile.GradeLevel,
-                    Subject = e.Course.Subject,
-                    TeachingMethod = e.Course.TeachingMethod.ToString(),
-                    Location = e.Course.Location,
-                    Status = e.Status,
-                    ConfirmedAt = e.ConfirmedAt,
-                    CancelledAt = e.CancelledAt,
-                    CancelReason = e.CancelReason
-                })
-                .ToListAsync();
-
-            return pagedEnrollments;
-        }
     }
 
 }

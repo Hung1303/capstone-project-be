@@ -276,33 +276,5 @@ namespace API.Controllers
             }
 
         }
-
-        [HttpPut("Cancel/{courseId}")]
-        public async Task<IActionResult> CancelCoures(Guid courseId, string reason)
-        {
-            try 
-            {
-                var result = await _courseService.CancelCourse(courseId, reason);
-                return result ? Ok(new { success = true, message = "Hủy khóa học thành công." }) : BadRequest(new {success = false, message = "Hủy khóa học thất bại."});
-            }
-            catch(Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
-        [HttpPut("TeacherWithdraw/{courseId}")]
-        public async Task<IActionResult> TeacherWithdraw(Guid courseId, string reason)
-        {
-            try
-            {
-                var result = await _courseService.TeacherWithdrawFromCourse(courseId, reason);
-                return result ? Ok(new { success = true, message = "Hủy khóa học thành công." }) : BadRequest(new { success = false, message = "Hủy khóa học thất bại." });
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
     }
 }

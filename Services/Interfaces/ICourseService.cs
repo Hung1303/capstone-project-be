@@ -22,7 +22,5 @@ namespace Services.Interfaces
         Task<bool> PublishCourseAsync(Guid centerProfileId, Guid courseId);
         Task<IEnumerable<CourseResponse>> GetAllPublishedCoursesByCenter(Guid centerProfileId, string? searchTerm, int pageNumber, int pageSize);
         Task<IEnumerable<CourseResponse>> GetAllPublishedCourse(string? searchTerm, int pageNumber, int pageSize, Guid? TeacherProfileId, Guid? CenterProfileId);
-        Task<bool> CancelCourse(Guid courseId, string reason);
-        Task<bool> TeacherWithdrawFromCourse(Guid courseId, string reason);
     }
 }

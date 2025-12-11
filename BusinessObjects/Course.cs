@@ -1,4 +1,4 @@
-﻿using Core.Base;
+using Core.Base;
 using System.ComponentModel.DataAnnotations;
 
 namespace BusinessObjects
@@ -15,7 +15,7 @@ namespace BusinessObjects
         public TeachingMethod TeachingMethod { get; set; }
         public decimal TuitionFee { get; set; }
         public int Capacity { get; set; }
-        [Range(6, 12, ErrorMessage = "Lớp học phải từ lớp 6 tới lớp 12.")]
+        [Range(6, 12, ErrorMessage = "Grade level must be between 6 and 12.")]
         public int GradeLevel { get; set; }
         public CourseStatus Status { get; set; } = CourseStatus.Draft;
         public bool IsPublished { get; set; } = false;
