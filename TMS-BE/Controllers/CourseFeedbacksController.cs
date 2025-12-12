@@ -67,7 +67,7 @@ namespace API.Controllers
             try
             {
                 var result = await _courseFeedbackService.GetCourseFeedbackById(id);
-                if (result == null) return NotFound("Feedback not found.");
+                if (result == null) return NotFound("Không tìm thấy đánh giá.");
                 return Ok(result);
             }catch(Exception e)
             {
@@ -82,7 +82,7 @@ namespace API.Controllers
             try
             {
                 var result = await _courseFeedbackService.CreateCourseFeedback(courseId, reviewerId, request);
-                if (result == null) return NotFound("Course not found");
+                if (result == null) return NotFound("Không tìm thấy khóa học.");
 
                 return Ok(result);
             }catch(Exception e)
@@ -99,7 +99,7 @@ namespace API.Controllers
             {
                 var result = await _courseFeedbackService.ApproveCourseFeedback(feedbackId, moderatorId, request);
 
-                if (result == null) return NotFound("Feedback not found.");
+                if (result == null) return NotFound("Không tìm thấy đánh giá.");
                 return Ok(result);
             }
             catch(Exception e)
@@ -115,7 +115,7 @@ namespace API.Controllers
             try
             {
                 var result = await _courseFeedbackService.UpdateCourseFeedback(feedbackId, request);
-                if (result == null) return NotFound("Feedback not found.");
+                if (result == null) return NotFound("Không tìm thấy đánh giá.");
 
                 return Ok(result);
             }
@@ -131,8 +131,8 @@ namespace API.Controllers
             try
             {
                 var result = await _courseFeedbackService.RemoveCourseFeedback(id);
-                if (!result) return NotFound("Delete failed.");
-                return result ? Ok(new { message = "Delete successfully." }) : BadRequest();
+                if (!result) return NotFound("Xóa thất bại.");
+                return result ? Ok(new { message = "Xóa thành công." }) : BadRequest();
             }catch(Exception e)
             {
                 return BadRequest(e.Message);

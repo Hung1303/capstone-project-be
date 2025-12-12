@@ -152,7 +152,7 @@ namespace API.Controllers
             try
             {
                 var result = await _courseService.PublishCourseAsync(centerProfileId, courseId);
-                return Ok(new { success = true, data = "Course published." });
+                return Ok(new { success = true, data = "Khóa học được công khai." });
             }catch(Exception e)
             {
                 return BadRequest(e.Message);
@@ -165,7 +165,7 @@ namespace API.Controllers
             try
             {
                 var result = await _courseService.DeleteCourse(id);
-                return Ok(new { success = true, message = "Delete Successfully" });
+                return Ok(new { success = true, message = "Xóa thành công." });
             }
             catch (Exception ex)
             {

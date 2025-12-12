@@ -26,11 +26,11 @@ namespace API.Controllers
             var enrollments = await _enrollmentService.GetAllEnrollments(searchTerm, pageNumber, pageSize);
 
             if (enrollments == null || !enrollments.Any())
-                return NotFound(new { message = "No enrollments found." });
+                return NotFound(new { message = "Không tìm thấy khóa học." });
 
             return Ok(new
             {
-                message = "Successfully retrieved enrollments.",
+                message = "Thành công lấy được danh sách khóa học.",
                 data = enrollments,
                 pagination = new
                 {
@@ -52,11 +52,11 @@ namespace API.Controllers
             var enrollments = await _enrollmentService.GetAllEnrollmentsByCenter(centerProfileId,searchTerm, status, pageNumber, pageSize);
 
             if (enrollments == null || !enrollments.Any())
-                return NotFound(new { message = "No enrollments found." });
+                return NotFound(new { message = "Không tìm thấy khóa học." });
 
             return Ok(new
             {
-                message = "Successfully retrieved enrollments.",
+                message = "Thành công lấy được danh sách đăng kí khóa học.",
                 data = enrollments,
                 pagination = new
                 {
@@ -104,11 +104,11 @@ namespace API.Controllers
             var enrollments = await _enrollmentService.GetAllEnrollmentsByStudent(studentProfileId, searchTerm, status, pageNumber, pageSize);
 
             if (enrollments == null || !enrollments.Any())
-                return NotFound(new { message = "No enrollments found." });
+                return NotFound(new { message = "Không tìm thấy khóa học." });
 
             return Ok(new
             {
-                message = "Successfully retrieved enrollments.",
+                message = "Thành công lấy được danh sách đăng kí khóa học.",
                 data = enrollments,
                 pagination = new
                 {
@@ -126,11 +126,11 @@ namespace API.Controllers
         {
             var enrollment = await _enrollmentService.GetEnrollmentById(id);
             if (enrollment == null)
-                return NotFound(new { message = "Enrollment not found." });
+                return NotFound(new { message = "Không tìm thấy khóa học." });
 
             return Ok(new
             {
-                message = "Successfully retrieved enrollment.",
+                message = "Thành công lấy được thông tin đăng kí khóa học.",
                 data = enrollment
             });
         }
@@ -148,7 +148,7 @@ namespace API.Controllers
                 var result = await _enrollmentService.CreateEnrollment(request);
                 return Ok(new
                 {
-                    message = "Enrollment created successfully.",
+                    message = "Tạo đăng kí khóa học thành công.",
                     data = result
                 });
             }
@@ -172,7 +172,7 @@ namespace API.Controllers
                 var result = await _enrollmentService.UpdateEnrollment(id, request);
                 return Ok(new
                 {
-                    message = "Enrollment updated successfully.",
+                    message = "Cập nhật đăng ký khóa học thành công.",
                     data = result
                 });
             }
@@ -193,7 +193,7 @@ namespace API.Controllers
                 var result = await _enrollmentService.ApproveEnrollment(id, approverProfileId);
                 return Ok(new
                 {
-                    message = "Enrollment approved successfully.",
+                    message = "Chấp thuận đăng kí khóa học thành công.",
                     data = result
                 });
             }
@@ -213,7 +213,7 @@ namespace API.Controllers
                 var result = await _enrollmentService.RejectEnrollment(id, approverProfileId, request.Reason);
                 return Ok(new
                 {
-                    message = "Enrollment rejected successfully.",
+                    message = "Từ chối đăng kí khóa học thành công.",
                     data = result
                 });
             }
@@ -232,9 +232,9 @@ namespace API.Controllers
 
             if (!result)
 
-                return NotFound(new { message = "Enrollment not found or already deleted." });
+                return NotFound(new { message = "Đăng kí khóa học không tìm thấy hoặc đã bị xóa." });
 
-            return Ok(new { message = "Enrollment deleted successfully." });
+            return Ok(new { message = "Xóa đăng kí khóa học thành công." });
         }
     }
 }

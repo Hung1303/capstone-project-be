@@ -203,5 +203,56 @@ namespace Services
             };
             return result;
         }
+
+        public async Task<IEnumerable<ClassScheduleResponse>> GetClassScheduleByCourse(Guid courseId, DayOfWeek? dayOfWeek, TimeOnly? startTime, TimeOnly? endTime, DateOnly? startDate, DateOnly? endDate, int pageNumber, int pageSize)
+        {
+            var classSchedule = _unitOfWork.GetRepository<SubjectBuilder>().Entities
+                .Where(sb => sb.CourseId == courseId && !sb.ClassSchedule.IsDeleted)
+                .Select(sb => sb.ClassSchedule)
+                .Distinct();
+
+            if (dayOfWeek.HasValue)
+            {
+                classSchedule = classSchedule.Where(s => s.DayOfWeek == dayOfWeek.Value);
+            }
+            if (startTime.HasValue)
+            {
+                classSchedule = classSchedule.Where(s => s.StartTime >= startTime.Value);
+            }
+            if (endTime.HasValue)
+            {
+                classSchedule = classSchedule.Where(s => s.EndTime <= endTime.Value);
+            }
+            if (startDate.HasValue)
+            {
+                classSchedule = classSchedule.Where(s => s.StartDate.HasValue && s.StartDate.Value >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                classSchedule = classSchedule.Where(s => s.EndDate.HasValue && s.EndDate.Value <= endDate.Value);
+            }
+            var totalCount = await classSchedule.CountAsync();
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Max(1, pageSize);
+            var skipAmount = (pageNumber - 1) * pageSize;
+            var paginatedClassSchedule = await classSchedule
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .Select(a => new ClassScheduleResponse
+                {
+                    Id = a.Id,
+                    ClassName = a.ClassName,
+                    ClassDescription = a.ClassDescription,
+                    TeacherProfileId = a.TeacherProfileId,
+                    DayOfWeek = a.DayOfWeek,
+                    StartTime = a.StartTime,
+                    EndTime = a.EndTime,
+                    StartDate = a.StartDate,
+                    EndDate = a.EndDate,
+                    RoomOrLink = a.RoomOrLink,
+                }).ToListAsync();
+            return paginatedClassSchedule;        
+        }
     }
 }

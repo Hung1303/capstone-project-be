@@ -1,4 +1,4 @@
-using Core.Base;
+﻿using Core.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTO.CenterVerification;
@@ -86,7 +86,7 @@ namespace API.Controllers
         {
             var result = await _verificationService.GetVerificationRequestByIdAsync(verificationId);
             if (result == null)
-                return NotFound(new { message = "Verification request not found" });
+                return NotFound(new { message = "Yêu cầu duyệt không tìm thấy." });
 
             return Ok(result);
         }
@@ -168,9 +168,9 @@ namespace API.Controllers
         {
                 var result = await _verificationService.CompleteVerificationAsync(verificationId);
                 if (result)
-                    return Ok(new { message = "Verification completed successfully" });
+                    return Ok(new { message = "Hoàn tất xác minh thành công." });
                 else
-                    return BadRequest(new { message = "Failed to complete verification" });
+                    return BadRequest(new { message = "Thất bại trong việc xác minh." });
             
         }
 
@@ -185,9 +185,9 @@ namespace API.Controllers
 
                 var result = await _verificationService.SuspendCenterAsync(centerId, request.Reason, request.AdminId);
                 if (result)
-                    return Ok(new { message = "Center suspended successfully" });
+                    return Ok(new { message = "Trung tâm đình chỉ thành công." });
                 else
-                    return BadRequest(new { message = "Failed to suspend center" });
+                    return BadRequest(new { message = "Đình chỉ trung tâm thất bại." });
             
         }
 
@@ -202,9 +202,9 @@ namespace API.Controllers
 
             var result = await _verificationService.RestoreCenterAsync(centerId, request.Reason, request.AdminId);
             if (result)
-                return Ok(new { message = "Center restored successfully" });
+                return Ok(new { message = "Khôi phục trung tâm thành công." });
             else
-                return BadRequest(new { message = "Failed to restore center" });
+                return BadRequest(new { message = "Khôi phục trung tâm thất bại." });
             
         }
     }

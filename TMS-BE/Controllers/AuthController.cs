@@ -214,7 +214,7 @@ namespace API.Controllers
                     return BadRequest(new ResultDTO
                     {
                         IsSuccess = false,
-                        Message = "Invalid token format."
+                        Message = "Định dạng token không hợp lệ."
                     });
                 }
 
@@ -240,7 +240,7 @@ namespace API.Controllers
                     return BadRequest(new ResultDTO
                     {
                         IsSuccess = false,
-                        Message = "Invalid UserId."
+                        Message = "UserId không hợp lệ."
                     });
                 }
 
@@ -256,7 +256,7 @@ namespace API.Controllers
                 return Ok(new ResultDTO
                 {
                     IsSuccess = true,
-                    Message = "Logout successfully!"
+                    Message = "Đăng xuất thành công!"
                 });
             }
             catch (Exception ex)
@@ -264,7 +264,7 @@ namespace API.Controllers
                 return BadRequest(new ResultDTO
                 {
                     IsSuccess = false,
-                    Message = "Something went wrong: " + ex.Message
+                    Message = "Có vấn đề xảy ra: " + ex.Message
                 });
             }
         }
@@ -280,7 +280,7 @@ namespace API.Controllers
         {
             if (!User.Identity.IsAuthenticated)
             {
-                return Unauthorized(new { Message = "User is not authenticated" });
+                return Unauthorized(new { Message = "Người dùng chưa được xác thực." });
             }
 
             try
@@ -303,7 +303,7 @@ namespace API.Controllers
                 // Kiểm tra thông tin bắt buộc
                 if (userIdClaim == null || emailClaim == null || usernameClaim == null || roleClaim == null)
                 {
-                    return Unauthorized(new { Message = "Missing essential user information in claims" });
+                    return Unauthorized(new { Message = "Thiếu thông tin người dùng cần thiết trong claim." });
                 }
 
                 // Parse role và status
@@ -349,7 +349,7 @@ namespace API.Controllers
             {
                 return BadRequest(new
                 {
-                    Message = "Error reading user information",
+                    Message = "Lỗi trong việc đọc thông tin người dùng.",
                     Detail = ex.Message
                 });
             }

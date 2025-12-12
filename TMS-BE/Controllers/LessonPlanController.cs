@@ -76,7 +76,7 @@ namespace API.Controllers
             try
             {
                 var result = await _lessonPlanService.DeleteLessonPlan(id);
-                return Ok(new { success = true, message = "Delete Successfully" });
+                return Ok(new { success = true, message = "Xóa thành công." });
             }
             catch (Exception ex)
             {

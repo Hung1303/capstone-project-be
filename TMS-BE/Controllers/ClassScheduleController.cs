@@ -58,6 +58,26 @@ namespace API.Controllers
             }
 
         }
+
+
+        [HttpGet("Course/{courseId}")]
+        public async Task<IActionResult> GetClassScheduleByCourse(Guid courseId, [FromQuery] DayOfWeek? dayOfWeek,
+            [FromQuery] TimeOnly? startTime, [FromQuery] TimeOnly? endTime, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate,
+            [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        {
+            try
+            {
+                var result = await _classScheduleService.GetClassScheduleByCourse(courseId, dayOfWeek, startTime, endTime, startDate, endDate, pageNumber, pageSize);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateClassSchedule(Guid id, UpdateClassScheduleRequest request)
         {
@@ -78,7 +98,7 @@ namespace API.Controllers
             try
             {
                 var result = await _classScheduleService.DeleteCLassSchedule(id);
-                return Ok(new { success = true, message = "Delete Successfully" });
+                return Ok(new { success = true, message = "Xóa thành công." });
             }
             catch (Exception ex)
             {

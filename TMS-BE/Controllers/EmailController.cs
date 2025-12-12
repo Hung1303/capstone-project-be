@@ -1,4 +1,4 @@
-using BusinessObjects;
+﻿using BusinessObjects;
 using Core.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +34,7 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new { success = false, message = "Invalid request", errors = ModelState });
+                return BadRequest(new { success = false, message = "Yêu cầu không hợp lệ.", errors = ModelState });
             }
 
             try
@@ -92,7 +92,7 @@ namespace API.Controllers
 
                 if (!centerEmails.Any())
                 {
-                    return BadRequest(new { success = false, message = "No valid center emails found" });
+                    return BadRequest(new { success = false, message = "Không tìm thấy email trung tâm hợp lệ." });
                 }
 
                 var result = await _emailService.SendEmailToCentersAsync(centerEmails, request.Subject, request.Body);
@@ -102,18 +102,18 @@ namespace API.Controllers
                     return Ok(new
                     {
                         success = true,
-                        message = $"Email sent to {centerEmails.Count} center(s)",
+                        message = $"Email đã gửi đến {centerEmails.Count} trung tâm.",
                         recipientsCount = centerEmails.Count
                     });
                 }
                 else
                 {
-                    return StatusCode(500, new { success = false, message = "Failed to send emails" });
+                    return StatusCode(500, new { success = false, message = "Gửi mail thất bại." });
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending emails to centers");
+                _logger.LogError(ex, "Lỗi khi gửi mail đến trung tâm.");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }

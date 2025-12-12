@@ -78,7 +78,7 @@ namespace API.Controllers
             try
             {
                 var result = await _subjectService.DeleteSubject(id);
-                return Ok(new { success = true, message = "Delete Successfully" });
+                return Ok(new { success = true, message = "Xóa thành công." });
             }
             catch (Exception ex)
             {
