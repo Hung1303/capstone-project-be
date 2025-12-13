@@ -1,4 +1,4 @@
-using Core.Base;
+﻿using Core.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTO.Subscription;
@@ -83,7 +83,7 @@ namespace API.Controllers
             try
             {
                 var result = await _subscriptionService.DeleteSubscriptionPackageAsync(id);
-                return Ok(new { success = true, message = "Subscription package deleted successfully" });
+                return Ok(new { success = true, message = "Xóa gói dịch vụ thành công." });
             }
             catch (Exception ex)
             {
@@ -129,7 +129,7 @@ namespace API.Controllers
             try
             {
                 var result = await _subscriptionService.CancelSubscriptionAsync(request);
-                return Ok(new { success = true, message = "Subscription cancelled successfully" });
+                return Ok(new { success = true, message = "Hủy dịch vụ thành công." });
             }
             catch (Exception ex)
             {
@@ -145,7 +145,7 @@ namespace API.Controllers
                 var result = await _subscriptionService.GetActiveSubscriptionAsync(centerProfileId);
                 if (result == null)
                 {
-                    return Ok(new { success = true, data = (object?)null, message = "No active subscription found" });
+                    return Ok(new { success = true, data = (object?)null, message = "Không tìm thấy gói kích hoạt." });
                 }
                 return Ok(new { success = true, data = result });
             }

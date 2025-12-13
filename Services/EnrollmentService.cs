@@ -51,7 +51,7 @@ namespace Services
         public async Task<EnrollmentResponse> CreateEnrollment(CreateEnrollmentRequest request)
         {
             var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(c => c.Id == request.CourseId && !c.IsDeleted);
-            if (course == null) throw new Exception("Course not found");
+            if (course == null) throw new Exception("Không tìm thấy khóa học.");
 
             // Check capacity logic:
             // Lưu ý: Có thể bạn vẫn muốn check capacity ngay lúc đăng ký để tránh việc nhận tiền nhưng hết chỗ.
@@ -59,13 +59,13 @@ namespace Services
                 .CountAsync(e => e.CourseId == request.CourseId && e.Status == EnrollmentStatus.Confirmed && !e.IsDeleted);
 
             if (confirmedCount >= course.Capacity)
-                throw new Exception("Course capacity reached");
+                throw new Exception("Đã đạt đủ số lượng học sinh tối đa.");
 
             var student = await _unitOfWork.GetRepository<StudentProfile>().Entities.FirstOrDefaultAsync(s => s.Id == request.StudentProfileId && !s.IsDeleted);
-            if (student == null) throw new Exception("Student profile not found");
+            if (student == null) throw new Exception("Không tìm thấy học sinh.");
 
             if (student.GradeLevel != course.GradeLevel)
-                throw new Exception($"Student grade level ({student.GradeLevel}) does not match course grade level ({course.GradeLevel}).");
+                throw new Exception($"Học sinh lớp ({student.GradeLevel}) không được học khóa học cho lớp ({course.GradeLevel}).");
 
             if (course.TeacherProfileId.HasValue)
             {
@@ -74,7 +74,7 @@ namespace Services
 
                 if (teacher != null && IsTeacherTeachingOwnStudent(teacher, student))
                 {
-                    throw new Exception($"Cannot enroll: Teacher teaches at the same school and class as student.");
+                    throw new Exception($"Không thể đăng kí. Giáo viên dạy cùng trường cùng lớp với học sinh.");
                 }
             }
 
@@ -85,7 +85,7 @@ namespace Services
             {
                 // Nếu đã có nhưng Cancelled thì cho tạo lại, còn Pending/Paid/Confirmed thì chặn
                 if (existingEnrollment.Status != EnrollmentStatus.Cancelled)
-                    throw new Exception("Student is already enrolled or pending payment for this course.");
+                    throw new Exception("Học sinh đã đăng kí hoặc đang chờ thanh toán cho khóa học.");
             }
 
             var enrollment = new Enrollment
@@ -115,7 +115,7 @@ namespace Services
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
 
             if (enrollment == null)
-                throw new Exception("Enrollment not found");
+                throw new Exception("Không tìm thấy đăng kí khóa học.");
 
             return new EnrollmentResponse
             {
@@ -313,19 +313,19 @@ namespace Services
         {
             var enrollment = await _unitOfWork.GetRepository<Enrollment>().Entities.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
             if (enrollment == null)
-                throw new Exception("Enrollment not found");
+                throw new Exception("Không tìm thấy đăng kí khóa học.");
 
             if (request.CourseId.HasValue)
             {
                 var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(c => c.Id == request.CourseId.Value && !c.IsDeleted);
                 if (course == null)
-                    throw new Exception("Course not found");
+                    throw new Exception("Không tìm thấy khóa học.");
 
                 // ✅ Validate grade level match if course is being changed
                 var studentForValidation = await _unitOfWork.GetRepository<StudentProfile>().Entities
                     .FirstOrDefaultAsync(s => s.Id == enrollment.StudentProfileId && !s.IsDeleted);
                 if (studentForValidation != null && studentForValidation.GradeLevel != course.GradeLevel)
-                    throw new Exception($"Student grade level ({studentForValidation.GradeLevel}) does not match course grade level ({course.GradeLevel}). Only students with grade {course.GradeLevel} can enroll in this course.");
+                    throw new Exception($"Học sinh lớp ({studentForValidation.GradeLevel}) không được học khóa học cho lớp ({course.GradeLevel}). Chỉ học sinh lớp {course.GradeLevel} có thể đăng kí khóa học này.");
 
                 // ✅ Validate that teacher is not teaching their own student
                 if (course.TeacherProfileId.HasValue && studentForValidation != null)
@@ -335,7 +335,7 @@ namespace Services
 
                     if (teacher != null && IsTeacherTeachingOwnStudent(teacher, studentForValidation))
                     {
-                        throw new Exception($"Cannot update enrollment: The teacher teaches at the same school ({studentForValidation.SchoolName}) and class ({studentForValidation.ClassName}) as this student. Teachers cannot teach their own students.");
+                        throw new Exception($"Không thể cập nhật đăng kí: Giáo viên dạy cùng trường ({studentForValidation.SchoolName}) và cùng lớp ({studentForValidation.ClassName}) với học sinh. Giáo viên không thể dạy thêm ngoài nhà trường cho học sinh này.");
                     }
                 }
 
@@ -346,13 +346,13 @@ namespace Services
             {
                 var student = await _unitOfWork.GetRepository<StudentProfile>().Entities.FirstOrDefaultAsync(s => s.Id == request.StudentProfileId.Value && !s.IsDeleted);
                 if (student == null)
-                    throw new Exception("Student profile not found");
+                    throw new Exception("Không tìm thấy học sinh.");
 
                 // ✅ Validate grade level match if student is being changed
                 var courseForValidation = await _unitOfWork.GetRepository<Course>().Entities
                     .FirstOrDefaultAsync(c => c.Id == enrollment.CourseId && !c.IsDeleted);
                 if (courseForValidation != null && student.GradeLevel != courseForValidation.GradeLevel)
-                    throw new Exception($"Student grade level ({student.GradeLevel}) does not match course grade level ({courseForValidation.GradeLevel}). Only students with grade {courseForValidation.GradeLevel} can enroll in this course.");
+                    throw new Exception($"Học sinh lớp ({student.GradeLevel}) không được học khóa học cho lớp ({courseForValidation.GradeLevel}). Chỉ học sinh lớp {courseForValidation.GradeLevel} có thể đăng kí khóa học này.");
 
                 // ✅ Validate that teacher is not teaching their own student
                 if (courseForValidation != null && courseForValidation.TeacherProfileId.HasValue)
@@ -362,7 +362,7 @@ namespace Services
 
                     if (teacher != null && IsTeacherTeachingOwnStudent(teacher, student))
                     {
-                        throw new Exception($"Cannot update enrollment: The teacher teaches at the same school ({student.SchoolName}) and class ({student.ClassName}) as this student. Teachers cannot teach their own students.");
+                        throw new Exception($"Không thể cập nhật đăng kí: Giáo viên dạy cùng trường ({student.SchoolName}) và cùng lớp ({student.ClassName}) với học sinh. Giáo viên không thể dạy thêm ngoài nhà trường cho học sinh này.");
                     }
                 }
 
@@ -378,13 +378,13 @@ namespace Services
                         .FirstOrDefaultAsync(c => c.Id == enrollment.CourseId && !c.IsDeleted);
 
                     if (courseForCapacity == null)
-                        throw new Exception("Course not found");
+                        throw new Exception("Không tìm thấy khóa học.");
 
                     var confirmedCountForCourse = await _unitOfWork.GetRepository<Enrollment>().Entities
                         .CountAsync(e => e.CourseId == enrollment.CourseId && e.Status == EnrollmentStatus.Confirmed && !e.IsDeleted);
 
                     if (confirmedCountForCourse >= courseForCapacity.Capacity)
-                        throw new Exception("Course capacity reached");
+                        throw new Exception("Đã đạt số lượng học sinh tối đa.");
                 }
 
                 enrollment.Status = request.Status.Value;
@@ -422,12 +422,12 @@ namespace Services
                 .Include(e => e.Course)
                 .FirstOrDefaultAsync(e => e.Id == enrollmentId && !e.IsDeleted);
 
-            if (enrollment == null) throw new Exception("Enrollment not found");
+            if (enrollment == null) throw new Exception("Không tìm thấy đăng kí.");
 
             // ✅ Check Logic: Phải thanh toán rồi mới được duyệt
             if (enrollment.Status != EnrollmentStatus.Paid)
             {
-                throw new Exception($"Cannot approve enrollment. Current status is {enrollment.Status}. Enrollment must be PAID (Status 4) before approval.");
+                throw new Exception($"Không thể duyệt đăng kí. Trạng thái hiện tại là {enrollment.Status}. Đăng kí phải được thanh toán (PAID - status 4) trước khi duyệt.");
             }
 
             var course = enrollment.Course;
@@ -436,7 +436,7 @@ namespace Services
             var student = await _unitOfWork.GetRepository<StudentProfile>().Entities
                 .FirstOrDefaultAsync(s => s.Id == enrollment.StudentProfileId && !s.IsDeleted);
 
-            if (student == null) throw new Exception("Student profile not found");
+            if (student == null) throw new Exception("Không tìm thấy học sinh.");
 
             // (Giữ nguyên logic check Teacher dạy học sinh ruột tại đây...)
             if (course.TeacherProfileId.HasValue)
@@ -444,7 +444,7 @@ namespace Services
                 var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities
                     .FirstOrDefaultAsync(t => t.Id == course.TeacherProfileId.Value && !t.IsDeleted);
                 if (teacher != null && IsTeacherTeachingOwnStudent(teacher, student))
-                    throw new Exception("Conflict: Teacher teaches this student at school.");
+                    throw new Exception("Mâu thuẫn: Giáo viên này dạy học sinh này ở trường.");
             }
 
             // Kiểm tra quyền duyệt
@@ -452,14 +452,14 @@ namespace Services
                                 (course.CenterProfileId == approverProfileId);
 
             if (!isAuthorized)
-                throw new Exception("You do not have permission to approve this enrollment");
+                throw new Exception("Bạn không có quyền duyệt.");
 
             // ✅ Kiểm tra Capacity một lần nữa trước khi chốt đơn (đề phòng lúc payment thì còn slot nhưng giờ hết)
             var confirmedCount = await _unitOfWork.GetRepository<Enrollment>().Entities
                 .CountAsync(e => e.CourseId == course.Id && e.Status == EnrollmentStatus.Confirmed && !e.IsDeleted);
 
             if (confirmedCount >= course.Capacity)
-                throw new Exception("Course capacity reached. Cannot approve more students.");
+                throw new Exception("Khóa học đã đạt đủ số lượng. Không thể duyệt thêm.");
 
             // ✅ Cập nhật trạng thái sang Confirmed (1)
             enrollment.Status = EnrollmentStatus.Confirmed;
@@ -487,7 +487,7 @@ namespace Services
                 .Include(e => e.Course)
                 .FirstOrDefaultAsync(e => e.Id == enrollmentId && !e.IsDeleted);
 
-            if (enrollment == null) throw new Exception("Enrollment not found");
+            if (enrollment == null) throw new Exception("Không tìm thấy đăng kí.");
 
             var course = enrollment.Course;
 
@@ -495,7 +495,7 @@ namespace Services
                                 (course.CenterProfileId == approverProfileId);
 
             if (!isAuthorized)
-                throw new Exception("You do not have permission to reject this enrollment");
+                throw new Exception("Bạn không có quyền duyệt.");
 
             // ✅ Update Status
             enrollment.Status = EnrollmentStatus.Cancelled;
@@ -522,7 +522,7 @@ namespace Services
         {
             var enrollment = await _unitOfWork.GetRepository<Enrollment>().Entities.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
             if (enrollment == null)
-                throw new Exception("Enrollment not found");
+                throw new Exception("Không tìm thấy đăng kí.");
 
             enrollment.IsDeleted = true;
 

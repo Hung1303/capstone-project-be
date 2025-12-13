@@ -26,7 +26,7 @@ namespace API.Services
             if (course == null) return false;
 
             if (course.Status != CourseStatus.Draft)
-                throw new Exception("Only courses in Draft status can be submitted for approval.");
+                throw new Exception("Chỉ khóa học ở trạng thái soạn thảo mới được tạo yêu cầu duyệt.");
 
             
             var request = new ApprovalRequest
@@ -60,7 +60,7 @@ namespace API.Services
             var reviewer = await userRepo.Entities
                 .FirstOrDefaultAsync(u => u.Id == reviewerUserId && !u.IsDeleted && (u.Role == UserRole.Admin || u.Role == UserRole.Inspector));
             if (reviewer == null)
-                throw new Exception("Only Admin or Inspector can approve/reject courses.");
+                throw new Exception("Chỉ có quản trị viên mới có quyền chấp nhận/từ chối yêu cầu.");
 
             request.Decision = decision;
             request.DecidedByUserId = reviewer.Id;
@@ -118,7 +118,7 @@ namespace API.Services
                     Id = x.a.Id,
                     CourseTitle = x.c.Title,
                     Decision = x.a.Decision.ToString(),
-                    DecidedBy = x.reviewer != null ? x.reviewer.FullName : "(Pending)",
+                    DecidedBy = x.reviewer != null ? x.reviewer.FullName : "(Chờ phê duyệt)",
                     DecidedAt = x.a.DecidedAt,
                     Notes = x.a.Notes,
                     CreatedAt = x.a.CreatedAt
@@ -136,14 +136,14 @@ namespace API.Services
                 .Include(r => r.DecidedByUser)
                 .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
 
-            if (request == null) throw new Exception("Approval request not found.");
+            if (request == null) throw new Exception("Không tìm thấy yêu cầu duyệt.");
 
             return new ApprovalRequestResponse
             {
                 Id = request.Id,
-                CourseTitle = request.Course?.Title ?? "(Unknown Course)",
+                CourseTitle = request.Course?.Title ?? "(Khóa học không xác định)",
                 Decision = request.Decision.ToString(),
-                DecidedBy = request.DecidedByUser?.FullName ?? "(Pending)",
+                DecidedBy = request.DecidedByUser?.FullName ?? "(Chờ phê duyệt)",
                 DecidedAt = request.DecidedAt,
                 Notes = request.Notes,
                 CreatedAt = request.CreatedAt

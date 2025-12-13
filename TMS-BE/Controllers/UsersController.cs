@@ -61,7 +61,7 @@ namespace TMS_BE.Controllers
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
-                return NotFound(new { message = "User not found" });
+                return NotFound(new { message = "Không tìm thấy người dùng" });
 
             return Ok(user);
         }
@@ -71,7 +71,7 @@ namespace TMS_BE.Controllers
         {
             var center = await _userService.GetCenterById(userId);
             if (center == null)
-                return NotFound(new { message = "Center not found" });
+                return NotFound(new { message = "Không tìm thấy trung tâm" });
 
             return Ok(center);
         }
@@ -88,7 +88,7 @@ namespace TMS_BE.Controllers
         {
             var center = await _userService.GetTeacherById(userId);
             if (center == null)
-                return NotFound(new { message = "Teacher not found" });
+                return NotFound(new { message = "Không tìm thấy giáo viên" });
 
             return Ok(center);
         }
@@ -98,7 +98,7 @@ namespace TMS_BE.Controllers
         {
             var center = await _userService.GetParentById(userId);
             if (center == null)
-                return NotFound(new { message = "Parent not found" });
+                return NotFound(new { message = "Không tìm thấy phụ huynh" });
 
             return Ok(center);
         }
@@ -108,7 +108,7 @@ namespace TMS_BE.Controllers
         {
             var center = await _userService.GetStudentById(userId);
             if (center == null)
-                return NotFound(new { message = "Student not found" });
+                return NotFound(new { message = "Không tìm thấy học sinh" });
 
             return Ok(center);
         }
@@ -316,7 +316,7 @@ namespace TMS_BE.Controllers
             try
             {
                 var user = await _userService.ChangePassword(userId, currentPassword, newPassword);
-                return Ok(new { message = "Password changed!!!"});
+                return Ok(new { message = "Mật khẩu đã được thay đổi."});
             }
             catch (Exception e)
             {
@@ -339,7 +339,7 @@ namespace TMS_BE.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var result = await _userService.UpdateCenterStatusAsync(centerId, request.Status, request.Reason);
-            return result ? Ok(new { message = "Center status updated successfully" }) : NotFound();
+            return result ? Ok(new { message = "Cập nhật trạng thái của trung tâm thành công." }) : NotFound();
         }
 
         //Delete user
@@ -348,7 +348,7 @@ namespace TMS_BE.Controllers
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
             var result = await _userService.DeleteUser(userId);
-            return result ? Ok(new { message = "User deleted." }) : NotFound();
+            return result ? Ok(new { message = "Đã xóa người dùng." }) : NotFound();
         }
     }
 }

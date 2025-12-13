@@ -18,7 +18,7 @@ namespace Services
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
             if (teacher == null)
             {
-                throw new Exception("teacher Not Found");
+                throw new Exception("Không tìm thấy giáo viên.");
             }
             var classSchedule = new ClassSchedule
             {
@@ -55,7 +55,7 @@ namespace Services
             var classSchedule = await _unitOfWork.GetRepository<ClassSchedule>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (classSchedule == null)
             {
-                throw new Exception("class schedule Not Found");
+                throw new Exception("Không tìm thấy lịch học.");
             }
             classSchedule.IsDeleted = true;
             await _unitOfWork.GetRepository<ClassSchedule>().UpdateAsync(classSchedule);
@@ -119,7 +119,7 @@ namespace Services
             var classSchedule = await _unitOfWork.GetRepository<ClassSchedule>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (classSchedule == null)
             {
-                throw new Exception("Class Schedule Not Found");
+                throw new Exception("Không tìm thấy lịch học.");
             }
             var result = new ClassScheduleResponse
             {
@@ -142,7 +142,7 @@ namespace Services
             var classSchedule = await _unitOfWork.GetRepository<ClassSchedule>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (classSchedule == null)
             {
-                throw new Exception("Class Schedule Not Found");
+                throw new Exception("Không tìm thấy lịch học.");
             }
             if (request.DayOfWeek.HasValue)
             {
@@ -181,7 +181,7 @@ namespace Services
                 var checkTeacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
                 if (checkTeacher == null)
                 {
-                    throw new Exception("Teacher Not Found");
+                    throw new Exception("Không tìm thấy giáo viên.");
                 }
                 classSchedule.TeacherProfileId = request.TeacherProfileId.Value;
             }

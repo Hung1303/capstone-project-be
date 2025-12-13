@@ -35,11 +35,11 @@ namespace API.Controllers
             var result = await _suspensionService.GetAllCourseSuspensionRecordsAsync(pageNumber, pageSize, searchKeyword);
 
             if (result == null || !result.Items.Any())
-                return NotFound(new { message = "No suspension records found." });
+                return NotFound(new { message = "Không tìm thấy hồ sơ đình chỉ." });
 
             return Ok(new
             {
-                message = "Successfully retrieved course suspension records.",
+                message = "Lấy được hồ sơ đình chỉ khóa học thành công.",
                 data = result.Items,
                 pagination = new
                 {
@@ -64,7 +64,7 @@ namespace API.Controllers
         public async Task<IActionResult> BanUser(Guid userId, Guid supervisorId, BanRequest record)
         {
             var result = await _suspensionService.BanUser(userId, supervisorId, record);
-            return result ? Ok(new { message = "User Banned!!!!" }) : BadRequest();
+            return result ? Ok(new { message = "Người dùng đã bị đình chỉ." }) : BadRequest();
         }
 
         //Ban course by Admin
@@ -73,7 +73,7 @@ namespace API.Controllers
         public async Task<IActionResult> BanCourse(Guid courseId, Guid supervisorId, BanRequest record)
         {
             var result = await _suspensionService.BanCourse(courseId, supervisorId, record);
-            return result ? Ok(new { message = "Course Banned!!!!" }) : BadRequest();
+            return result ? Ok(new { message = "Khóa học đã bị đình chỉ." }) : BadRequest();
         }
 
 
@@ -83,7 +83,7 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateSuspensionRecord(Guid suspensionRecordId, UpdateSuspensionRecordRequest request)
         {
             var result = await _suspensionService.UpdateSuspensionRecord(suspensionRecordId, request);
-            if (result == null) return NotFound(new { message = "Record not found." });
+            if (result == null) return NotFound(new { message = "không tìm thấy hồ sơ." });
 
             return Ok(result);
         }
@@ -95,7 +95,7 @@ namespace API.Controllers
         public async Task<IActionResult> RemoveBan(Guid suspensionRecordId, Guid moderatorId)
         {
             var result = await _suspensionService.RemoveBan(suspensionRecordId, moderatorId);
-            return result ? Ok(new { message = "Ban has been removed." }) : NotFound();
+            return result ? Ok(new { message = "Đình chỉ đã được gỡ." }) : NotFound();
         }
     }
 }

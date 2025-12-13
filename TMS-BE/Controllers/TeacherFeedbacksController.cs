@@ -53,7 +53,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetTeacherFeedbackById(Guid id)
         {
             var result = await _teacherFeedbackService.GetTeacherFeedbackById(id);
-            if (result == null) return NotFound("Feedback not found.");
+            if (result == null) return NotFound("Không tìm thấy đánh giá.");
             return Ok(result);
         }
 
@@ -63,7 +63,7 @@ namespace API.Controllers
         {
             var result = await _teacherFeedbackService.CreateTeacherFeedback(teacherProfileId, reviewerId, request);
 
-            if (result == null) return NotFound("Teacher not found.");
+            if (result == null) return NotFound("Không tìm thấy giáo viên.");
             return Ok(result);
         }
 
@@ -75,7 +75,7 @@ namespace API.Controllers
             {
                 var result = await _teacherFeedbackService.ApproveTeacherFeedback(feedbackId, moderatorId, request);
 
-                if (result == null) return NotFound("Feedback not found.");
+                if (result == null) return NotFound("Không tìm thấy đánh giá.");
                 return Ok(result);
             }catch(Exception e)
             {
@@ -90,7 +90,7 @@ namespace API.Controllers
             try
             {
                 var result = await _teacherFeedbackService.UpdateTeacherFeedback(feedbackId, request);
-                if (result == null) return NotFound("Feedback not found.");
+                if (result == null) return NotFound("Không tìm thấy đánh giá.");
 
                 return Ok(result);
             }catch(Exception e)
@@ -103,8 +103,8 @@ namespace API.Controllers
         public async Task<IActionResult> RemoveTeacherFeedback(Guid id)
         {
             var result = await _teacherFeedbackService.RemoveTeacherFeedback(id);
-            if (!result) return NotFound("Delete failed.");
-            return result ? Ok(new { message = "Delete successfully." }) : BadRequest();
+            if (!result) return NotFound("Xóa thất bại.");
+            return result ? Ok(new { message = "Xóa thành công." }) : BadRequest();
         }
     }
 }

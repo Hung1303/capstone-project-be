@@ -20,24 +20,24 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == request.StudentId && !a.IsDeleted);
             if (student == null)
             {
-                throw new Exception("Student Not Found");
+                throw new Exception("Không tìm thấy học sinh.");
             }
             var enrollments = student.Enrollments.Select(s => s.CourseId).ToList();
             var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == request.CourseId && enrollments.Contains(request.CourseId) && !a.IsDeleted);
             if (course == null)
             {
-                throw new Exception("Course Not Found or not enroll");
+                throw new Exception("Khóa học không tồn tại hoặc không đăng kí.");
             }
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherId && !a.IsDeleted);
             if (teacher == null)
             {
-                throw new Exception("Teacher Not Found");
+                throw new Exception("Không tìm thấy giáo viên.");
             }
             var checkCourseResult = await _unitOfWork.GetRepository<CourseResult>().Entities
                 .FirstOrDefaultAsync(a => a.CourseId == course.Id && a.StudentProfileId == student.Id && !a.IsDeleted);
             if (checkCourseResult != null)
             {
-                throw new Exception("CourseResult for this student already exist");
+                throw new Exception("Kết quả khóa học của học sinh này đã có sẵn.");
             }
             var courseResult = new CourseResult
             {
@@ -65,7 +65,7 @@ namespace Services
             var courseResult = await _unitOfWork.GetRepository<CourseResult>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (courseResult == null)
             {
-                throw new Exception("CourseResult Not Found");
+                throw new Exception("Không tìm thấy kết quả khóa học.");
             }
             courseResult.IsDeleted = true;
             await _unitOfWork.GetRepository<CourseResult>().UpdateAsync(courseResult);
@@ -124,7 +124,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (courseResult == null)
             {
-                throw new Exception("CourseResult Not Found");
+                throw new Exception("Không tìm thấy kết quả khóa học.");
             }
             var result = new CourseResultResponse
             {
@@ -145,7 +145,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (courseResult == null)
             {
-                throw new Exception("CourseResult Not Found");
+                throw new Exception("Không tìm thấy kết quả khóa học.");
             }
             if (request.Mark.HasValue)
             {
@@ -160,7 +160,7 @@ namespace Services
                 var checkCourse = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == request.CourseId && !a.IsDeleted);
                 if (checkCourse == null)
                 {
-                    throw new Exception("Course Not Found");
+                    throw new Exception("Không tìm thấy kết quả khóa học.");
                 }
                 courseResult.CourseId = request.CourseId.Value;
             }
@@ -169,7 +169,7 @@ namespace Services
                 var checkTeacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherId && !a.IsDeleted);
                 if (checkTeacher == null)
                 {
-                    throw new Exception("Teacher Not Found");
+                    throw new Exception("Không tìm thấy giáo viên.");
                 }
                 courseResult.TeacherProfileId = request.TeacherId.Value;
             }
@@ -178,7 +178,7 @@ namespace Services
                 var checkStudent = await _unitOfWork.GetRepository<StudentProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.StudentId && !a.IsDeleted);
                 if (checkStudent == null)
                 {
-                    throw new Exception("Student Not Found");
+                    throw new Exception("Không tìm thấy học sinh.");
                 }
                 courseResult.StudentProfileId = request.StudentId.Value;
             }
@@ -284,7 +284,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => !a.IsDeleted && a.Id == ParentId);
             if (parent == null)
             {
-                throw new Exception("parent not found");
+                throw new Exception("Không tìm thấy phụ huynh.");
             }
             var studentList = parent.StudentProfiles.Select(s => s.Id).ToList();
             var courseResult = _unitOfWork.GetRepository<CourseResult>().Entities

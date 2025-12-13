@@ -23,12 +23,12 @@ namespace Services
             var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (course == null)
             {
-                throw new Exception("Course Not Found");
+                throw new Exception("Không tìm thấy khóa học.");
             }
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId && !a.IsDeleted);
             if (teacher == null)
             {
-                throw new Exception("Teacher Not Found");
+                throw new Exception("Không tìm thấy giáo viên.");
             }
 
             Guid? centerToUse = course.CenterProfileId;
@@ -40,12 +40,12 @@ namespace Services
                     .FirstOrDefaultAsync(a => a.Id == centerToUse);
                 if (center == null)
                 {
-                    throw new Exception("CenterProfile Not Found");
+                    throw new Exception("Không tìm thấy trung tâm.");
                 }
 
                 if (teacher.CenterProfileId == null || teacher.CenterProfileId != centerToUse)
                 {
-                    throw new Exception("Teacher does not belong to the specified Center");
+                    throw new Exception("Giáo viên không thuộc trung tâm.");
                 }
             }
             else
@@ -57,7 +57,7 @@ namespace Services
             // Circular 29: require verified teacher before organizing extra classes
             if (teacher.VerificationStatus != VerificationStatus.Completed && teacher.VerificationStatus != VerificationStatus.Finalized)
             {
-                throw new Exception("Teacher must be verified per Circular 29 before creating courses");
+                throw new Exception("Giáo viên phải được xác minh theo Thông tư 29.");
             }
 
             course.TeacherProfileId = request.TeacherProfileId;
@@ -94,7 +94,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == centerToUse);
             if (center == null)
             {
-                throw new Exception("CenterProfile Not Found");
+                throw new Exception("Không tìm thấy trung tâm.");
             }
 
             var course = new Course
@@ -140,7 +140,7 @@ namespace Services
         {
             if (request.TeacherProfileId == null)
             {
-                throw new Exception("TeacherProfileId is required");
+                throw new Exception("Cần thêm giáo viên.");
             }
 
             var teacher = await _unitOfWork
@@ -149,7 +149,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
             if (teacher == null)
             {
-                throw new Exception("TeacherProfile Not Found");
+                throw new Exception("Không tìm thấy giáo viên.");
             }
 
             Guid? centerToUse = request.CenterProfileId;
@@ -161,12 +161,12 @@ namespace Services
                     .FirstOrDefaultAsync(a => a.Id == centerToUse);
                 if (center == null)
                 {
-                    throw new Exception("CenterProfile Not Found");
+                    throw new Exception("Không tìm thấy trung tâm.");
                 }
 
                 if (teacher.CenterProfileId == null || teacher.CenterProfileId != centerToUse)
                 {
-                    throw new Exception("Teacher does not belong to the specified Center");
+                    throw new Exception("Giáo viên không thuộc trung tâm.");
                 }
             }
             else
@@ -178,7 +178,7 @@ namespace Services
             // Circular 29: require verified teacher before organizing extra classes
             if (teacher.VerificationStatus != VerificationStatus.Completed && teacher.VerificationStatus != VerificationStatus.Finalized)
             {
-                throw new Exception("Teacher must be verified per Circular 29 before creating courses");
+                throw new Exception("Giáo viên phải được xác minh theo Thông tư 29 để được tạo khóa học.");
             }
 
             var course = new Course
@@ -229,7 +229,7 @@ namespace Services
 
             if (course == null || subject == null || classSchedule == null)
             {
-                throw new Exception("course or subject or classSchedule not found");
+                throw new Exception("Khóa học hoặc môn học hoặc lịch học không tìm thấy.");
             }
 
             var subjectBuilder = new SubjectBuilder
@@ -267,7 +267,7 @@ namespace Services
             var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (course == null)
             {
-                throw new Exception("Course Not Found");
+                throw new Exception("Không tìm thấy khóa học.");
             }
             course.IsDeleted = true;
             await _unitOfWork.GetRepository<Course>().UpdateAsync(course);
@@ -280,7 +280,7 @@ namespace Services
             var subjectBuilder = await _unitOfWork.GetRepository<SubjectBuilder>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (subjectBuilder == null)
             {
-                throw new Exception("Course Subject Not Found");
+                throw new Exception("Không tìm thấy môn khóa học.");
             }
             subjectBuilder.IsDeleted = true;
             await _unitOfWork.GetRepository<SubjectBuilder>().UpdateAsync(subjectBuilder);
@@ -574,13 +574,13 @@ namespace Services
             var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == CourseId && !a.IsDeleted);
             if (course == null)
             {
-                throw new Exception("Course not found");
+                throw new Exception("Không tìm thấy khóa học.");
             }
             var enroll = await _unitOfWork.GetRepository<Enrollment>().Entities
                 .FirstOrDefaultAsync(a => a.StudentProfileId == StudentId && a.CourseId == course.Id && a.Status != EnrollmentStatus.Pending && a.Status != EnrollmentStatus.Cancelled && !a.IsDeleted);
             if (enroll == null)
             {
-                throw new Exception("Student Enrollments not found or confirmed");
+                throw new Exception("Đăng kí khóa học của học sinh không tìm thấy hoặc đã được chấp nhập.");
             }
 
             var subjectBuilder = _unitOfWork.GetRepository<SubjectBuilder>().Entities
@@ -636,14 +636,14 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == ParentId && !a.IsDeleted);
             if (parent == null)
             {
-                throw new Exception("Parent not found");
+                throw new Exception("Không tìm thấy phụ huynh.");
             }
             var studentList = parent.StudentProfiles.Select(s => s.Id).ToList();
             var enroll = _unitOfWork.GetRepository<Enrollment>().Entities
                 .Where(a => studentList.Contains(a.StudentProfileId) && a.Status != EnrollmentStatus.Pending && a.Status != EnrollmentStatus.Cancelled && !a.IsDeleted);
             if (enroll == null)
             {
-                throw new Exception("Student Enrollments not found or confirmed");
+                throw new Exception("Đăng kí khóa học của học sinh không tìm thấy hoặc được chấp nhận.");
             }
             var courseList = enroll.Select(s => s.CourseId).ToList();
             var subjectBuilder = _unitOfWork.GetRepository<SubjectBuilder>().Entities
@@ -699,7 +699,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (course == null)
             {
-                throw new Exception("Course Not Found");
+                throw new Exception("Không tìm thấy khóa học.");
             }
             var result = new CourseResponse
             {
@@ -733,7 +733,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (subjectBuilder == null)
             {
-                throw new Exception("Course Subject Not Found");
+                throw new Exception("Không tìm thấy môn khóa học.");
             }
             var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == subjectBuilder.CourseId && !a.IsDeleted);
             var subject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == subjectBuilder.SubjectId && !a.IsDeleted);
@@ -768,14 +768,14 @@ namespace Services
             var course = await _unitOfWork.GetRepository<Course>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (course == null)
             {
-                throw new Exception("Course Not Found");
+                throw new Exception("Không tìm thấy khóa học.");
             }
 
             // Determine target teacher and center
             var targetTeacherId = request.TeacherProfileId ?? course.TeacherProfileId;
             if (targetTeacherId == null)
             {
-                throw new Exception("Course must have a TeacherProfileId");
+                throw new Exception("Khóa học phải có giáo viên.");
             }
 
             var teacher = await _unitOfWork
@@ -784,7 +784,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == targetTeacherId);
             if (teacher == null)
             {
-                throw new Exception("TeacherProfile Not Found");
+                throw new Exception("Không tìm thấy giáo viên.");
             }
 
             Guid? targetCenterId = request.CenterProfileId ?? course.CenterProfileId;
@@ -802,12 +802,12 @@ namespace Services
                     .FirstOrDefaultAsync(a => a.Id == targetCenterId);
                 if (center == null)
                 {
-                    throw new Exception("CenterProfile Not Found");
+                    throw new Exception("Không tìm thấy trung tâm.");
                 }
 
                 if (teacher.CenterProfileId == null || teacher.CenterProfileId != targetCenterId)
                 {
-                    throw new Exception("Teacher does not belong to the specified Center");
+                    throw new Exception("Không tìm thấy giáo viên không thuộc trung tâm.");
                 }
             }
 
@@ -863,28 +863,28 @@ namespace Services
             var effectiveTeacher = teacher;
             if (effectiveTeacher.VerificationStatus != VerificationStatus.Completed && effectiveTeacher.VerificationStatus != VerificationStatus.Finalized)
             {
-                throw new Exception("Teacher must be verified per Circular 29 before updating courses");
+                throw new Exception("Giáo viên phải được xác minh theo Thông tư 29.");
             }
-            if (effectiveTeacher.CenterProfileId != null)
-            {
-                if (targetCenterId == null || targetCenterId != effectiveTeacher.CenterProfileId)
-                {
-                    throw new Exception("Institution teacher cannot set course off-campus (Circular 29)");
-                }
-                if (request.TeachingMethod.HasValue && request.TeachingMethod.Value == TeachingMethod.InPerson)
-                {
-                    var center = await _unitOfWork.GetRepository<CenterProfile>().Entities.FirstOrDefaultAsync(a => a.Id == targetCenterId);
-                    if (center != null)
-                    {
-                        var addr = (center.Address ?? string.Empty).Trim().ToLower();
-                        var loc = (request.Location ?? course.Location ?? string.Empty).Trim().ToLower();
-                        if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
-                        {
-                            throw new Exception("Off-campus in-person extra classes by institution teachers are banned (Circular 29)");
-                        }
-                    }
-                }
-            }
+            //if (effectiveTeacher.CenterProfileId != null)
+            //{
+            //    if (targetCenterId == null || targetCenterId != effectiveTeacher.CenterProfileId)
+            //    {
+            //        throw new Exception("Giáo viên của trường học không được tạo khóa dạy ngoài nhà trường (Thông tư 29).");
+            //    }
+            //    if (request.TeachingMethod.HasValue && request.TeachingMethod.Value == TeachingMethod.InPerson)
+            //    {
+            //        var center = await _unitOfWork.GetRepository<CenterProfile>().Entities.FirstOrDefaultAsync(a => a.Id == targetCenterId);
+            //        if (center != null)
+            //        {
+            //            var addr = (center.Address ?? string.Empty).Trim().ToLower();
+            //            var loc = (request.Location ?? course.Location ?? string.Empty).Trim().ToLower();
+            //            if (!string.IsNullOrEmpty(addr) && !loc.Contains(addr))
+            //            {
+            //                throw new Exception("Lớp dạy thêm trực tiếp ngoài nhà trường bị cấm");
+            //            }
+            //        }
+            //    }
+            //}
             // Apply ownership updates after validation above
             course.TeacherProfileId = targetTeacherId;
             course.CenterProfileId = targetCenterId;
@@ -921,7 +921,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (subjectBuilder == null)
             {
-                throw new Exception("Course Not Found");
+                throw new Exception("Không tìm thấy khóa học.");
             }
             if (request.ClassScheduleId.HasValue)
             {
@@ -959,18 +959,18 @@ namespace Services
         {
             var subscription = await _subscriptionService.GetActiveSubscriptionAsync(centerProfileId);
             if (subscription == null || subscription.RemainingCoursePosts <= 0)
-                throw new Exception("No remaining course publish slots this month.");
+                throw new Exception("Hết số lần đăng tải khóa học trong tháng này.");
 
             var course = await _unitOfWork.GetRepository<Course>()
                 .Entities
                 .FirstOrDefaultAsync(c => c.Id == courseId && !c.IsDeleted && c.CenterProfileId == centerProfileId);
 
             if (course == null)
-                throw new Exception("Course not found.");
+                throw new Exception("Không tìm thấy khóa học.");
             if (course.Status != CourseStatus.Approved)
                 throw new Exception("Course is not approved.");
             if (course.IsPublished)
-                throw new Exception("Course is already published.");
+                throw new Exception("Khóa học đã được đăng tải.");
 
             course.IsPublished = true;
             course.PublishedAt = DateTime.UtcNow;

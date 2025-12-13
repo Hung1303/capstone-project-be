@@ -18,7 +18,7 @@ namespace Services
             var syllabus = await _unitOfWork.GetRepository<Syllabus>().Entities.FirstOrDefaultAsync(a => a.Id == request.SyllabusId);
             if (syllabus == null)
             {
-                throw new Exception("Syllabus Not Found");
+                throw new Exception("Không tìm thấy giáo trình.");
             }
             var lessonPlan = new LessonPlan
             {
@@ -47,7 +47,7 @@ namespace Services
             var lessonPlan = await _unitOfWork.GetRepository<LessonPlan>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (lessonPlan == null)
             {
-                throw new Exception("lessonPlan Not Found");
+                throw new Exception("Không tìm thấy kế hoạch dạy học.");
             }
             lessonPlan.IsDeleted = true;
             await _unitOfWork.GetRepository<LessonPlan>().UpdateAsync(lessonPlan);
@@ -97,7 +97,7 @@ namespace Services
             var lessonPlan = await _unitOfWork.GetRepository<LessonPlan>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (lessonPlan == null)
             {
-                throw new Exception("LessonPlan Not Found");
+                throw new Exception("Không tìm thấy kế hoạch dạy học.");
             }
             var result = new LessonPlanResponse
             {
@@ -116,7 +116,7 @@ namespace Services
             var lessonPlan = await _unitOfWork.GetRepository<LessonPlan>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (lessonPlan == null)
             {
-                throw new Exception("LessonPlan Not Found");
+                throw new Exception("Không tìm thấy kế hoạch dạy học.");
             }
             if (request.Topic != null)
             {
@@ -139,7 +139,7 @@ namespace Services
                 var checkSyllabus = await _unitOfWork.GetRepository<Syllabus>().Entities.FirstOrDefaultAsync(a => a.Id == request.SyllabusId);
                 if (checkSyllabus == null)
                 {
-                    throw new Exception("Syllabus Not Found");
+                    throw new Exception("Không tìm thấy giáo trình.");
                 }
                 lessonPlan.SyllabusId = request.SyllabusId.Value;
             }

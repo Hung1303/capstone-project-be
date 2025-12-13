@@ -36,7 +36,7 @@ namespace Services
             var subject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (subject == null)
             {
-                throw new Exception("Subject Not Found");
+                throw new Exception("Không tìm thấy môn học.");
             }
             subject.IsDeleted = true;
             await _unitOfWork.GetRepository<Subject>().UpdateAsync(subject);
@@ -78,7 +78,7 @@ namespace Services
             var subject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (subject == null)
             {
-                throw new Exception("Subject Not Found");
+                throw new Exception("Không tìm thấy môn học.");
             }
             var result = new SubjectResponse
             {
@@ -95,7 +95,7 @@ namespace Services
             var subject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (subject == null)
             {
-                throw new Exception("subject Not Found");
+                throw new Exception("Không tìm thấy môn học.");
             }
             if (request.SubjectName != null)
             {

@@ -18,12 +18,12 @@ namespace Services
             var subject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == request.SubjectId);
             if (subject == null)
             {
-                throw new Exception("Subject Not Found");
+                throw new Exception("Không tìm thấy môn học.");
             }
             var teacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
             if (teacher == null)
             {
-                throw new Exception("Teacher Not Found");
+                throw new Exception("Không tìm thấy giáo viên.");
             }
             var syllabus = new Syllabus
             {
@@ -59,7 +59,7 @@ namespace Services
             var syllabus = await _unitOfWork.GetRepository<Syllabus>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (syllabus == null)
             {
-                throw new Exception("Syllabus Not Found");
+                throw new Exception("Không tìm thấy giáo trình.");
             }
             syllabus.IsDeleted = true;
             await _unitOfWork.GetRepository<Syllabus>().UpdateAsync(syllabus);
@@ -123,7 +123,7 @@ namespace Services
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (syllabus == null)
             {
-                throw new Exception("Syllabus Not Found");
+                throw new Exception("Không tìm thấy giáo trình.");
             }
             var result = new SyllabusResponse
             {
@@ -150,7 +150,7 @@ namespace Services
 
             if (syllabus == null)
             {
-                throw new Exception("Syllabus Not Found");
+                throw new Exception("Không tìm thấy giáo trình.");
             }
             var result = new SyllabusResponse
             {
@@ -174,7 +174,7 @@ namespace Services
             var syllabus = await _unitOfWork.GetRepository<Syllabus>().Entities.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
             if (syllabus == null)
             {
-                throw new Exception("Syllabus Not Found");
+                throw new Exception("Không tìm thấy giáo trình.");
             }
             if (request.SyllabusName != null)
             {
@@ -205,7 +205,7 @@ namespace Services
                 var checkSubject = await _unitOfWork.GetRepository<Subject>().Entities.FirstOrDefaultAsync(a => a.Id == request.SubjectId);
                 if (checkSubject == null)
                 {
-                    throw new Exception("Subject Not Found");
+                    throw new Exception("Không tìm thấy môn học.");
                 }
                 syllabus.SubjectId = request.SubjectId.Value;
             }
@@ -214,7 +214,7 @@ namespace Services
                 var checkTeacher = await _unitOfWork.GetRepository<TeacherProfile>().Entities.FirstOrDefaultAsync(a => a.Id == request.TeacherProfileId);
                 if (checkTeacher == null)
                 {
-                    throw new Exception("Teacher Not Found");
+                    throw new Exception("Không tìm thấy giáo viên.");
                 }
                 syllabus.TeacherProfileId = request.TeacherProfileId.Value;
             }
